@@ -1,0 +1,168 @@
+:root {
+    --evergreen: #e66239;
+    --evergreen-deep: #c64f2a;
+    --evergreen-soft: #fff1eb;
+    --soft-red: #fde9eb;
+    --soft-amber: #fff3d6;
+    --ink: #111111;
+    --bs-primary: #e66239;
+    --bs-primary-rgb: 230, 98, 57;
+    --bs-link-color: #404040;
+    --bs-link-hover-color: #e66239;
+}
+
+html,
+body {
+    height: 100%;
+    overflow-y: auto;
+}
+
+body {
+    color: var(--ink);
+}
+
+body.admin-auth-body {
+    min-height: 100vh;
+}
+
+.content-stack {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.topbar-kicker {
+    color: var(--bs-primary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.topbar-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.avatar-fallback {
+    align-items: center;
+    background: linear-gradient(135deg, var(--evergreen), var(--evergreen-deep));
+    color: #fff;
+    display: inline-flex;
+    justify-content: center;
+}
+
+.brand-mark {
+    align-items: center;
+    background: linear-gradient(135deg, var(--evergreen), var(--evergreen-deep));
+    border-radius: 0.9rem;
+    color: #fff;
+    display: inline-flex;
+    font-size: 1rem;
+    font-weight: 800;
+    height: 2.25rem;
+    justify-content: center;
+    width: 2.25rem;
+}
+
+.sidebar-user-block {
+    border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+    margin-bottom: 0.5rem;
+}
+
+.sidebar .nav-link.active {
+    background: rgba(230, 98, 57, 0.12);
+    color: var(--bs-primary);
+}
+
+.sidebar .nav-link:hover {
+    background: rgba(230, 98, 57, 0.08);
+    color: var(--bs-primary);
+}
+
+.topbar.full,
+.content.full {
+    left: 5.625rem;
+}
+
+.admin-user-menu .dropdown-item:active {
+    background: rgba(230, 98, 57, 0.12);
+    color: var(--bs-primary);
+}
+
+.admin-shell-body .text-success,
+.admin-auth-body .text-success {
+    color: var(--bs-primary) !important;
+}
+
+.login-card {
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 45px rgba(23, 23, 23, 0.08);
+}
+
+.btn-evergreen {
+    background-color: var(--evergreen);
+    border-color: var(--evergreen);
+    color: #fff;
+}
+
+.btn-evergreen:hover,
+.btn-evergreen:focus {
+    background-color: var(--evergreen-deep);
+    border-color: var(--evergreen-deep);
+    color: #fff;
+}
+
+.summary-value {
+    color: var(--bs-primary);
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.badge-soft-success,
+.badge-soft-warning,
+.badge-soft-danger,
+.status-pill {
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.35rem 0.75rem;
+    text-transform: capitalize;
+}
+
+.badge-soft-success,
+.status-pill {
+    background-color: var(--evergreen-soft);
+    color: var(--bs-primary);
+}
+
+.badge-soft-warning {
+    background-color: var(--soft-amber);
+    color: #6e5200;
+}
+
+.badge-soft-danger {
+    background-color: var(--soft-red);
+    color: #9b1c1c;
+}
+
+.team-panel {
+    border: 1px solid rgba(23, 23, 23, 0.08);
+    border-radius: 1rem;
+    padding: 1rem;
+}
+
+.squad-box {
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+@media (max-width: 991.98px) {
+    html {
+        font-size: 14px;
+    }
+
+    .admin-page-shell {
+        padding: 5.5rem 1rem 1.5rem;
+    }
+}

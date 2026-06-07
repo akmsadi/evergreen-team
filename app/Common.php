@@ -13,3 +13,14 @@
  *
  * @see: https://codeigniter.com/user_guide/extending/common.html
  */
+
+if (! function_exists('getFormattedDate')) {
+    function getFormattedDate(?string $value, string $fallback = ''): string
+    {
+        if ($value === null || $value === '') {
+            return $fallback;
+        }
+        $timestamp = strtotime($value);
+        return $timestamp === false ? $fallback : date('d.m.Y', $timestamp);
+    }
+}
