@@ -936,6 +936,29 @@ class AdminMatches extends BaseController
         return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Expense deleted successfully.');
     }
 
+    public function clearScoreboard(int $matchId)
+    {
+        if (! session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        $match = $this->matches->find($matchId);
+
+        if ($match === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $db = db_connect();
+
+        // Delete all balls for this match
+        $db->table('match_balls')->where('match_id', $matchId)->delete();
+
+        // Delete all innings for this match
+        $db->table('match_innings')->where('match_id', $matchId)->delete();
+
+        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Match scoreboard cleared successfully. You can start a new scoreboard.');
+    }
+
     private function emptyToNull(string $value): ?string
     {
         $trimmed = trim($value);

@@ -17,6 +17,10 @@
                     <a href="<?= site_url('/admin/matches/' . $match['id'] . '/start') ?>" class="btn btn-evergreen"><?= $scoreboard['innings'] === [] ? 'Start' : 'Scoreboard' ?></a>
                 <?php endif; ?>
                 <a href="<?= site_url('/admin/matches/' . $match['id'] . '/edit') ?>" class="btn btn-secondary">Edit Match</a>
+                <form action="<?= site_url('/admin/matches/' . $match['id'] . '/clear-scoreboard') ?>" method="post" onsubmit="return confirm('Clear the match scoreboard? All innings and ball data will be deleted. You can then start a new scoreboard.');" class="d-inline d-none">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-outline-warning">Clear Scoreboard</button>
+                </form>
                 <?php if (($match['match_status'] ?? '') === 'scheduled'): ?>
                     <form action="<?= site_url('/admin/matches/' . $match['id'] . '/delete') ?>" method="post" onsubmit="return confirm('Archive this match? It will be hidden from the active list but not permanently removed.');">
                         <?= csrf_field() ?>

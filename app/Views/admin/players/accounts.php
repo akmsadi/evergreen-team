@@ -170,64 +170,6 @@
     <div class="panel mt-6">
         <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
             <div>
-                <h2 class="h4 mb-1">Deposit Ledger</h2>
-                <p class="text-secondary mb-0">All player wallet deposits are managed here.</p>
-            </div>
-        </div>
-        <?php if ($deposits === []): ?>
-            <p class="text-secondary mb-0">No player deposits recorded yet.</p>
-        <?php else: ?>
-            <div class="table-responsive">
-                <table class="table table-sm table-hover align-middle admin-table">
-                    <thead>
-                        <tr>
-                            <th>Player</th>
-                            <th>Amount</th>
-                            <th>Note</th>
-                            <th>Created</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($deposits as $deposit): ?>
-                            <tr>
-                                <td><?= esc($deposit['name']) ?></td>
-                                <td><?= esc(number_format((float) $deposit['amount'], 2)) ?></td>
-                                <td><?= esc($deposit['notes'] ?: '-') ?></td>
-                                <td><?= esc(getFormattedDate($deposit['created_at'] ?? null, '-')) ?></td>
-                                <td class="text-end">
-                                    <div class="d-inline-flex gap-2">
-                                        <button type="button" class="btn btn-sm btn-primary btn-icon" data-bs-toggle="modal" data-bs-target="#editDepositModal<?= esc((string) $deposit['id']) ?>" aria-label="Edit deposit" title="Edit deposit">
-                                            <i class="ti ti-pencil"></i>
-                                        </button>
-                                        <form action="<?= site_url('/admin/players/deposits/' . $deposit['id'] . '/delete') ?>" method="post" onsubmit="return confirm('Delete this deposit?');">
-                                            <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-sm btn-outline-danger btn-icon" aria-label="Delete deposit" title="Delete deposit">
-                                                <i class="ti ti-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th class="text-end">Total</th>
-                            <th><?= esc(number_format($totalLedgerDeposits, 2)) ?></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <div class="panel mt-6">
-        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-            <div>
                 <h2 class="h4 mb-1">Player Accounts</h2>
                 <p class="text-secondary mb-0">Review total recorded expenses for each player from the accounts overview.</p>
             </div>
@@ -295,6 +237,64 @@
                 </tfoot>
             </table>
         </div>
+    </div>
+
+    <div class="panel mt-6">
+        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+            <div>
+                <h2 class="h4 mb-1">Deposit Ledger</h2>
+                <p class="text-secondary mb-0">All player wallet deposits are managed here.</p>
+            </div>
+        </div>
+        <?php if ($deposits === []): ?>
+            <p class="text-secondary mb-0">No player deposits recorded yet.</p>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle admin-table">
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Amount</th>
+                            <th>Note</th>
+                            <th>Created</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($deposits as $deposit): ?>
+                            <tr>
+                                <td><?= esc($deposit['name']) ?></td>
+                                <td><?= esc(number_format((float) $deposit['amount'], 2)) ?></td>
+                                <td><?= esc($deposit['notes'] ?: '-') ?></td>
+                                <td><?= esc(getFormattedDate($deposit['created_at'] ?? null, '-')) ?></td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-2">
+                                        <button type="button" class="btn btn-sm btn-primary btn-icon" data-bs-toggle="modal" data-bs-target="#editDepositModal<?= esc((string) $deposit['id']) ?>" aria-label="Edit deposit" title="Edit deposit">
+                                            <i class="ti ti-pencil"></i>
+                                        </button>
+                                        <form action="<?= site_url('/admin/players/deposits/' . $deposit['id'] . '/delete') ?>" method="post" onsubmit="return confirm('Delete this deposit?');">
+                                            <?= csrf_field() ?>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger btn-icon" aria-label="Delete deposit" title="Delete deposit">
+                                                <i class="ti ti-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="text-end">Total</th>
+                            <th><?= esc(number_format($totalLedgerDeposits, 2)) ?></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 

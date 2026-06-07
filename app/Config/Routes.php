@@ -30,6 +30,7 @@ $routes->post('/admin/matches/(:num)/contributors', 'AdminMatches::updateContrib
 $routes->post('/admin/matches/(:num)/expenses', 'AdminMatches::storeExpense/$1');
 $routes->post('/admin/matches/(:num)/expenses/(:num)/update', 'AdminMatches::updateExpense/$1/$2');
 $routes->post('/admin/matches/(:num)/expenses/(:num)/delete', 'AdminMatches::deleteExpense/$1/$2');
+$routes->post('/admin/matches/(:num)/clear-scoreboard', 'AdminMatches::clearScoreboard/$1');
 $routes->get('/admin/players', 'AdminPlayers::index');
 $routes->get('/admin/accounts', 'AdminPlayers::accounts');
 $routes->get('/admin/players/create', 'AdminPlayers::create');
