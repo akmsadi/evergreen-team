@@ -130,7 +130,7 @@ $tossDecisionLabel = match ((string) ($match['toss_decision'] ?? '')) {
                 <?php if (isset($matchContributorErrors['match_contributor_ids'])): ?>
                     <div class="text-danger small mb-3"><?= esc($matchContributorErrors['match_contributor_ids']) ?></div>
                 <?php endif; ?>
-                <button type="submit" class="btn btn-evergreen">Save Contributors</button>
+                <button type="submit" class="btn btn-primary">Save Contributors</button>
             </div>
         </div>
     </form>
@@ -198,7 +198,7 @@ $tossDecisionLabel = match ((string) ($match['toss_decision'] ?? '')) {
                 <textarea class="form-control" id="expense_notes" name="expense_notes" rows="3"><?= esc(old('expense_notes')) ?></textarea>
             </div>
             <div class="col-12">
-                <button type="submit" class="btn btn-evergreen">Add Expense</button>
+                <button type="submit" class="btn btn-primary">Add Expense</button>
             </div>
         </div>
     </form>
@@ -252,7 +252,7 @@ $tossDecisionLabel = match ((string) ($match['toss_decision'] ?? '')) {
                                                     <textarea class="form-control form-control-sm" name="expense_notes" rows="2" placeholder="Notes"><?= esc($expenseEditId === (int) $expense['id'] ? old('expense_notes', $expense['notes']) : $expense['notes']) ?></textarea>
                                                 </div>
                                                 <div class="col-12">
-                                                    <button type="submit" class="btn btn-sm btn-evergreen">Save</button>
+                                                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
                                                 </div>
                                             </div>
                                         </form>

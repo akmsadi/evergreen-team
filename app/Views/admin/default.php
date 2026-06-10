@@ -20,7 +20,6 @@ $displayUsername = $username ?? 'Admin';
     <link rel="manifest" href="<?= base_url('assets/images/favicon/site.webmanifest') ?>">
     <?= $this->renderSection('head') ?>
     <link href="<?= base_url('assets/inapp/css/main.css') ?>" rel="stylesheet">
-    <link href="<?= base_url('assets/css/admin.css') ?>" rel="stylesheet">
     <style {csp-style-nonce}>
         body {
             --bs-body-font-size: 13px;
@@ -79,8 +78,7 @@ $displayUsername = $username ?? 'Admin';
             </button>
             <ul class="list-unstyled d-flex align-items-center mb-0 gap-2">
                 <li class="dropdown">
-                    <a href="#" class="d-flex align-items-center gap-2 text-reset" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="avatar avatar-sm rounded-circle avatar-fallback"><?= esc(strtoupper(substr($displayUsername, 0, 1))) ?></span>
+                    <a href="#" class="btn btn-outline-secondary" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <span class="d-none d-md-inline"><?= esc($displayUsername) ?></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end p-2 admin-user-menu">

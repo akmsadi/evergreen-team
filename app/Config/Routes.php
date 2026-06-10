@@ -41,4 +41,3 @@ $routes->post('/admin/players/(:num)/delete', 'AdminPlayers::delete/$1');
 $routes->post('/admin/players/deposits', 'AdminPlayers::storeDeposit');
 $routes->post('/admin/players/deposits/(:num)/update', 'AdminPlayers::updateDeposit/$1');
 $routes->post('/admin/players/deposits/(:num)/delete', 'AdminPlayers::deleteDeposit/$1');
-$routes->get('/admin/backup', 'AdminAuth::backupDatabase');

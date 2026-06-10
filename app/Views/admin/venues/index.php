@@ -35,7 +35,7 @@
                             <div class="invalid-feedback"><?= esc($errors['name']) ?></div>
                         <?php endif; ?>
                     </div>
-                    <button type="submit" class="btn btn-evergreen">Save Venue</button>
+                    <button type="submit" class="btn btn-primary">Save Venue</button>
                 </form>
             </div>
         </div>

@@ -220,7 +220,7 @@
             </div>
             <div class="col-12">
                 <?php if (empty($isMatchLocked)): ?>
-                    <button type="submit" class="btn btn-evergreen"><?= esc($submitLabel) ?></button>
+                    <button type="submit" class="btn btn-primary"><?= esc($submitLabel) ?></button>
                 <?php else: ?>
                     <div class="text-secondary small">This match is completed, so match fields are displayed for reference only.</div>
                 <?php endif; ?>

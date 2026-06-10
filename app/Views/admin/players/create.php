@@ -91,7 +91,7 @@
                 <?php endif; ?>
             </div>
 
-            <button type="submit" class="btn btn-evergreen">Save Player</button>
+            <button type="submit" class="btn btn-primary">Save Player</button>
         </form>
     </div>
 </div>

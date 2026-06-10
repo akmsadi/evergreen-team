@@ -339,7 +339,7 @@ foreach ($participants as $participant) {
                 </div>
 
                 <div class="d-flex justify-content-end mt-4">
-                    <button type="button" class="btn btn-evergreen" data-wizard-next>Next: Opening Players</button>
+                    <button type="button" class="btn btn-primary" data-wizard-next>Next: Opening Players</button>
                 </div>
             </section>
 
@@ -394,7 +394,7 @@ foreach ($participants as $participant) {
                 </div>
 
                 <div class="d-flex justify-content-end mt-4">
-                    <button type="submit" class="btn btn-evergreen" data-start-submit><?= $startCompleted ? 'Refresh Scoreboard' : 'Start Scoreboard' ?></button>
+                    <button type="submit" class="btn btn-primary" data-start-submit><?= $startCompleted ? 'Refresh Scoreboard' : 'Start Scoreboard' ?></button>
                 </div>
             </section>
 

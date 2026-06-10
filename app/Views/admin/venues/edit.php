@@ -38,7 +38,7 @@
             </div>
             <div class="d-flex gap-2">
                 <a href="<?= site_url('/admin/venues') ?>" class="btn btn-light border">Cancel</a>
-                <button type="submit" class="btn btn-evergreen">Save Changes</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
         </form>
     </div>

@@ -14,7 +14,7 @@
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <?php if (($match['match_status'] ?? '') === 'live' || $scoreboard['innings'] !== []): ?>
-                    <a href="<?= site_url('/admin/matches/' . $match['id'] . '/start') ?>" class="btn btn-evergreen"><?= $scoreboard['innings'] === [] ? 'Start' : 'Scoreboard' ?></a>
+                    <a href="<?= site_url('/admin/matches/' . $match['id'] . '/start') ?>" class="btn btn-primary"><?= $scoreboard['innings'] === [] ? 'Start' : 'Scoreboard' ?></a>
                 <?php endif; ?>
                 <a href="<?= site_url('/admin/matches/' . $match['id'] . '/edit') ?>" class="btn btn-secondary">Edit Match</a>
                 <form action="<?= site_url('/admin/matches/' . $match['id'] . '/clear-scoreboard') ?>" method="post" onsubmit="return confirm('Clear the match scoreboard? All innings and ball data will be deleted. You can then start a new scoreboard.');" class="d-inline d-none">

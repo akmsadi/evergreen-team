@@ -1,11 +1,7 @@
 <aside id="sidebar" class="sidebar">
     <div class="logo-area">
-        <a href="<?= site_url('/admin/dashboard') ?>" class="d-inline-flex align-items-center text-reset">
-            <img src="<?= base_url('assets/images/logo-wheel-square.png') ?>" alt="Evergreen Team Logo" style="width: 50px;">
-            <span class="ms-2">
-                <span class="logo-text d-block">Evergreen</span>
-                <span class="nav-text small">Team Admin</span>
-            </span>
+        <a href="<?= site_url('/admin/dashboard') ?>">
+            <img src="<?= base_url('assets/images/logo1.png') ?>" alt="Evergreen Team Logo" style="height: 40px;">
         </a>
     </div>
 

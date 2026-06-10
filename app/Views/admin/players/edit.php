@@ -16,7 +16,7 @@
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <a href="<?= site_url('/admin/players') ?>" class="btn btn-light border">Back to Players</a>
-                <a href="<?= site_url('/admin/players/create') ?>" class="btn btn-evergreen">Add Player</a>
+                <a href="<?= site_url('/admin/players/create') ?>" class="btn btn-primary">Add Player</a>
             </div>
         </div>
     </div>
@@ -123,7 +123,7 @@
             </div>
             <div class="col-12 d-flex justify-content-end gap-2">
                 <a href="<?= site_url('/admin/players') ?>" class="btn btn-light border">Cancel</a>
-                <button type="submit" class="btn btn-evergreen">Save Changes</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
         </form>
 

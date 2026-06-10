@@ -26,7 +26,8 @@
     $previousBowlerId = isset($activeInnings['current_pair']['bowler_id']) ? (int) $activeInnings['current_pair']['bowler_id'] : null;
     $nextInningsNumber = (int) ($scoreboard['nextInningsNumber'] ?? 0);
     $canStartNextInnings = (int) ($activeInnings['completed'] ?? 0) === 1
-        && $nextInningsNumber === ((int) ($activeInnings['innings_number'] ?? 0) + 1);
+        && $nextInningsNumber === ((int) ($activeInnings['innings_number'] ?? 0) + 1)
+        && $nextInningsNumber <= 2;
     $nextBattingSide = (string) ($activeInnings['bowling_side'] ?? '');
     $nextBowlingSide = (string) ($activeInnings['batting_side'] ?? '');
     $dismissedBatterIds = array_map('intval', $activeInnings['dismissed_batter_ids'] ?? []);
@@ -268,7 +269,7 @@
                 </details>
 
                 <div class="d-flex gap-2 flex-wrap">
-                    <button type="submit" class="btn btn-evergreen"><?= $isEditingLastBall ? 'Update Last Delivery' : 'Save Delivery' ?></button>
+                    <button type="submit" class="btn btn-primary"><?= $isEditingLastBall ? 'Update Last Delivery' : 'Save Delivery' ?></button>
                     <button type="button" class="btn btn-light border<?= $isEditingLastBall ? '' : ' d-none' ?>" data-cancel-edit-ball>Cancel Edit</button>
                     <span class="text-secondary small align-self-center">The scoreboard refreshes inside this wizard after each saved ball.</span>
                 </div>
@@ -287,7 +288,7 @@
                         <input type="hidden" name="batting_side" value="<?= esc($nextBattingSide) ?>">
                         <input type="hidden" name="bowling_side" value="<?= esc($nextBowlingSide) ?>">
                         <input type="hidden" name="return_to" value="<?= esc('/admin/matches/' . $match['id'] . '/start') ?>">
-                        <button type="submit" class="btn btn-evergreen">Start <?= esc((string) $nextInningsNumber) ?>nd Innings Scoreboard</button>
+                        <button type="submit" class="btn btn-primary">Start <?= esc((string) $nextInningsNumber) ?>nd Innings Scoreboard</button>
                     </form>
                 </div>
             </div>

@@ -10,7 +10,7 @@
     <div class="card shadow-sm" style="max-width: 420px; width: 100%;">
         <div class="card-body p-5">
             <div class="text-center mb-4">
-                <img src="<?= base_url('assets/images/logo-wheel-square.png') ?>" alt="Evergreen Team Logo" class="mb-3" style="width: 80px;">
+                <img src="<?= base_url('assets/images/logo1.png') ?>" alt="Evergreen Team Logo" class="mb-3" style="width: 120px;">
                 <h1 class="card-title mb-0 h5">Sign in to your account</h1>
             </div>
 

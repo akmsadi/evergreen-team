@@ -73,7 +73,7 @@
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="<?= site_url('/admin/accounts') ?>" class="btn btn-light border">Accounts</a>
-                    <a href="<?= site_url('/admin/players/create') ?>" class="btn btn-evergreen">Add Player</a>
+                    <a href="<?= site_url('/admin/players/create') ?>" class="btn btn-primary">Add Player</a>
                 </div>
             </div>
 

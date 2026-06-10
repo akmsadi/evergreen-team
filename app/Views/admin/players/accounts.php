@@ -214,7 +214,7 @@
                                     <?php if (($entry['player']['status'] ?? '') === 'approved'): ?>
                                         <button
                                             type="button"
-                                            class="btn btn-sm btn-evergreen"
+                                            class="btn btn-sm btn-primary"
                                             data-bs-toggle="modal"
                                             data-bs-target="#createDepositModal"
                                             data-player-id="<?= esc((string) $entry['player']['id']) ?>"
@@ -334,7 +334,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-evergreen">Save Deposit</button>
+                    <button type="submit" class="btn btn-primary">Save Deposit</button>
                 </div>
             </form>
         </div>
@@ -378,7 +378,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-evergreen">Save Changes</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
             </div>

@@ -79,7 +79,6 @@ $totalMatches = array_sum(array_map(static fn(array $point): int => (int) $point
             <h1 class="h2 mb-2">Welcome, <?= esc($username) ?></h1>
             <p class="text-secondary mb-4">You are signed in to the admin area.</p>
         </div>
-        <a href="<?= site_url('/admin/backup') ?>" class="btn btn-primary">Backup Database</a>
     </div>
     <div class="panel mb-8">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">

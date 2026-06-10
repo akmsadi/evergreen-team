@@ -21,7 +21,7 @@ $otherMatches = array_values(array_filter(
             <h1 class="h2 mb-2">Matches</h1>
             <p class="text-secondary mb-0">Open a match to manage participant expenses, deposits, and balances.</p>
         </div>
-        <a href="<?= site_url('/admin/matches/create') ?>" class="btn btn-evergreen">Create Match</a>
+        <a href="<?= site_url('/admin/matches/create') ?>" class="btn btn-primary">Create Match</a>
     </div>
 
     <?php if (session()->getFlashdata('success')): ?>
@@ -55,7 +55,7 @@ $otherMatches = array_values(array_filter(
                                 </div>
                                 <div class="d-flex flex-wrap gap-2">
                                     <?php if (($match['match_status'] ?? '') === 'live'): ?>
-                                        <a href="<?= site_url('/admin/matches/' . $match['id'] . '/start') ?>" class="btn btn-evergreen">Start</a>
+                                        <a href="<?= site_url('/admin/matches/' . $match['id'] . '/start') ?>" class="btn btn-primary">Start</a>
                                     <?php endif; ?>
                                     <a href="<?= site_url('/admin/matches/' . $match['id'] . '/edit') ?>" class="btn btn-primary">Edit</a>
                                     <?php if (($match['match_status'] ?? '') === 'scheduled'): ?>
