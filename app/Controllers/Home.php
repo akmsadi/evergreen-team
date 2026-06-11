@@ -16,8 +16,8 @@ class Home extends BaseController
 
     public function index(): string
     {
-        return view('index-new-view', [
-            'playerCount'  => $this->players->countAllResults(),
+        return view('index-view', [
+            'playerCount'  => $this->players->where('status', 'approved')->countAllResults(),
             'pendingCount' => $this->players->where('status', 'pending')->countAllResults(),
         ]);
     }

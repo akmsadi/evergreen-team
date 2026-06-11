@@ -15,585 +15,38 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style {csp-style-nonce}>
-        :root {
-            --evergreen: #1f7a3d;
-            --evergreen-deep: forestgreen;
-            --evergreen-soft: #dff3e5;
-            --pitch: #f5f0e6;
-            --ink: #111111;
-        }
-
-        body {
-            color: var(--ink);
-            font-family: "Barlow", sans-serif;
-            min-height: 100vh;
-        }
-
-        .navbar-brand {
-            letter-spacing: 0.08em;
-        }
-
-        .hero-card,
-        .info-card,
-        .stat-card {
-            backdrop-filter: blur(8px);
-            background-color: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(31, 122, 61, 0.14);
-            border-radius: 1.5rem;
-            box-shadow: 0 18px 45px rgba(20, 83, 45, 0.08);
-        }
-
-        .hero-card {
-            background-color: rgba(236, 246, 238, 0.98);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .hero-card::after {
-            content: none;
-            inset: 0;
-            pointer-events: none;
-            position: absolute;
-        }
-
-        .eyebrow {
-            color: var(--evergreen);
-            font-size: 0.85rem;
-            font-weight: 800;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-        }
-
-        .display-title {
-            font-size: clamp(2.8rem, 7vw, 5.5rem);
-            font-weight: 800;
-            line-height: 0.95;
-        }
-
-        .accent-text {
-            color: var(--evergreen);
-        }
-
-        .btn-evergreen {
-            background-color: var(--evergreen);
-            border-color: var(--evergreen);
-            color: #fff;
-        }
-
-        .btn-evergreen:hover,
-        .btn-evergreen:focus {
-            background-color: var(--evergreen-deep);
-            border-color: var(--evergreen-deep);
-            color: #fff;
-        }
-
-        .btn-outline-evergreen {
-            border-color: var(--evergreen);
-            color: var(--evergreen);
-        }
-
-        .btn-outline-evergreen:hover,
-        .btn-outline-evergreen:focus {
-            background-color: var(--evergreen-soft);
-            border-color: var(--evergreen);
-            color: var(--ink);
-        }
-
-        .pitch-mark {
-            background-color: rgba(252, 251, 247, 0.98);
-            border: 1px solid rgba(17, 17, 17, 0.08);
-            border-radius: 1.5rem;
-            min-height: 100%;
-            position: relative;
-        }
-
-        .pitch-mark::before,
-        .pitch-mark::after {
-            background-color: rgba(31, 122, 61, 0.22);
-            border-radius: 999px;
-            content: "";
-            left: 50%;
-            position: absolute;
-            transform: translateX(-50%);
-            width: 72%;
-        }
-
-        .stat-value {
-            color: var(--evergreen-deep);
-            font-size: 2.2rem;
-            font-weight: 800;
-            line-height: 1;
-        }
-
-        .section-title {
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 700;
-        }
-
-        .info-card ul {
-            margin-bottom: 0;
-            padding-left: 1.1rem;
-        }
-
-        .footer-strip {
-            background-color: var(--evergreen-deep);
-            color: #fff;
-        }
-
-        .form-panel {
-            background: rgba(255, 255, 255, 0.96);
-            border: 1px solid rgba(31, 122, 61, 0.12);
-            border-radius: 1.25rem;
-            box-shadow: 0 18px 40px rgba(20, 83, 45, 0.08);
-        }
-
-        .hero-grid {
-            display: grid;
-            gap: 1.25rem;
-            grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.95fr);
-        }
-
-        .hero-side-stack {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .mini-panel {
-            background-color: rgba(244, 250, 245, 0.96);
-            border: 1px solid rgba(31, 122, 61, 0.12);
-            border-radius: 1.4rem;
-            box-shadow: 0 16px 34px rgba(20, 83, 45, 0.07);
-            padding: 1.2rem;
-        }
-
-        .mini-panel__value {
-            color: var(--evergreen-deep);
-            font-size: 1.85rem;
-            font-weight: 800;
-            line-height: 1;
-        }
-
-        .hero-badge-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-        }
-
-        .hero-badge {
-            background: rgba(31, 122, 61, 0.09);
-            border: 1px solid rgba(31, 122, 61, 0.1);
-            border-radius: 999px;
-            color: var(--evergreen-deep);
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 0.65rem 1rem;
-        }
-
-        .section-shell {
-            background-color: rgba(239, 248, 241, 0.96);
-            border: 1px solid rgba(31, 122, 61, 0.12);
-            border-radius: 1.75rem;
-            box-shadow: 0 18px 44px rgba(20, 83, 45, 0.07);
-            overflow: hidden;
-            padding: 1.5rem;
-        }
-
-        .section-shell--dark {
-            background-color: rgba(239, 248, 241, 0.96);
-            border-color: rgba(31, 122, 61, 0.12);
-            color: var(--ink);
-        }
-
-        .section-shell--dark .eyebrow,
-        .section-shell--dark .text-secondary,
-        .section-shell--dark .section-copy,
-        .section-shell--dark .testimonial-role,
-        .section-shell--dark .timeline-meta {
-            color: #52606d !important;
-        }
-
-        .section-shell--dark .timeline-step {
-            background: rgba(31, 122, 61, 0.12);
-            border-color: rgba(31, 122, 61, 0.18);
-            color: var(--evergreen-deep);
-        }
-
-        .section-copy {
-            color: #52606d;
-            font-size: 1.05rem;
-            max-width: 42rem;
-        }
-
-        .feature-grid {
-            display: grid;
-            gap: 1rem;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.86);
-            border: 1px solid rgba(31, 122, 61, 0.08);
-            border-radius: 1.25rem;
-            padding: 1.2rem;
-        }
-
-        .feature-card__number {
-            color: var(--evergreen-deep);
-            display: inline-flex;
-            font-size: 0.9rem;
-            font-weight: 800;
-            margin-bottom: 0.75rem;
-        }
-
-        .story-carousel .carousel-item {
-            min-height: 100%;
-        }
-
-        .story-slide {
-            background: linear-gradient(135deg, rgba(17, 17, 17, 0.18), rgba(17, 17, 17, 0.55)), linear-gradient(135deg, #2d8b57 0%, #123524 100%);
-            border-radius: 1.5rem;
-            min-height: 360px;
-            overflow: hidden;
-            padding: 1.75rem;
-            position: relative;
-        }
-
-        .story-slide::before {
-            background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18), transparent 28%);
-            content: "";
-            inset: 0;
-            position: absolute;
-        }
-
-        .story-slide__content {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            justify-content: flex-end;
-            position: relative;
-            z-index: 1;
-        }
-
-        .story-slide__tag {
-            background: rgba(255, 255, 255, 0.14);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 999px;
-            color: #fff;
-            display: inline-flex;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            padding: 0.45rem 0.9rem;
-        }
-
-        .story-slide__title {
-            color: #fff;
-            font-size: clamp(1.8rem, 4vw, 3rem);
-            font-weight: 800;
-            line-height: 1;
-            margin-bottom: 0.8rem;
-            max-width: 22rem;
-        }
-
-        .story-slide__copy {
-            color: rgba(255, 255, 255, 0.84);
-            font-size: 1.03rem;
-            margin-bottom: 0;
-            max-width: 28rem;
-        }
-
-        .gallery-grid {
-            display: grid;
-            gap: 1rem;
-            grid-template-columns: 1.3fr 0.9fr 1.1fr;
-            grid-template-rows: repeat(2, minmax(190px, 1fr));
-        }
-
-        .gallery-card {
-            border-radius: 1.4rem;
-            color: #fff;
-            overflow: hidden;
-            padding: 1.25rem;
-            position: relative;
-        }
-
-        .gallery-card::after {
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.48));
-            content: "";
-            inset: 0;
-            position: absolute;
-        }
-
-        .gallery-card>* {
-            position: relative;
-            z-index: 1;
-        }
-
-        .gallery-card--wide {
-            background: linear-gradient(135deg, #0f5132 0%, #1f7a3d 55%, #62b47f 100%);
-            grid-column: span 1;
-            grid-row: span 2;
-        }
-
-        .gallery-card--pitch {
-            background: linear-gradient(135deg, #734b21 0%, #b67a32 58%, #edd298 100%);
-        }
-
-        .gallery-card--night {
-            background: linear-gradient(135deg, #112d4e 0%, #205375 54%, #3282b8 100%);
-        }
-
-        .gallery-card--locker {
-            background: linear-gradient(135deg, #263238 0%, #455a64 55%, #78909c 100%);
-            grid-column: span 2;
-        }
-
-        .gallery-card__meta {
-            color: rgba(255, 255, 255, 0.76);
-            font-size: 0.78rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        .gallery-card__title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            line-height: 1.05;
-            margin-top: 0.5rem;
-        }
-
-        .gallery-card__copy {
-            color: rgba(255, 255, 255, 0.82);
-            margin-bottom: 0;
-            max-width: 18rem;
-        }
-
-        .team-grid,
-        .testimonial-grid,
-        .timeline-grid {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .team-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-        }
-
-        .team-card,
-        .testimonial-card,
-        .timeline-card {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(31, 122, 61, 0.1);
-            border-radius: 1.35rem;
-            padding: 1.25rem;
-        }
-
-        .team-avatar {
-            align-items: center;
-            background: linear-gradient(135deg, rgba(31, 122, 61, 0.18), rgba(31, 122, 61, 0.35));
-            border-radius: 1rem;
-            color: var(--evergreen-deep);
-            display: inline-flex;
-            font-size: 1.35rem;
-            font-weight: 800;
-            height: 3rem;
-            justify-content: center;
-            margin-bottom: 1rem;
-            width: 3rem;
-        }
-
-        .team-role,
-        .testimonial-role,
-        .timeline-meta {
-            color: #66737f;
-            font-size: 0.92rem;
-        }
-
-        .team-pill-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .team-pill {
-            background: rgba(31, 122, 61, 0.08);
-            border-radius: 999px;
-            color: var(--evergreen-deep);
-            font-size: 0.78rem;
-            font-weight: 700;
-            padding: 0.45rem 0.75rem;
-        }
-
-        .testimonial-card {
-            height: 100%;
-            position: relative;
-        }
-
-        .testimonial-card::before {
-            color: rgba(31, 122, 61, 0.16);
-            content: "\201C";
-            font-size: 4rem;
-            font-weight: 800;
-            line-height: 1;
-            position: absolute;
-            right: 1rem;
-            top: 0.35rem;
-        }
-
-        .testimonial-card p {
-            position: relative;
-            z-index: 1;
-        }
-
-        .timeline-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        .timeline-step {
-            align-items: center;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 999px;
-            color: #fff;
-            display: inline-flex;
-            font-size: 0.75rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            padding: 0.45rem 0.8rem;
-        }
-
-        .cta-strip {
-            align-items: center;
-            background: linear-gradient(135deg, rgba(31, 122, 61, 0.14), rgba(31, 122, 61, 0.04));
-            border: 1px solid rgba(31, 122, 61, 0.1);
-            border-radius: 1.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: space-between;
-            padding: 1.4rem 1.5rem;
-        }
-
-        main#home {
-            padding-bottom: 7rem !important;
-        }
-
-        .back-to-top {
-            align-items: center;
-            background: linear-gradient(135deg, var(--evergreen) 0%, #2b8150 100%);
-            border: 0;
-            border-radius: 999px;
-            bottom: 5rem;
-            box-shadow: 0 10px 18px rgba(20, 83, 45, 0.22);
-            color: #fff;
-            cursor: pointer;
-            display: inline-flex;
-            height: 1.625rem;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            position: fixed;
-            right: 1.5rem;
-            transform: translateY(0.8rem);
-            transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-            width: 1.625rem;
-            z-index: 1030;
-        }
-
-        .back-to-top:hover,
-        .back-to-top:focus-visible {
-            background: linear-gradient(135deg, var(--evergreen-deep) 0%, #236c43 100%);
-            box-shadow: 0 12px 20px rgba(20, 83, 45, 0.28);
-            color: #fff;
-            outline: none;
-        }
-
-        .back-to-top.is-visible {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
-        }
-
-        .back-to-top svg {
-            height: 0.625rem;
-            width: 0.625rem;
-        }
-
-        @media (max-width: 991.98px) {
-
-            .hero-grid,
-            .feature-grid,
-            .gallery-grid,
-            .team-grid,
-            .timeline-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .gallery-grid {
-                grid-template-rows: auto;
-            }
-
-            .gallery-card--wide,
-            .gallery-card--locker {
-                grid-column: auto;
-                grid-row: auto;
-            }
-        }
-
-        @media (max-width: 767.98px) {
-            .story-slide {
-                min-height: 300px;
-            }
-
-            .section-shell,
-            .hero-card,
-            .info-card,
-            .form-panel {
-                border-radius: 1.25rem;
-            }
-
-            .back-to-top {
-                bottom: 4rem;
-                height: 1.5rem;
-                right: 1rem;
-                width: 1.5rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg py-3">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-black" href="#home">EVERGREEN TEAM</a>
-            <div class="d-flex gap-2 flex-wrap justify-content-end">
-                <a class="btn btn-sm btn-outline-evergreen rounded-pill px-3" href="#about">About</a>
-                <a class="btn btn-sm btn-outline-evergreen rounded-pill px-3" href="#stories">Stories</a>
-                <a class="btn btn-sm btn-outline-evergreen rounded-pill px-3" href="#gallery">Gallery</a>
-                <a class="btn btn-sm btn-outline-evergreen rounded-pill px-3" href="#team">Team</a>
-                <a class="btn btn-sm btn-outline-evergreen rounded-pill px-3" href="#testimonials">Testimonials</a>
-                <a class="btn btn-sm btn-evergreen rounded-pill px-3" href="#join">Join Us</a>
+    <nav class="navbar navbar-expand-lg py-3" style="border-bottom: 5px solid #1f7a3d;">
+        <div class="container-fluid g-5">
+            <a class="navbar-brand" href="#home">
+                <img src="<?= base_url('assets/images/logo1.png') ?>" alt="Evergreen Team Logo" style="width: 180px;">
+            </a>
+            <div class="d-flex gap-2 flex-wrap justify-content-end top-menu">
+                <a class="btn text-uppercase" href="#about">About</a>
+                <a class="btn text-uppercase" href="#stories">Stories</a>
+                <a class="btn text-uppercase" href="#gallery">Gallery</a>
+                <a class="btn text-uppercase" href="#team">Team</a>
+                <a class="btn text-uppercase" href="#testimonials">Testimonials</a>
+                <a class="btn text-uppercase" href="#join">Join Us</a>
                 <?php if (session()->get('is_admin')): ?>
-                    <a class="btn btn-sm btn-outline-evergreen rounded-pill px-3" href="<?= site_url('/admin/dashboard') ?>">Dashboard</a>
+                    <a class="btn text-uppercase" href="<?= site_url('/admin/dashboard') ?>">Dashboard</a>
                 <?php else: ?>
-                    <a class="btn btn-sm btn-outline-evergreen rounded-pill px-3" href="<?= site_url('/admin/login') ?>">Admin Login</a>
+                    <a class="btn text-uppercase" href="<?= site_url('/admin/login') ?>">Admin</a>
                 <?php endif; ?>
             </div>
         </div>
     </nav>
 
-    <main id="home" class="pb-5">
-        <section class="container py-4 py-lg-5">
-            <div class="hero-card p-4 p-md-5">
+    <main id="home" class="pb-5 bg-body-secondary">
+        <section class="container-fluid g-5">
+            <div class="p-4 p-md-5">
                 <div class="hero-grid position-relative" style="z-index: 1;">
                     <div>
                         <p class="eyebrow mb-3">Cricket. Commitment. Community.</p>
-                        <h1 class="display-title mb-3">Play bold with <span class="accent-text">Evergreen Team</span></h1>
+                        <h1 class="display-title mb-3">Play bold with<br><span class="accent-text">Evergreen Team</span></h1>
                         <p class="fs-5 text-dark mb-4">A sharper home page for a sharper club: match energy, training culture, player identity, and community momentum all in one place.</p>
                         <div class="d-flex flex-wrap gap-3">
                             <a class="btn btn-evergreen btn-lg rounded-pill px-4" href="#join">Join the Squad</a>
@@ -640,15 +93,15 @@
             </div>
         </section>
 
-        <section id="about" class="container py-4 py-lg-5">
-            <div class="section-shell">
+        <section id="about" class="container-fluid g-5">
+            <div class="p-4 p-md-5">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
                     <div>
                         <p class="eyebrow mb-2">Team Identity</p>
                         <h2 class="section-title mb-2">Evergreen means consistent, prepared, and hard to break.</h2>
                         <p class="section-copy mb-0">We value smart cricket, high standards, and a team-first culture that keeps improving every season. Every session is designed to feel like match preparation, not just attendance.</p>
                     </div>
-                    <a class="btn btn-outline-evergreen rounded-pill px-4" href="#team">Meet the Core Group</a>
+                    <a class="btn btn-secondary" href="#team">Meet the Core Group</a>
                 </div>
                 <div class="feature-grid">
                     <div class="feature-card">
@@ -670,8 +123,8 @@
             </div>
         </section>
 
-        <section id="stories" class="container py-4 py-lg-5">
-            <div class="section-shell--dark section-shell p-4 p-md-5">
+        <section id="stories" class="container-fluid g-5">
+            <div class="p-4 p-md-5">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
                     <div>
                         <p class="eyebrow mb-2">Club Stories</p>
@@ -680,11 +133,6 @@
                     </div>
                 </div>
                 <div id="evergreenStoryCarousel" class="carousel slide story-carousel" data-bs-ride="carousel">
-                    <div class="carousel-indicators position-static mt-0 mb-4 justify-content-start">
-                        <button type="button" data-bs-target="#evergreenStoryCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                        <button type="button" data-bs-target="#evergreenStoryCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                        <button type="button" data-bs-target="#evergreenStoryCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                    </div>
                     <div class="carousel-inner">
                         <div class="carousel-item active">
                             <div class="story-slide">
@@ -722,11 +170,16 @@
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
+                    <div class="carousel-indicators position-static mt-4 mb-0">
+                        <button type="button" data-bs-target="#evergreenStoryCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#evergreenStoryCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#evergreenStoryCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="gallery" class="container py-4 py-lg-5">
+        <section id="gallery" class="container-fluid g-5">
             <div class="section-shell">
                 <div class="mb-4">
                     <p class="eyebrow mb-2">Gallery</p>
@@ -755,7 +208,7 @@
             </div>
         </section>
 
-        <section id="team" class="container py-4 py-lg-5">
+        <section id="team" class="container-fluid g-5">
             <div class="section-shell">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
                     <div>
@@ -809,7 +262,7 @@
             </div>
         </section>
 
-        <section id="fixtures" class="container py-4 py-lg-5">
+        <section id="fixtures" class="container-fluid g-5">
             <div class="section-shell">
                 <div class="row g-4 align-items-center">
                     <div class="col-lg-5">
@@ -853,7 +306,7 @@
             </div>
         </section>
 
-        <section id="testimonials" class="container py-4 py-lg-5">
+        <section id="testimonials" class="container-fluid g-5">
             <div class="section-shell">
                 <div class="mb-4">
                     <p class="eyebrow mb-2">Testimonials</p>
@@ -886,7 +339,7 @@
             </div>
         </section>
 
-        <section id="join" class="container py-4 py-lg-5">
+        <section id="join" class="container-fluid g-5">
             <div class="hero-card p-4 p-md-5">
                 <div class="row align-items-center g-4 position-relative" style="z-index: 1;">
                     <div class="col-lg-5">

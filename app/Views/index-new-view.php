@@ -2,24 +2,30 @@
 <html lang="en">
 
 <head>
-    <title>Sportz &mdash; Colorlib Sports Team Template</title>
+    <title>Chattogram Challengers</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="AKM Sadi">
+    <meta name="designer" content="AKM Sadi">
+    <meta name="developer" content="AKM Sadi">
+    <meta name="generator" content="CodeIgniter 4.7.3">
+    <meta name="copyright" content="© 2026 Evergreen Team">
+
+    <link rel="icon" type="image/png" href="<?= base_url('assets/images/favicon/favicon-96x96.png') ?>" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="<?= base_url('assets/images/favicon/favicon.svg') ?>" />
+    <link rel="shortcut icon" href="<?= base_url('assets/images/favicon/favicon.ico') ?>" />
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('assets/images/favicon/apple-touch-icon.png') ?>" />
+    <link rel="manifest" href="<?= base_url('assets/images/favicon/site.webmanifest') ?>" />
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700">
-    <link rel="stylesheet" href="assets/fonts/icomoon/style.css">
-
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/magnific-popup.css">
-    <link rel="stylesheet" href="assets/css/jquery-ui.css">
-    <link rel="stylesheet" href="assets/css/owl.carousel.min.css">
-    <link rel="stylesheet" href="assets/css/owl.theme.default.min.css">
-
-
-    <link rel="stylesheet" href="assets/css/aos.css">
-
-    <link rel="stylesheet" href="assets/css/style.css">
-
+    <link rel="stylesheet" href="<?= base_url('assets/fonts/icomoon/style.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/magnific-popup.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/jquery-ui.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/owl.carousel.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/owl.theme.default.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/aos.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/style.css') ?>">
 </head>
 
 <body>
@@ -29,7 +35,7 @@
         <div class="site-mobile-menu">
             <div class="site-mobile-menu-header">
                 <div class="site-mobile-menu-logo">
-                    <a href="#"><img src="assets/images/logo.png" alt="Image"></a>
+                    <a href="<?= site_url('/') ?>"><img src="<?= base_url('assets/images/logo/challengers-logo.png') ?>" alt="Chattogram Challengers"></a>
                 </div>
                 <div class="site-mobile-menu-close mt-3">
                     <span class="icon-close2 js-menu-toggle"></span>
@@ -49,8 +55,8 @@
                             <a href="#" class="text-secondary px-2"><span class="icon-linkedin"></span></a>
                         </div>
                         <div class="col-6 col-md-9 text-right">
-                            <div class="d-inline-block"><a href="#" class="text-secondary p-2 d-flex align-items-center"><span class="icon-envelope mr-3"></span> <span class="d-none d-md-block">youremail@domain.com</span></a></div>
-                            <div class="d-inline-block"><a href="#" class="text-secondary p-2 d-flex align-items-center"><span class="icon-phone mr-0 mr-md-3"></span> <span class="d-none d-md-block">+1 232 3532 321</span></a></div>
+                            <div class="d-inline-block"><a href="#" class="text-secondary p-2 d-flex align-items-center"><span class="icon-envelope mr-2"></span> <span class="d-none d-md-block">admin@evergreen.com</span></a></div>
+                            <div class="d-inline-block"><a href="#" class="text-secondary p-2 d-flex align-items-center"><span class="icon-phone mr-0 mr-md-2"></span> <span class="d-none d-md-block">+880 1710112279</span></a></div>
                         </div>
                     </div>
                 </div>
@@ -58,7 +64,7 @@
             <nav class="site-navigation position-relative text-right bg-black text-md-right" role="navigation">
                 <div class="container position-relative">
                     <div class="site-logo">
-                        <a href="index.html"><img src="assets/images/logo.png" alt=""></a>
+                        <a href="<?= site_url('/') ?>"><img src="<?= base_url('assets/images/logo/challengers-logo.png') ?>" alt="Chattogram Challengers" style="height: 113px;"></a>
                     </div>
 
                     <div class="d-inline-block d-md-none ml-md-0 mr-auto py-3"><a href="#" class="site-menu-toggle js-menu-toggle text-white"><span class="icon-menu h3"></span></a></div>
@@ -97,37 +103,32 @@
             </nav>
         </header>
 
-
-
         <div class="slide-one-item home-slider owl-carousel">
-            <div class="site-blocks-cover overlay" style="background-image: url(assets/images/hero_bg_2.jpg);" data-aos="fade" data-stellar-background-ratio="0.5">
+            <div class="site-blocks-cover overlay" style="background-image: url('<?= base_url('assets/images/slider/slider-image-1.jpg') ?>');" data-aos="fade" data-stellar-background-ratio="0.5">
                 <div class="container">
                     <div class="row align-items-center justify-content-start">
                         <div class="col-md-6 text-center text-md-left" data-aos="fade-up" data-aos-delay="400">
-                            <h1 class="bg-text-line">Russia's World Cup Championship</h1>
-                            <p><a href="#" class="btn btn-primary btn-sm rounded-0 py-3 px-5">Read More</a></p>
+                            <h4>Welcome to Chattogram Challengers</h4>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="site-blocks-cover overlay" style="background-image: url(assets/images/hero_bg_4.jpg);" data-aos="fade" data-stellar-background-ratio="0.5">
+            <div class="site-blocks-cover overlay" style="background-image: url('<?= base_url('assets/images/slider/slider-image-2.jpg') ?>');" data-aos="fade" data-stellar-background-ratio="0.5">
                 <div class="container">
                     <div class="row align-items-center justify-content-start">
                         <div class="col-md-6 text-center text-md-left" data-aos="fade-up" data-aos-delay="400">
-                            <h1 class="bg-text-line">Russia's World Cup Championship</h1>
-                            <p><a href="#" class="btn btn-primary btn-sm rounded-0 py-3 px-5">Read More</a></p>
+                            <h4>Farewell Party</h4>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="site-blocks-cover overlay" style="background-image: url(assets/images/hero_bg_3.jpg);" data-aos="fade" data-stellar-background-ratio="0.5">
+            <div class="site-blocks-cover overlay" style="background-image: url('<?= base_url('assets/images/slider/slider-image-3.jpg') ?>');" data-aos="fade" data-stellar-background-ratio="0.5">
                 <div class="container">
                     <div class="row align-items-center justify-content-start">
                         <div class="col-md-6 text-center text-md-left" data-aos="fade-up" data-aos-delay="400">
-                            <h1 class="bg-text-line">Russia's World Cup Championship</h1>
-                            <p><a href="#" class="btn btn-primary btn-sm rounded-0 py-3 px-5">Read More</a></p>
+                            <h4>Challengers Championship</h4>
                         </div>
                     </div>
                 </div>
@@ -139,29 +140,30 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-lg-4">
-                        <div class="p-3 p-md-5 feature-block-1 mb-5 mb-lg-0 bg" style="background-image: url('assets/images/img_1.jpg');">
+                        <img src="<?= base_url('assets/images/home/image-1.jpeg') ?>" alt="Home Ground" class="w-100">
+                        <div class="p-3 p-md-5 feature-block-1 mb-5 mb-lg-0 bg">
                             <div class="text">
-                                <h2 class="h5 text-white">Russia's World Cup Championship</h2>
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos repellat autem illum nostrum sit distinctio!</p>
-                                <p class="mb-0"><a href="#" class="btn btn-primary btn-sm px-4 py-2 rounded-0">Read More</a></p>
+                                <h2 class="h5 text-white">Home Ground</h2>
+                                <p>Built for focused practice, match-day energy, and the kind of teamwork that wins close games.</p>
+                                <p class="mb-0"><a href="#" class="btn btn-primary btn-sm px-4 py-2 rounded-0">Evergreen Oval</a></p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <div class="p-3 p-md-5 feature-block-1 mb-5 mb-lg-0 bg" style="background-image: url('assets/images/img_2.jpg');">
+                        <div class="p-3 p-md-5 feature-block-1 mb-5 mb-lg-0 bg" style="background-image: url('<?= base_url('assets/images/home/image-2.jpeg') ?>');">
                             <div class="text">
-                                <h2 class="h5 text-white">Russia's World Cup Championship</h2>
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos repellat autem illum nostrum sit distinctio!</p>
-                                <p class="mb-0"><a href="#" class="btn btn-primary btn-sm px-4 py-2 rounded-0">Read More</a></p>
+                                <h2 class="h5 text-white">Cricket. Commitment. Community.</h2>
+                                <p>A sharper home page for a sharper club: match energy, training culture, player identity, and community momentum all in one place.</p>
+                                <p class="mb-0"><a href="#" class="btn btn-primary btn-sm px-4 py-2 rounded-0">Evergreen Team</a></p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <div class="p-3 p-md-5 feature-block-1 mb-5 mb-lg-0 bg" style="background-image: url('assets/images/img_3.jpg');">
+                        <div class="p-3 p-md-5 feature-block-1 mb-5 mb-lg-0 bg" style="background-image: url('<?= base_url('assets/images/home/image-3.jpeg') ?>');">
                             <div class="text">
-                                <h2 class="h5 text-white">Russia's World Cup Championship</h2>
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos repellat autem illum nostrum sit distinctio!</p>
-                                <p class="mb-0"><a href="#" class="btn btn-primary btn-sm px-4 py-2 rounded-0">Read More</a></p>
+                                <h2 class="h5 text-white">Structured nets twice a week</h2>
+                                <p>Game-speed fielding blocks</p>
+                                <p>Weekend fixtures and club friendlies</p>
                             </div>
                         </div>
                     </div>
@@ -182,11 +184,11 @@
                     <div class="ml-auto pr-4 order-md-2">
                         <div class="h5 text-black text-uppercase text-center text-lg-left">
                             <div class="d-block d-md-inline-block mb-3 mb-lg-0">
-                                <img src="assets/images/img_1_sq.jpg" alt="Image" class="mr-3 image"><span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">Sea Hawlks </span>
+                                <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="mr-3 image"><span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">Sea Hawlks </span>
                             </div>
                             <span class="text-muted mx-3 text-normal mb-3 mb-lg-0 d-block d-md-inline ">vs</span>
                             <div class="d-block d-md-inline-block">
-                                <img src="assets/images/img_3_sq.jpg" alt="Image" class="mr-3 image"><span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">Patriots</span>
+                                <img src="<?= base_url('assets/images/img_3_sq.jpg') ?>" alt="Image" class="mr-3 image"><span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">Patriots</span>
                             </div>
                         </div>
                     </div>
@@ -194,7 +196,7 @@
 
                 </div>
 
-                <div class="bg-image overlay-success rounded mb-5" style="background-image: url('assets/images/hero_bg_1.jpg');" data-stellar-background-ratio="0.5">
+                <div class="bg-image overlay-success rounded mb-5" style="background-image: url('<?= base_url('assets/images/hero_bg_1.jpg') ?>');" data-stellar-background-ratio="0.5">
 
                     <div class="row align-items-center">
                         <div class="col-md-12 col-lg-4 mb-4 mb-lg-0">
@@ -202,7 +204,7 @@
                             <div class="text-center text-lg-left">
                                 <div class="d-block d-lg-flex align-items-center">
                                     <div class="image mx-auto mb-3 mb-lg-0 mr-lg-3">
-                                        <img src="assets/images/img_1_sq.jpg" alt="Image" class="img-fluid">
+                                        <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="img-fluid">
                                     </div>
                                     <div class="text">
                                         <h3 class="h5 mb-0 text-black">Sea Hawks</h3>
@@ -224,7 +226,7 @@
                             <div class="">
                                 <div class="d-block d-lg-flex align-items-center">
                                     <div class="image mx-auto ml-lg-3 mb-3 mb-lg-0 order-2">
-                                        <img src="assets/images/img_4_sq.jpg" alt="Image" class="img-fluid">
+                                        <img src="<?= base_url('assets/images/img_4_sq.jpg') ?>" alt="Image" class="img-fluid">
                                     </div>
                                     <div class="text order-1">
                                         <h3 class="h5 mb-0 text-black">Steelers</h3>
@@ -266,7 +268,7 @@
                                                     <div class="text-center text-lg-left">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                                                                <img src="assets/images/img_1_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text">
                                                                 <h3 class="h5 mb-0 text-black">Packers</h3>
@@ -286,7 +288,7 @@
                                                     <div class="">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                                                                <img src="assets/images/img_4_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_4_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text order-1 w-100">
                                                                 <h3 class="h5 mb-0 text-black">Steelers</h3>
@@ -305,7 +307,7 @@
                                                     <div class="text-center text-lg-left">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                                                                <img src="assets/images/img_1_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text">
                                                                 <h3 class="h5 mb-0 text-black">Patriots</h3>
@@ -325,7 +327,7 @@
                                                     <div class="">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                                                                <img src="assets/images/img_4_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_4_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text order-1 w-100">
                                                                 <h3 class="h5 mb-0 text-black">Cowboys</h3>
@@ -344,7 +346,7 @@
                                                     <div class="text-center text-lg-left">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                                                                <img src="assets/images/img_1_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text">
                                                                 <h3 class="h5 mb-0 text-black">Raiders</h3>
@@ -364,7 +366,7 @@
                                                     <div class="">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                                                                <img src="assets/images/img_4_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_4_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text order-1 w-100">
                                                                 <h3 class="h5 mb-0 text-black">Chiefs</h3>
@@ -392,7 +394,7 @@
                                                     <div class="text-center text-lg-left">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                                                                <img src="assets/images/img_1_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text">
                                                                 <h3 class="h5 mb-0 text-black">Packers</h3>
@@ -412,7 +414,7 @@
                                                     <div class="">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                                                                <img src="assets/images/img_4_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_4_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text order-1 w-100">
                                                                 <h3 class="h5 mb-0 text-black">Steelers</h3>
@@ -431,7 +433,7 @@
                                                     <div class="text-center text-lg-left">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                                                                <img src="assets/images/img_1_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text">
                                                                 <h3 class="h5 mb-0 text-black">Patriots</h3>
@@ -451,7 +453,7 @@
                                                     <div class="">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                                                                <img src="assets/images/img_4_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_4_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text order-1 w-100">
                                                                 <h3 class="h5 mb-0 text-black">Cowboys</h3>
@@ -470,7 +472,7 @@
                                                     <div class="text-center text-lg-left">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                                                                <img src="assets/images/img_1_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text">
                                                                 <h3 class="h5 mb-0 text-black">Raiders</h3>
@@ -490,7 +492,7 @@
                                                     <div class="">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                                                                <img src="assets/images/img_4_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_4_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text order-1 w-100">
                                                                 <h3 class="h5 mb-0 text-black">Chiefs</h3>
@@ -518,7 +520,7 @@
                                                     <div class="text-center text-lg-left">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                                                                <img src="assets/images/img_1_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text">
                                                                 <h3 class="h5 mb-0 text-black">Packers</h3>
@@ -538,7 +540,7 @@
                                                     <div class="">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                                                                <img src="assets/images/img_4_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_4_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text order-1 w-100">
                                                                 <h3 class="h5 mb-0 text-black">Steelers</h3>
@@ -557,7 +559,7 @@
                                                     <div class="text-center text-lg-left">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                                                                <img src="assets/images/img_1_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text">
                                                                 <h3 class="h5 mb-0 text-black">Patriots</h3>
@@ -577,7 +579,7 @@
                                                     <div class="">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                                                                <img src="assets/images/img_4_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_4_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text order-1 w-100">
                                                                 <h3 class="h5 mb-0 text-black">Cowboys</h3>
@@ -596,7 +598,7 @@
                                                     <div class="text-center text-lg-left">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                                                                <img src="assets/images/img_1_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_1_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text">
                                                                 <h3 class="h5 mb-0 text-black">Raiders</h3>
@@ -616,7 +618,7 @@
                                                     <div class="">
                                                         <div class="d-block d-lg-flex align-items-center">
                                                             <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                                                                <img src="assets/images/img_4_sq.jpg" alt="Image" class="img-fluid">
+                                                                <img src="<?= base_url('assets/images/img_4_sq.jpg') ?>" alt="Image" class="img-fluid">
                                                             </div>
                                                             <div class="text order-1 w-100">
                                                                 <h3 class="h5 mb-0 text-black">Chiefs</h3>
@@ -641,7 +643,7 @@
         </div>
 
 
-        <div class="site-section block-13 bg-primary fixed overlay-primary bg-image" style="background-image: url('assets/images/hero_bg_3.jpg');" data-stellar-background-ratio="0.5">
+        <div class="site-section block-13 bg-primary fixed overlay-primary bg-image" style="background-image: url('<?= base_url('assets/images/hero_bg_3.jpg') ?>');" data-stellar-background-ratio="0.5">
 
             <div class="container">
                 <div class="row mb-5">
@@ -656,7 +658,7 @@
                             <!-- uses .block-12 -->
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_1.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_1.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -671,7 +673,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_2.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_2.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -686,7 +688,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_3.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_3.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -701,7 +703,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_4.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_4.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -716,7 +718,7 @@
                             <!-- uses .block-12 -->
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_1.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_1.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -731,7 +733,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_2.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_2.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -746,7 +748,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_3.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_3.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -761,7 +763,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_4.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_4.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -776,7 +778,7 @@
                             <!-- uses .block-12 -->
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_1.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_1.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -791,7 +793,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_2.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_2.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -806,7 +808,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_3.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_3.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -821,7 +823,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_4.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_4.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -836,7 +838,7 @@
                             <!-- uses .block-12 -->
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_1.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_1.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -851,7 +853,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_2.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_2.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -866,7 +868,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_3.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_3.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -881,7 +883,7 @@
                         <div class="item">
                             <div class="block-12">
                                 <figure>
-                                    <img src="assets/images/img_4.jpg" alt="Image" class="img-fluid">
+                                    <img src="<?= base_url('assets/images/img_4.jpg') ?>" alt="Image" class="img-fluid">
                                 </figure>
                                 <div class="text">
                                     <span class="meta">May 20th 2018</span>
@@ -910,7 +912,7 @@
                     <div class="col-md-6 col-lg-4">
                         <div class="post-entry">
                             <div class="image">
-                                <img src="assets/images/img_1.jpg" alt="Image" class="img-fluid">
+                                <img src="<?= base_url('assets/images/img_1.jpg') ?>" alt="Image" class="img-fluid">
                             </div>
                             <div class="text p-4">
                                 <h2 class="h5 text-black"><a href="#">RealMad vs Striker Who Will Win?</a></h2>
@@ -922,7 +924,7 @@
                     <div class="col-md-6 col-lg-4">
                         <div class="post-entry">
                             <div class="image">
-                                <img src="assets/images/img_2.jpg" alt="Image" class="img-fluid">
+                                <img src="<?= base_url('assets/images/img_2.jpg') ?>" alt="Image" class="img-fluid">
                             </div>
                             <div class="text p-4">
                                 <h2 class="h5 text-black"><a href="#">RealMad vs Striker Who Will Win?</a></h2>
@@ -934,7 +936,7 @@
                     <div class="col-md-6 col-lg-4">
                         <div class="post-entry">
                             <div class="image">
-                                <img src="assets/images/img_3.jpg" alt="Image" class="img-fluid">
+                                <img src="<?= base_url('assets/images/img_3.jpg') ?>" alt="Image" class="img-fluid">
                             </div>
                             <div class="text p-4">
                                 <h2 class="h5 text-black"><a href="#">RealMad vs Striker Who Will Win?</a></h2>
@@ -965,7 +967,7 @@
                                     <li class="mb-3">
                                         <a href="#" class="d-flex">
                                             <figure class="image mr-4">
-                                                <img src="assets/images/img_1.jpg" alt="" class="img-fluid">
+                                                <img src="<?= base_url('assets/images/img_1.jpg') ?>" alt="" class="img-fluid">
                                             </figure>
                                             <div class="text">
                                                 <h3 class="heading font-weight-light">Lorem ipsum dolor sit amet consectetur elit</h3>
@@ -975,7 +977,7 @@
                                     <li class="mb-3">
                                         <a href="#" class="d-flex">
                                             <figure class="image mr-4">
-                                                <img src="assets/images/img_1.jpg" alt="" class="img-fluid">
+                                                <img src="<?= base_url('assets/images/img_1.jpg') ?>" alt="" class="img-fluid">
                                             </figure>
                                             <div class="text">
                                                 <h3 class="heading font-weight-light">Lorem ipsum dolor sit amet consectetur elit</h3>
@@ -985,7 +987,7 @@
                                     <li class="mb-3">
                                         <a href="#" class="d-flex">
                                             <figure class="image mr-4">
-                                                <img src="assets/images/img_1.jpg" alt="" class="img-fluid">
+                                                <img src="<?= base_url('assets/images/img_1.jpg') ?>" alt="" class="img-fluid">
                                             </figure>
                                             <div class="text">
                                                 <h3 class="heading font-weight-light">Lorem ipsum dolor sit amet consectetur elit</h3>
@@ -1041,7 +1043,7 @@
 
                             <div class="block-16">
                                 <figure>
-                                    <img src="assets/images/img_1.jpg" alt="Image placeholder" class="img-fluid rounded">
+                                    <img src="<?= base_url('assets/images/img_1.jpg') ?>" alt="Image placeholder" class="img-fluid rounded">
                                     <a href="https://vimeo.com/channels/staffpicks/93951774" class="play-button popup-vimeo"><span class="icon-play"></span></a>
                                 </figure>
                             </div>
@@ -1076,18 +1078,18 @@
         </footer>
     </div>
 
-    <script src="assets/js/jquery-3.3.1.min.js"></script>
-    <script src="assets/js/jquery-migrate-3.0.1.min.js"></script>
-    <script src="assets/js/jquery-ui.js"></script>
-    <script src="assets/js/popper.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
-    <script src="assets/js/owl.carousel.min.js"></script>
-    <script src="assets/js/jquery.stellar.min.js"></script>
-    <script src="assets/js/jquery.countdown.min.js"></script>
-    <script src="assets/js/jquery.magnific-popup.min.js"></script>
-    <script src="assets/js/aos.js"></script>
+    <script src="<?= base_url('assets/js/jquery-3.3.1.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/jquery-migrate-3.0.1.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/jquery-ui.js') ?>"></script>
+    <script src="<?= base_url('assets/js/popper.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/bootstrap.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/owl.carousel.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/jquery.stellar.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/jquery.countdown.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/jquery.magnific-popup.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/aos.js') ?>"></script>
 
-    <script src="assets/js/main.js"></script>
+    <script src="<?= base_url('assets/js/main.js') ?>"></script>
 
 </body>
 
