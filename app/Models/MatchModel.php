@@ -43,6 +43,15 @@ class MatchModel extends AuditableModel
             ->findAll(max(1, $limit));
     }
 
+    public function nextMatch(): ?array
+    {
+        return $this->selectWithVenue()
+            ->where('scheduled_at >', date('Y-m-d H:i:s'))
+            ->where('match_status !=', 'archived')
+            ->orderBy('scheduled_at', 'ASC')
+            ->first();
+    }
+
     public function findWithVenue(int $matchId): ?array
     {
         return $this->selectWithVenue()

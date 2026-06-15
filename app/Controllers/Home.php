@@ -3,22 +3,35 @@
 namespace App\Controllers;
 
 use App\Models\PlayerModel;
+use App\Models\MatchModel;
 
 class Home extends BaseController
 {
     private PlayerModel $players;
+    private MatchModel $matches;
 
     public function __construct()
     {
         helper(['form', 'url']);
         $this->players = new PlayerModel();
+        $this->matches = new MatchModel();
     }
 
     public function index(): string
     {
+        $lastMatch = null;
+        $recentMatches = $this->matches->recentList(1);
+        if (!empty($recentMatches)) {
+            $lastMatch = $recentMatches[0];
+        }
+
+        $nextMatch = $this->matches->nextMatch();
+
         return view('index-view', [
             'playerCount'  => $this->players->where('status', 'approved')->countAllResults(),
             'pendingCount' => $this->players->where('status', 'pending')->countAllResults(),
+            'lastMatch'    => $lastMatch,
+            'nextMatch'    => $nextMatch,
         ]);
     }
 

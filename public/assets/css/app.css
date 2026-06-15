@@ -1,16 +1,27 @@
 :root {
-    --evergreen: #1f7a3d;
+    --green: #1f7a35;
+    --dark: #101010;
+    --light: #f5f7f6;
     --evergreen-deep: forestgreen;
-    --evergreen-soft: #dff3e5;
-    --pitch: #f5f0e6;
-    --ink: #111111;
-    --bs-border-radius: 14px;
+    --bs-border-radius: 8px;
 }
 
 body {
-    color: var(--ink);
-    font-family: "Barlow", sans-serif;
+    color: var(--dark);
+    font-family: "Poppins", sans-serif;
     min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+.h1,
+.h2,
+.h3,
+.h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
 }
 
 .navbar-brand {
@@ -23,7 +34,7 @@ body {
     backdrop-filter: blur(8px);
     background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(31, 122, 61, 0.14);
-    border-radius: 14px;
+    border-radius: 8px;
 }
 
 .hero-card {
@@ -40,7 +51,7 @@ body {
 }
 
 .eyebrow {
-    color: var(--evergreen);
+    color: var(--green);
     font-weight: 600;
     text-transform: uppercase;
 }
@@ -52,12 +63,12 @@ body {
 }
 
 .accent-text {
-    color: var(--evergreen);
+    color: var(--green);
 }
 
 .btn-evergreen {
-    background-color: var(--evergreen);
-    border-color: var(--evergreen);
+    background-color: var(--green);
+    border-color: var(--green);
     color: #fff;
 }
 
@@ -69,8 +80,8 @@ body {
 }
 
 .btn-outline-evergreen {
-    border-color: var(--evergreen);
-    color: var(--evergreen);
+    border-color: var(--green);
+    color: var(--green);
 }
 
 .btn-outline-evergreen:hover,
@@ -82,7 +93,7 @@ body {
 
 .pitch-mark {
     background-color: #fff;
-    border-radius: 14px;
+    border-radius: 8px;
     min-height: 100%;
     position: relative;
 }
@@ -122,15 +133,12 @@ body {
     grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.95fr);
 }
 
-.hero-side-stack {
-    display: grid;
-    gap: 1rem;
-}
-
 .mini-panel {
-    background-color: #fff;
-    border-radius: 14px;
+    background-color: var(--light);
+    border-radius: 8px;
     padding: 1.2rem;
+    margin-top: 1.5rem;
+    display: none;
 }
 
 .mini-panel__value {
@@ -150,10 +158,8 @@ body {
 .hero-badge {
     background: rgba(31, 122, 61, 0.09);
     border: 1px solid rgba(31, 122, 61, 0.1);
-    border-radius: 999px;
-    color: var(--evergreen-deep);
+    border-radius: 8px;
     font-size: 0.85rem;
-    font-weight: 700;
     padding: 0.65rem 1rem;
 }
 
@@ -169,7 +175,7 @@ body {
 .section-shell--dark {
     background-color: rgba(239, 248, 241, 0.96);
     border-color: rgba(31, 122, 61, 0.12);
-    color: var(--ink);
+    color: var(--dark);
 }
 
 .section-shell--dark .eyebrow,
@@ -219,7 +225,7 @@ body {
 
 .story-slide {
     background: linear-gradient(135deg, rgba(17, 17, 17, 0.18), rgba(17, 17, 17, 0.55)), linear-gradient(135deg, #2d8b57 0%, #123524 100%);
-    border-radius: 14px;
+    border-radius: 8px;
     min-height: 360px;
     overflow: hidden;
     padding: 1.75rem;
@@ -278,7 +284,7 @@ body {
 }
 
 .gallery-card {
-    border-radius: 14px;
+    border-radius: 8px;
     color: #fff;
     overflow: hidden;
     padding: 1.25rem;
@@ -436,7 +442,7 @@ body {
     align-items: center;
     background: linear-gradient(135deg, rgba(31, 122, 61, 0.14), rgba(31, 122, 61, 0.04));
     border: 1px solid rgba(31, 122, 61, 0.1);
-    border-radius: 14px;
+    border-radius: 8px;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
@@ -450,7 +456,7 @@ main#home {
 
 .back-to-top {
     align-items: center;
-    background: linear-gradient(135deg, var(--evergreen) 0%, #2b8150 100%);
+    background: linear-gradient(135deg, var(--green) 0%, #2b8150 100%);
     border: 0;
     border-radius: 999px;
     bottom: 5rem;
@@ -535,7 +541,7 @@ main#home {
 }
 
 .top-menu .btn:hover {
-    background-color: var(--evergreen);
+    background-color: var(--green);
     color: #fff;
 }
 

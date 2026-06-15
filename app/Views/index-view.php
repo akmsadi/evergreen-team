@@ -11,11 +11,162 @@
     <link rel="icon" type="image/png" sizes="16x16" href="<?= base_url('assets/images/favicon/favicon-16x16.png') ?>">
     <link rel="shortcut icon" href="<?= base_url('assets/images/favicon/favicon.ico') ?>">
     <link rel="manifest" href="<?= base_url('assets/images/favicon/site.webmanifest') ?>">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
+    <style>
+        .hero-slider {
+            width: 100%;
+            height: 600px;
+        }
+
+        .swiper-slide {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .slide-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, .4);
+            text-align: center;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .slide-content h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .slide-content p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+        }
+
+        .swiper-button-prev,
+        .swiper-button-next {
+            color: #fff;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: #28a745;
+        }
+
+        @media (max-width: 768px) {
+            .hero-slider {
+                height: 400px;
+            }
+
+            .slide-content h2 {
+                font-size: 2.5rem;
+            }
+
+            .slide-content p {
+                font-size: 1rem;
+            }
+        }
+
+        .countdown-panel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-panel::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+
+            background: url('<?= base_url('assets/images/logo/challengers-logo.png') ?>') center/50% no-repeat;
+            opacity: 0.08;
+        }
+
+        .countdown-panel>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .countdown-panel {
+            border-radius: 8px;
+            background: #fff;
+            padding: 3rem 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .countdown-timer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .countdown-value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #1f7a3d;
+            line-height: 1;
+            margin-bottom: 0.35rem;
+        }
+
+        .countdown-label {
+            font-family: 'Bebas Neue', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .countdown-sep {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3rem;
+            color: #1f7a3d;
+            line-height: 1;
+            align-self: flex-start;
+            padding-top: 0.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .countdown-value {
+                font-size: 2rem;
+            }
+
+            .countdown-sep {
+                font-size: 1.75rem;
+            }
+
+            .countdown-item {
+                min-width: 44px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -24,107 +175,162 @@
             <a class="navbar-brand" href="#home">
                 <img src="<?= base_url('assets/images/logo1.png') ?>" alt="Evergreen Team Logo" style="width: 180px;">
             </a>
-            <div class="d-flex gap-2 flex-wrap justify-content-end top-menu">
-                <a class="btn text-uppercase" href="#about">About</a>
-                <a class="btn text-uppercase" href="#stories">Stories</a>
-                <a class="btn text-uppercase" href="#gallery">Gallery</a>
-                <a class="btn text-uppercase" href="#team">Team</a>
-                <a class="btn text-uppercase" href="#testimonials">Testimonials</a>
-                <a class="btn text-uppercase" href="#join">Join Us</a>
-                <?php if (session()->get('is_admin')): ?>
-                    <a class="btn text-uppercase" href="<?= site_url('/admin/dashboard') ?>">Dashboard</a>
-                <?php else: ?>
-                    <a class="btn text-uppercase" href="<?= site_url('/admin/login') ?>">Admin</a>
-                <?php endif; ?>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavMenu" aria-controls="mainNavMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="mainNavMenu">
+                <div class="d-flex flex-column flex-lg-row gap-2 justify-content-end top-menu py-2 py-lg-0">
+                    <a class="btn text-uppercase" href="#teams">Teams</a>
+                    <a class="btn text-uppercase" href="#members">Members</a>
+                    <a class="btn text-uppercase" href="#gallery">Gallery</a>
+                    <a class="btn text-uppercase" href="#news">News</a>
+                    <a class="btn text-uppercase" href="#join">Join Us</a>
+                    <?php if (session()->get('is_admin')): ?>
+                        <a class="btn text-uppercase" href="<?= site_url('/admin/dashboard') ?>">Dashboard</a>
+                    <?php else: ?>
+                        <a class="btn text-uppercase" href="<?= site_url('/admin/login') ?>">Admin</a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </nav>
 
     <main id="home" class="pb-5 bg-body-secondary">
+        <div class="swiper hero-slider">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <img class="w-100" src="<?= base_url('assets/images/slider/slider-image-1.jpg') ?>" alt="EverGreen Cricket Team">
+                    <div class="slide-content">
+                        <h2>EVERGREEN TEAM</h2>
+                        <p>PASSION • PERFORMANCE • TEAMWORK</p>
+                    </div>
+                </div>
+
+                <div class="swiper-slide">
+                    <img class="w-100" src="<?= base_url('assets/images/slider/slider-image-2.jpg') ?>" alt="EverGreen Cricket Team">
+                    <div class="slide-content">
+                        <h2>MATCH DAY READY</h2>
+                        <p>UNITED WE PLAY, UNITED WE WIN</p>
+                    </div>
+                </div>
+
+                <div class="swiper-slide">
+                    <img class="w-100" src="<?= base_url('assets/images/slider/slider-image-3.jpg') ?>" alt="EverGreen Cricket Team">
+                    <div class="slide-content">
+                        <h2>CHAMPIONS IN ACTION</h2>
+                        <p>BUILDING A WINNING LEGACY</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="swiper-pagination"></div>
+
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+        </div>
+
         <section class="container-fluid g-5">
-            <div class="p-4 p-md-5">
+            <div class="py-4 py-md-5">
                 <div class="hero-grid position-relative" style="z-index: 1;">
                     <div>
                         <p class="eyebrow mb-3">Cricket. Commitment. Community.</p>
                         <h1 class="display-title mb-3">Play bold with<br><span class="accent-text">Evergreen Team</span></h1>
-                        <p class="fs-5 text-dark mb-4">A sharper home page for a sharper club: match energy, training culture, player identity, and community momentum all in one place.</p>
+                        <p>We value smart cricket, high standards, and a team-first culture that keeps improving every season. Every session is designed to feel like match preparation, not just attendance.</p>
                         <div class="d-flex flex-wrap gap-3">
-                            <a class="btn btn-evergreen btn-lg rounded-pill px-4" href="#join">Join the Squad</a>
-                            <a class="btn btn-outline-evergreen btn-lg rounded-pill px-4" href="#stories">Explore Stories</a>
-                        </div>
-                        <div class="hero-badge-row">
-                            <span class="hero-badge">Structured nets twice a week</span>
-                            <span class="hero-badge">Game-speed fielding blocks</span>
-                            <span class="hero-badge">Weekend fixtures and club friendlies</span>
-                        </div>
-                    </div>
-                    <div class="hero-side-stack">
-                        <div class="pitch-mark p-4 p-md-4 text-center">
-                            <p class="eyebrow mb-2">Home Ground</p>
-                            <h2 class="h1 fw-bold mb-3 text-black">Evergreen Oval</h2>
-                            <p class="mb-4">Built for focused practice, match-day energy, and the kind of teamwork that wins close games.</p>
-                            <div class="row g-3">
-                                <div class="col-6">
-                                    <div class="stat-card p-3">
-                                        <div class="stat-value"><?= esc((string) $playerCount) ?></div>
-                                        <div class="small text-uppercase">Active Players</div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="stat-card p-3">
-                                        <div class="stat-value"><?= esc((string) $pendingCount) ?></div>
-                                        <div class="small text-uppercase">Pending Requests</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <a class="btn btn-outline-dark px-3" href="#join">Join the Squad</a>
+                            <a class="btn btn-outline-dark px-3" href="#stories">Explore Stories</a>
                         </div>
                         <div class="mini-panel">
-                            <div class="d-flex justify-content-between align-items-start gap-3">
-                                <div>
-                                    <div class="eyebrow mb-2">This Week</div>
-                                    <h3 class="h4 fw-bold mb-2">Two intense sessions, one match focus</h3>
-                                    <p class="text-secondary mb-0">Batting against spin on Tuesday, death-over bowling on Thursday, then a Saturday pressure simulation.</p>
+                            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-4">
+                                <div class="row g-3 align-self-end">
+                                    <div class="col-6">
+                                        <div class="stat-card p-3">
+                                            <div class="stat-value"><?= esc((string) $playerCount) ?></div>
+                                            <div class="small text-uppercase">Active Members</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="stat-card p-3">
+                                            <div class="stat-value"><?= esc((string) $pendingCount) ?></div>
+                                            <div class="small text-uppercase">Pending Requests</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mini-panel__value">3</div>
                             </div>
                         </div>
+                    </div>
+                    <div class="countdown-panel text-center">
+                        <?php if ($nextMatch): ?>
+                            <div class="eyebrow mb-3">Next Match</div>
+                            <h2 class="mb-2"><?= esc($nextMatch['team_name'] ?? 'Evergreen Team') ?> vs <?= esc($nextMatch['opponent_name'] ?? 'Opposition') ?></h2>
+                            <p class="mb-1"><span id="nextMatchDate" data-ts="<?= strtotime($nextMatch['scheduled_at']) * 1000 ?>"><?= esc(date('M d, Y - g:i A', strtotime($nextMatch['scheduled_at']))) ?></span></p>
+                            <p class="mb-3"><?= esc($nextMatch['venue'] ?? 'TBA') ?></p>
+                            <div class="countdown-timer">
+                                <div class="countdown-item">
+                                    <div class="countdown-value" id="countdown-days">0</div>
+                                    <div class="countdown-label">Days</div>
+                                </div>
+                                <div class="countdown-sep">:</div>
+                                <div class="countdown-item">
+                                    <div class="countdown-value" id="countdown-hours">0</div>
+                                    <div class="countdown-label">Hrs</div>
+                                </div>
+                                <div class="countdown-sep">:</div>
+                                <div class="countdown-item">
+                                    <div class="countdown-value" id="countdown-mins">0</div>
+                                    <div class="countdown-label">Min</div>
+                                </div>
+                                <div class="countdown-sep">:</div>
+                                <div class="countdown-item">
+                                    <div class="countdown-value" id="countdown-secs">0</div>
+                                    <div class="countdown-label">Sec</div>
+                                </div>
+                            </div>
+                        <?php elseif ($lastMatch): ?>
+                            <div class="eyebrow mb-3">Last Match</div>
+                            <h2 class="mb-2"><?= esc($lastMatch['team_name'] ?? 'Evergreen Team') ?> vs <?= esc($lastMatch['opponent_name'] ?? 'Opposition') ?></h2>
+                            <p class="mb-1"><strong>Venue:</strong> <?= esc($lastMatch['venue'] ?? 'N/A') ?></p>
+                            <p class="mb-1"><strong>Result:</strong> <?= esc($lastMatch['result_summary'] ?? 'Match result pending') ?></p>
+                            <?php if (!empty($lastMatch['notes'])): ?>
+                                <p class="mb-0"><?= esc($lastMatch['notes']) ?></p>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <h3 class="h4 fw-bold mb-2">No upcoming matches</h3>
+                            <p class="text-secondary mb-0">Stay tuned for the next scheduled fixture!</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="about" class="container-fluid g-5">
-            <div class="p-4 p-md-5">
-                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
-                    <div>
-                        <p class="eyebrow mb-2">Team Identity</p>
-                        <h2 class="section-title mb-2">Evergreen means consistent, prepared, and hard to break.</h2>
-                        <p class="section-copy mb-0">We value smart cricket, high standards, and a team-first culture that keeps improving every season. Every session is designed to feel like match preparation, not just attendance.</p>
+        <section id="teams" class="container-fluid g-5">
+            <div class="py-4 py-md-5">
+                <p class="eyebrow mb-3">Meet the teams</p>
+                <h2 class="mb-3">From the nets to match day, these are the teams driving EverGreen forward.</h2>
+                <div class="row ">
+                    <div class="col-md-3">
+                        <img src="<?= base_url('assets/images/teams/aliza.jpeg') ?>" alt="Aliza strike force" class="w-100 mb-3">
+                        <p class="text-center">ALIZA strike force</p>
                     </div>
-                    <a class="btn btn-secondary" href="#team">Meet the Core Group</a>
-                </div>
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-card__number">01</div>
-                        <h3 class="h4 fw-bold mb-2">Structured growth</h3>
-                        <p class="mb-0 text-secondary">Players work through batting, bowling, and fielding progressions with clear role expectations.</p>
+                    <div class="col-md-3">
+                        <img src="<?= base_url('assets/images/teams/w-warriors.jpeg') ?>" alt="W-Warriors sports team" class="w-100 mb-3">
+                        <p class="text-center">W-WARRIORS sports team</p>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-card__number">02</div>
-                        <h3 class="h4 fw-bold mb-2">Pressure-first training</h3>
-                        <p class="mb-0 text-secondary">Sessions include chase simulations, over management, and match-intensity decision making.</p>
+                    <div class="col-md-3">
+                        <img src="<?= base_url('assets/images/teams/v-bold.jpeg') ?>" alt="V-Bold" class="w-100 mb-3">
+                        <p class="text-center">V-BOLD sports team</p>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-card__number">03</div>
-                        <h3 class="h4 fw-bold mb-2">Club culture</h3>
-                        <p class="mb-0 text-secondary">Discipline, communication, and calm execution matter as much as talent inside the squad.</p>
+                    <div class="col-md-3">
+                        <img src="<?= base_url('assets/images/teams/w-avanta.jpeg') ?>" alt="Wichet wizards avanta" class="w-100 mb-3">
+                        <p class="text-center">Wichet wizards AVANTA</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="stories" class="container-fluid g-5">
-            <div class="p-4 p-md-5">
+            <div class="py-4 py-md-5">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
                     <div>
                         <p class="eyebrow mb-2">Club Stories</p>
@@ -340,7 +546,7 @@
         </section>
 
         <section id="join" class="container-fluid g-5">
-            <div class="hero-card p-4 p-md-5">
+            <div class="hero-card py-4 py-md-5">
                 <div class="row align-items-center g-4 position-relative" style="z-index: 1;">
                     <div class="col-lg-5">
                         <p class="eyebrow mb-2">Join Evergreen Team</p>
@@ -417,6 +623,36 @@
             <path d="M6.75 10.25L12 5l5.25 5.25" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
     </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <script>
+        new Swiper('.hero-slider', {
+            loop: true,
+
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false
+            },
+
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true
+            },
+
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev'
+            },
+
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            },
+
+            speed: 1000
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         (() => {
@@ -441,6 +677,51 @@
             window.addEventListener('scroll', toggleBackToTop, {
                 passive: true
             });
+        })();
+    </script>
+    <script>
+        (() => {
+            // Initialize countdown timer for next match
+            const daysEl = document.getElementById('countdown-days');
+            const hoursEl = document.getElementById('countdown-hours');
+            const minsEl = document.getElementById('countdown-mins');
+            const secsEl = document.getElementById('countdown-secs');
+            const nextMatchDateEl = document.getElementById('nextMatchDate');
+
+            // Only run if countdown elements exist (next match is available)
+            if (!daysEl || !nextMatchDateEl) {
+                return;
+            }
+
+            const updateCountdown = () => {
+                const nextMatchDate = new Date(parseInt(nextMatchDateEl.dataset.ts));
+                const now = new Date();
+                const difference = nextMatchDate - now;
+
+                if (difference <= 0) {
+                    // Match time has passed
+                    daysEl.textContent = '0';
+                    hoursEl.textContent = '0';
+                    minsEl.textContent = '0';
+                    secsEl.textContent = '0';
+                    return;
+                }
+
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((difference % (1000 * 60)) / 1000);
+
+                const pad = n => String(n).padStart(2, '0');
+                daysEl.textContent = pad(days);
+                hoursEl.textContent = pad(hours);
+                minsEl.textContent = pad(mins);
+                secsEl.textContent = pad(secs);
+            };
+
+            // Update immediately and then every second
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
         })();
     </script>
 </body>
