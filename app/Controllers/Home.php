@@ -4,17 +4,23 @@ namespace App\Controllers;
 
 use App\Models\PlayerModel;
 use App\Models\MatchModel;
+use App\Models\EventModel;
+use App\Models\EventImageModel;
 
 class Home extends BaseController
 {
     private PlayerModel $players;
     private MatchModel $matches;
+    private EventModel $events;
+    private EventImageModel $eventImages;
 
     public function __construct()
     {
         helper(['form', 'url']);
         $this->players = new PlayerModel();
         $this->matches = new MatchModel();
+        $this->events = new EventModel();
+        $this->eventImages = new EventImageModel();
     }
 
     public function index(): string
@@ -24,38 +30,47 @@ class Home extends BaseController
         if (!empty($recentMatches)) {
             $lastMatch = $recentMatches[0];
         }
-
         $nextMatch = $this->matches->nextMatch();
+        $players = $this->players->where('status', 'approved')->orderBy('id', 'RANDOM')->findAll(10);
+
+        $eventsRaw = $this->events->orderedList();
+        $events = [];
+        foreach ($eventsRaw as $event) {
+            $event['images'] = $this->eventImages->forEvent((int) $event['id']);
+            $events[] = $event;
+        }
 
         return view('index-view', [
-            'playerCount'  => $this->players->where('status', 'approved')->countAllResults(),
+            'playerCount' => $this->players->where('status', 'approved')->countAllResults(),
             'pendingCount' => $this->players->where('status', 'pending')->countAllResults(),
-            'lastMatch'    => $lastMatch,
-            'nextMatch'    => $nextMatch,
+            'lastMatch' => $lastMatch,
+            'nextMatch' => $nextMatch,
+            'players' => $players,
+            'events' => $events,
         ]);
     }
 
     public function joinUs()
     {
         $rules = [
-            'name'    => 'required|min_length[2]',
-            'email'   => 'permit_empty|valid_email',
-            'phone'   => 'required|min_length[7]',
+            'name' => 'required|min_length[2]',
+            'email' => 'permit_empty|valid_email',
+            'phone' => 'required|min_length[7]',
             'address' => 'required|min_length[5]',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->to(site_url('/') . '#join')
                 ->withInput()
                 ->with('join_errors', $this->validator->getErrors());
         }
 
         $playerData = [
-            'name'    => (string) $this->request->getPost('name'),
-            'email'   => (string) $this->request->getPost('email'),
-            'phone'   => (string) $this->request->getPost('phone'),
+            'name' => (string) $this->request->getPost('name'),
+            'email' => (string) $this->request->getPost('email'),
+            'phone' => (string) $this->request->getPost('phone'),
             'address' => (string) $this->request->getPost('address'),
-            'status'  => 'pending',
+            'status' => 'pending',
         ];
 
         $this->players->insert($playerData);
