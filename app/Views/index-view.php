@@ -416,52 +416,56 @@
 
             <section id="join" class="container-fluid g-5">
                 <div class="content-div py-4 py-md-5">
-                    <h2 class="section-title mb-2">Join US</h2>
-                    <p class="mb-3">Bring your game. We will build the rest.</p>
-                    <div class="row g-0">
-                        <div class="col-sm-6">
-                            <img src="<?= base_url('assets/images/logo/challengers-logo.png') ?>" alt="Join Evergreen Team" class="w-100 rounded">
+                    <div class="row g-4 position-relative" style="z-index: 1;">
+                        <div class="col-lg-6">
+                            <p class="eyebrow mb-2">Join Evergreen Team</p>
+                            <h2 class="section-title mb-3">Bring your game. We will build the rest.</h2>
+                            <p class="mb-0">Open to players who want consistent training, real teamwork, and a clear cricket identity built around growth.</p>
                         </div>
-                        <div class="col-sm-6">
-                            <?php if (session()->getFlashdata('join_success')): ?>
-                                <div class="alert alert-success"><?= esc(session()->getFlashdata('join_success')) ?></div>
-                            <?php endif; ?>
+                        <div class="col-lg-6">
+                            <div class="form-panel p-4 p-md-4">
+                                <?php if (session()->getFlashdata('join_success')): ?>
+                                    <div class="alert alert-success"><?= esc(session()->getFlashdata('join_success')) ?></div>
+                                <?php endif; ?>
 
-                            <?php $joinErrors = session()->getFlashdata('join_errors') ?? []; ?>
+                                <?php $joinErrors = session()->getFlashdata('join_errors') ?? []; ?>
 
-                            <form action="<?= site_url('/join-us') ?>" method="post">
-                                <?= csrf_field() ?>
+                                <p class="mb-3 text-secondary">Send your player details here. We will save your request with pending status for admin review.</p>
+                                <form action="<?= site_url('/join-us') ?>" method="post">
+                                    <?= csrf_field() ?>
 
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Player Name *</label>
-                                    <input type="text" class="form-control<?= isset($joinErrors['name']) ? ' is-invalid' : '' ?>" id="name" name="name" value="<?= esc(old('name')) ?>">
-                                    <?php if (isset($joinErrors['name'])): ?>
-                                        <div class="invalid-feedback"><?= esc($joinErrors['name']) ?></div>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control<?= isset($joinErrors['email']) ? ' is-invalid' : '' ?>" id="email" name="email" value="<?= esc(old('email')) ?>">
-                                    <?php if (isset($joinErrors['email'])): ?>
-                                        <div class="invalid-feedback"><?= esc($joinErrors['email']) ?></div>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="phone" class="form-label">Phone *</label>
-                                    <input type="text" class="form-control<?= isset($joinErrors['phone']) ? ' is-invalid' : '' ?>" id="phone" name="phone" value="<?= esc(old('phone')) ?>">
-                                    <?php if (isset($joinErrors['phone'])): ?>
-                                        <div class="invalid-feedback"><?= esc($joinErrors['phone']) ?></div>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="address" class="form-label">Address *</label>
-                                    <input type="text" class="form-control<?= isset($joinErrors['address']) ? ' is-invalid' : '' ?>" id="address" name="address" value="<?= esc(old('address')) ?>">
-                                    <?php if (isset($joinErrors['address'])): ?>
-                                        <div class="invalid-feedback"><?= esc($joinErrors['address']) ?></div>
-                                    <?php endif; ?>
-                                </div>
-                                <button type="submit" class="btn btn-evergreen w-100 d-flex align-items-center justify-content-center py-2">Send Player Details</button>
-                            </form>
+                                    <div class="mb-4">
+                                        <label for="name" class="form-label">Name *</label>
+                                        <input type="text" class="form-control<?= isset($joinErrors['name']) ? ' is-invalid' : '' ?>" id="name" name="name" value="<?= esc(old('name')) ?>">
+                                        <?php if (isset($joinErrors['name'])): ?>
+                                            <div class="invalid-feedback"><?= esc($joinErrors['name']) ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="mb-4 d-none">
+                                        <label for="email" class="form-label fw-semibold">Email</label>
+                                        <input type="email" class="form-control<?= isset($joinErrors['email']) ? ' is-invalid' : '' ?>" id="email" name="email" value="<?= esc(old('email')) ?>">
+                                        <?php if (isset($joinErrors['email'])): ?>
+                                            <div class="invalid-feedback"><?= esc($joinErrors['email']) ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="phone" class="form-label fw-semibold">Phone *</label>
+                                        <input type="text" class="form-control<?= isset($joinErrors['phone']) ? ' is-invalid' : '' ?>" id="phone" name="phone" value="<?= esc(old('phone')) ?>">
+                                        <?php if (isset($joinErrors['phone'])): ?>
+                                            <div class="invalid-feedback"><?= esc($joinErrors['phone']) ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="address" class="form-label fw-semibold">Address *</label>
+                                        <input type="text" class="form-control<?= isset($joinErrors['address']) ? ' is-invalid' : '' ?>" id="address" name="address" value="<?= esc(old('address')) ?>">
+                                        <?php if (isset($joinErrors['address'])): ?>
+                                            <div class="invalid-feedback"><?= esc($joinErrors['address']) ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <button type="submit" class="btn btn-evergreen w-100 d-flex align-items-center justify-content-center py-2">Send Player Details</button>
+
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
