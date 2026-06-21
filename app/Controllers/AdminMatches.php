@@ -42,19 +42,19 @@ class AdminMatches extends BaseController
 
     public function index(): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
         return view('admin/matches/index', [
             'username' => session()->get('admin_username'),
-            'matches'  => $this->matches->orderedList(),
+            'matches' => $this->matches->orderedList(),
         ]);
     }
 
     public function create(): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -63,7 +63,7 @@ class AdminMatches extends BaseController
 
     public function edit(int $matchId): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -78,7 +78,7 @@ class AdminMatches extends BaseController
 
     public function store()
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -102,7 +102,7 @@ class AdminMatches extends BaseController
 
     public function update(int $matchId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -142,7 +142,7 @@ class AdminMatches extends BaseController
 
     public function delete(int $matchId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -165,7 +165,7 @@ class AdminMatches extends BaseController
 
     public function show(int $matchId): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -178,21 +178,21 @@ class AdminMatches extends BaseController
         $participants = $this->matchFinance->getParticipants($matchId);
 
         return view('admin/matches/show', [
-            'username'         => session()->get('admin_username'),
-            'match'            => $match,
-            'participants'     => $participants,
+            'username' => session()->get('admin_username'),
+            'match' => $match,
+            'participants' => $participants,
             'matchContributorIds' => $this->matchFinance->getMatchContributorIds($matchId),
             'matchContributors' => $this->matchFinance->getMatchContributors($matchId),
-            'scoreboard'       => $this->buildScoreboardData($match, $participants),
+            'scoreboard' => $this->buildScoreboardData($match, $participants),
             'contributorGroups' => $this->matchFinance->buildContributorGroups($participants, $match),
-            'expenses'         => $this->matchFinance->getExpenses($matchId),
-            'financeSummary'   => $this->matchFinance->buildSummary($matchId, $participants),
+            'expenses' => $this->matchFinance->getExpenses($matchId),
+            'financeSummary' => $this->matchFinance->buildSummary($matchId, $participants),
         ]);
     }
 
     public function scoreboard(int $matchId): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -205,7 +205,7 @@ class AdminMatches extends BaseController
 
     public function updateContributors(int $matchId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -236,12 +236,11 @@ class AdminMatches extends BaseController
 
     public function start(int $matchId): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
         $match = $this->matches->findWithVenue($matchId);
-
         if ($match === null) {
             throw PageNotFoundException::forPageNotFound('Match not found.');
         }
@@ -265,7 +264,7 @@ class AdminMatches extends BaseController
 
     public function storeStart(int $matchId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -319,11 +318,11 @@ class AdminMatches extends BaseController
 
         $errors = [];
 
-        if (! isset($sideLabels[$tossWinnerSide])) {
+        if (!isset($sideLabels[$tossWinnerSide])) {
             $errors['toss_winner_side'] = 'Select a valid toss winner.';
         }
 
-        if (! in_array($tossDecision, ['bat', 'bowl'], true)) {
+        if (!in_array($tossDecision, ['bat', 'bowl'], true)) {
             $errors['toss_decision'] = 'Select a valid toss decision.';
         }
 
@@ -332,15 +331,15 @@ class AdminMatches extends BaseController
             : null;
         $bowlingSide = $battingSide !== null ? $oppositeSides[$battingSide] : null;
 
-        if (! isset($playerSides[$strikerPlayerId])) {
+        if (!isset($playerSides[$strikerPlayerId])) {
             $errors['striker_player_id'] = 'Select a valid opening batter.';
         }
 
-        if (! isset($playerSides[$nonStrikerPlayerId])) {
+        if (!isset($playerSides[$nonStrikerPlayerId])) {
             $errors['non_striker_player_id'] = 'Select a valid non-striker.';
         }
 
-        if (! isset($playerSides[$bowlerPlayerId])) {
+        if (!isset($playerSides[$bowlerPlayerId])) {
             $errors['bowler_player_id'] = 'Select a valid opening bowler.';
         }
 
@@ -399,6 +398,8 @@ class AdminMatches extends BaseController
             'opening_bowler_player_id' => $bowlerPlayerId,
         ]);
 
+        $this->autoPopulateSummaryData($matchId, 1, $battingSide, $bowlingSide);
+
         if ($this->request->isAJAX()) {
             return $this->respondWithJson([
                 'success' => true,
@@ -414,7 +415,7 @@ class AdminMatches extends BaseController
 
     public function storeInnings(int $matchId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -443,11 +444,11 @@ class AdminMatches extends BaseController
             $errors['innings_number'] = 'Select a valid innings number.';
         }
 
-        if (! in_array($battingSide, ['team_a', 'team_b'], true)) {
+        if (!in_array($battingSide, ['team_a', 'team_b'], true)) {
             $errors['batting_side'] = 'Select a valid batting side.';
         }
 
-        if (! in_array($bowlingSide, ['team_a', 'team_b'], true)) {
+        if (!in_array($bowlingSide, ['team_a', 'team_b'], true)) {
             $errors['bowling_side'] = 'Select a valid bowling side.';
         }
 
@@ -512,7 +513,7 @@ class AdminMatches extends BaseController
 
     public function storeBall(int $matchId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -610,15 +611,15 @@ class AdminMatches extends BaseController
         $markCompleted = $this->request->getPost('complete_innings') ? 1 : 0;
         $errors = [];
 
-        if (! isset($playersById[$strikerPlayerId])) {
+        if (!isset($playersById[$strikerPlayerId])) {
             $errors['striker_player_id'] = 'Select a valid striker.';
         }
 
-        if (! isset($playersById[$nonStrikerPlayerId])) {
+        if (!isset($playersById[$nonStrikerPlayerId])) {
             $errors['non_striker_player_id'] = 'Select a valid non-striker.';
         }
 
-        if (! isset($playersById[$bowlerPlayerId])) {
+        if (!isset($playersById[$bowlerPlayerId])) {
             $errors['bowler_player_id'] = 'Select a valid bowler.';
         }
 
@@ -668,7 +669,7 @@ class AdminMatches extends BaseController
             $errors['bowler_player_id'] = 'Select a new bowler at the start of each over.';
         }
 
-        if ($extraType !== '' && ! in_array($extraType, ['wide', 'no_ball', 'bye', 'leg_bye', 'penalty'], true)) {
+        if ($extraType !== '' && !in_array($extraType, ['wide', 'no_ball', 'bye', 'leg_bye', 'penalty'], true)) {
             $errors['extra_type'] = 'Select a valid extra type.';
         }
 
@@ -691,7 +692,7 @@ class AdminMatches extends BaseController
         }
 
         $maxBalls = max(1, (int) ($match['format_overs'] ?? 0)) * 6;
-        $isLegalDelivery = ! in_array($extraType, ['wide', 'no_ball'], true);
+        $isLegalDelivery = !in_array($extraType, ['wide', 'no_ball'], true);
 
         if ((int) ($innings['balls'] ?? 0) >= $maxBalls) {
             $errors['innings_id'] = 'This innings has already reached the scheduled overs limit.';
@@ -838,7 +839,7 @@ class AdminMatches extends BaseController
 
     public function storeExpense(int $matchId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -854,7 +855,7 @@ class AdminMatches extends BaseController
             'expense_notes' => 'permit_empty|string',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->to('/admin/matches/' . $matchId)
                 ->withInput()
                 ->with('expense_errors', $this->validator->getErrors());
@@ -878,7 +879,7 @@ class AdminMatches extends BaseController
 
     public function updateExpense(int $matchId, int $expenseId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -898,7 +899,7 @@ class AdminMatches extends BaseController
             'expense_notes' => 'permit_empty|string',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->to('/admin/matches/' . $matchId)
                 ->withInput()
                 ->with('expense_update_errors', $this->validator->getErrors())
@@ -923,7 +924,7 @@ class AdminMatches extends BaseController
 
     public function deleteExpense(int $matchId, int $expenseId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -938,7 +939,7 @@ class AdminMatches extends BaseController
 
     public function clearScoreboard(int $matchId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -994,7 +995,7 @@ class AdminMatches extends BaseController
             'match_status' => 'required|in_list[scheduled,live,completed,abandoned,archived]',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -1016,19 +1017,19 @@ class AdminMatches extends BaseController
         $teamBCaptainId = (int) $this->request->getPost('team_b_captain_id');
         $teamBKeeperId = (int) $this->request->getPost('team_b_keeper_id');
 
-        if ($teamACaptainId > 0 && ! in_array($teamACaptainId, $teamAPlayers, true)) {
+        if ($teamACaptainId > 0 && !in_array($teamACaptainId, $teamAPlayers, true)) {
             return redirect()->back()->withInput()->with('errors', ['team_a_captain_id' => 'Select a Team A captain from the Team A squad.']);
         }
 
-        if ($teamAKeeperId > 0 && ! in_array($teamAKeeperId, $teamAPlayers, true)) {
+        if ($teamAKeeperId > 0 && !in_array($teamAKeeperId, $teamAPlayers, true)) {
             return redirect()->back()->withInput()->with('errors', ['team_a_keeper_id' => 'Select a Team A wicketkeeper from the Team A squad.']);
         }
 
-        if ($teamBCaptainId > 0 && ! in_array($teamBCaptainId, $teamBPlayers, true)) {
+        if ($teamBCaptainId > 0 && !in_array($teamBCaptainId, $teamBPlayers, true)) {
             return redirect()->back()->withInput()->with('errors', ['team_b_captain_id' => 'Select a Team B captain from the Team B squad.']);
         }
 
-        if ($teamBKeeperId > 0 && ! in_array($teamBKeeperId, $teamBPlayers, true)) {
+        if ($teamBKeeperId > 0 && !in_array($teamBKeeperId, $teamBPlayers, true)) {
             return redirect()->back()->withInput()->with('errors', ['team_b_keeper_id' => 'Select a Team B wicketkeeper from the Team B squad.']);
         }
 
@@ -1224,7 +1225,7 @@ class AdminMatches extends BaseController
         $matchId = (int) $match['id'];
         $wasCompleted = ($match['match_status'] ?? '') === 'completed';
 
-        if (! $this->hasCompletedSecondInnings($scoreboard)) {
+        if (!$this->hasCompletedSecondInnings($scoreboard)) {
             if ($wasCompleted) {
                 $this->matches->update($matchId, [
                     'match_status' => 'live',
@@ -1244,7 +1245,7 @@ class AdminMatches extends BaseController
             'result_summary' => $result['result_summary'],
         ]);
 
-        if (! $shouldRedirectOnCompletion || $wasCompleted) {
+        if (!$shouldRedirectOnCompletion || $wasCompleted) {
             return null;
         }
 
@@ -1403,7 +1404,7 @@ class AdminMatches extends BaseController
         foreach ($balls as $ball) {
             $bowlerPlayerId = (int) ($ball['bowler_player_id'] ?? 0);
 
-            if (! isset($card[$bowlerPlayerId])) {
+            if (!isset($card[$bowlerPlayerId])) {
                 continue;
             }
 
@@ -1538,12 +1539,31 @@ class AdminMatches extends BaseController
         $scoreboard = $this->buildScoreboardData($match, $participants);
         $activeInnings = $this->selectWizardInnings($scoreboard);
 
+        // Load summary data
+        $summaryBatsmen = new \App\Models\MatchSummaryBatsmenModel();
+        $summaryBowlers = new \App\Models\MatchSummaryBowlersModel();
+        $summaryWickets = new \App\Models\MatchSummaryWicketsModel();
+
+        $matchId = (int) $match['id'];
+        $summaryData = [
+            'batsmen' => [],
+            'bowlers' => [],
+            'wickets' => [],
+        ];
+
+        for ($inningsNum = 1; $inningsNum <= 2; $inningsNum++) {
+            $summaryData['batsmen'][$inningsNum] = $summaryBatsmen->forMatchInnings($matchId, $inningsNum);
+            $summaryData['bowlers'][$inningsNum] = $summaryBowlers->forMatchInnings($matchId, $inningsNum);
+            $summaryData['wickets'][$inningsNum] = $summaryWickets->forMatchInnings($matchId, $inningsNum);
+        }
+
         return view('admin/matches/_start_scoreboard', [
             'match' => $match,
             'scoreboard' => $scoreboard,
             'activeInnings' => $activeInnings,
             'ballErrors' => $ballErrors,
             'ballValues' => $ballValues,
+            'summaryData' => $summaryData,
         ]);
     }
 
@@ -1648,7 +1668,7 @@ class AdminMatches extends BaseController
 
     private function countsAsBowlerWicket(string $wicketType): bool
     {
-        return ! in_array(strtolower(trim($wicketType)), ['run_out', 'retired_hurt', 'retired_out', 'obstructing_the_field'], true);
+        return !in_array(strtolower(trim($wicketType)), ['run_out', 'retired_hurt', 'retired_out', 'obstructing_the_field'], true);
     }
 
     private function formatOvers(int $balls): string
@@ -1737,5 +1757,182 @@ class AdminMatches extends BaseController
             'teamBCaptainId' => $teamBCaptainId,
             'teamBKeeperId' => $teamBKeeperId,
         ];
+    }
+
+    private function autoPopulateSummaryData(int $matchId, int $inningsNumber, string $battingSide, string $bowlingSide): void
+    {
+        $battingPlayers = $this->matchPlayers
+            ->select('match_players.player_id, players.name')
+            ->join('players', 'players.id = match_players.player_id')
+            ->where('match_players.match_id', $matchId)
+            ->where('match_players.side', $battingSide)
+            ->orderBy('match_players.batting_position', 'ASC')
+            ->findAll();
+
+        $bowlingPlayers = $this->matchPlayers
+            ->select('match_players.player_id, players.name')
+            ->join('players', 'players.id = match_players.player_id')
+            ->where('match_players.match_id', $matchId)
+            ->where('match_players.side', $bowlingSide)
+            ->orderBy('match_players.batting_position', 'ASC')
+            ->findAll();
+
+        $summaryBatsmen = new \App\Models\MatchSummaryBatsmenModel();
+        $summaryBowlers = new \App\Models\MatchSummaryBowlersModel();
+
+        foreach ($battingPlayers as $player) {
+            $summaryBatsmen->insert([
+                'match_id' => $matchId,
+                'innings_number' => $inningsNumber,
+                'batsman_name' => (string) $player['name'],
+                'runs' => 0,
+                'balls' => 0,
+                'fours' => 0,
+                'sixes' => 0,
+                'dismissal_mode' => null,
+                'dismissal_by' => null,
+            ]);
+        }
+
+        foreach ($bowlingPlayers as $player) {
+            $summaryBowlers->insert([
+                'match_id' => $matchId,
+                'innings_number' => $inningsNumber,
+                'bowler_name' => (string) $player['name'],
+                'overs' => 0.0,
+                'maidens' => 0,
+                'runs' => 0,
+                'wickets' => 0,
+            ]);
+        }
+    }
+
+    public function storeSummaryBatsman(int $matchId)
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        if ($this->matches->find($matchId) === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $summaryBatsmen = new \App\Models\MatchSummaryBatsmenModel();
+        $summaryBatsmen->insert([
+            'match_id' => $matchId,
+            'innings_number' => (int) $this->request->getPost('innings_number'),
+            'batsman_name' => trim((string) $this->request->getPost('batsman_name')),
+            'runs' => (int) $this->request->getPost('runs') ?? 0,
+            'balls' => (int) $this->request->getPost('balls') ?? 0,
+            'fours' => (int) $this->request->getPost('fours') ?? 0,
+            'sixes' => (int) $this->request->getPost('sixes') ?? 0,
+            'dismissal_mode' => $this->emptyToNull((string) $this->request->getPost('dismissal_mode')),
+            'dismissal_by' => $this->emptyToNull((string) $this->request->getPost('dismissal_by')),
+        ]);
+
+        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Batsman added to summary.');
+    }
+
+    public function deleteSummaryBatsman(int $matchId, int $batsmanId)
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        if ($this->matches->find($matchId) === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $summaryBatsmen = new \App\Models\MatchSummaryBatsmenModel();
+        if ($summaryBatsmen->find($batsmanId) === null) {
+            throw PageNotFoundException::forPageNotFound('Batsman not found.');
+        }
+
+        $summaryBatsmen->delete($batsmanId);
+        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Batsman removed from summary.');
+    }
+
+    public function storeSummaryBowler(int $matchId)
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        if ($this->matches->find($matchId) === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $summaryBowlers = new \App\Models\MatchSummaryBowlersModel();
+        $summaryBowlers->insert([
+            'match_id' => $matchId,
+            'innings_number' => (int) $this->request->getPost('innings_number'),
+            'bowler_name' => trim((string) $this->request->getPost('bowler_name')),
+            'overs' => (float) $this->request->getPost('overs') ?? 0,
+            'maidens' => (int) $this->request->getPost('maidens') ?? 0,
+            'runs' => (int) $this->request->getPost('runs') ?? 0,
+            'wickets' => (int) $this->request->getPost('wickets') ?? 0,
+        ]);
+
+        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Bowler added to summary.');
+    }
+
+    public function deleteSummaryBowler(int $matchId, int $bowlerId)
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        if ($this->matches->find($matchId) === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $summaryBowlers = new \App\Models\MatchSummaryBowlersModel();
+        if ($summaryBowlers->find($bowlerId) === null) {
+            throw PageNotFoundException::forPageNotFound('Bowler not found.');
+        }
+
+        $summaryBowlers->delete($bowlerId);
+        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Bowler removed from summary.');
+    }
+
+    public function storeSummaryWicket(int $matchId)
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        if ($this->matches->find($matchId) === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $summaryWickets = new \App\Models\MatchSummaryWicketsModel();
+        $summaryWickets->insert([
+            'match_id' => $matchId,
+            'innings_number' => (int) $this->request->getPost('innings_number'),
+            'player_name' => trim((string) $this->request->getPost('player_name')),
+            'score_at_dismissal' => (int) $this->request->getPost('score_at_dismissal'),
+            'over_at_dismissal' => (float) $this->request->getPost('over_at_dismissal'),
+        ]);
+
+        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Wicket added to summary.');
+    }
+
+    public function deleteSummaryWicket(int $matchId, int $wicketId)
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        if ($this->matches->find($matchId) === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $summaryWickets = new \App\Models\MatchSummaryWicketsModel();
+        if ($summaryWickets->find($wicketId) === null) {
+            throw PageNotFoundException::forPageNotFound('Wicket not found.');
+        }
+
+        $summaryWickets->delete($wicketId);
+        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Wicket removed from summary.');
     }
 }

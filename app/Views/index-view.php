@@ -342,22 +342,18 @@
                     <h2 class="section-title mb-2">Meet the teams</h2>
                     <p class="section-copy mb-3">From the nets to match day, these are the teams driving EverGreen forward.</p>
                     <div class="row">
-                        <div class="col-md-3">
-                            <img src="<?= base_url('assets/images/teams/aliza.jpeg') ?>" alt="Aliza strike force" class="w-100 mb-3">
-                            <p class="text-center">ALIZA strike force</p>
-                        </div>
-                        <div class="col-md-3">
-                            <img src="<?= base_url('assets/images/teams/w-warriors.jpeg') ?>" alt="W-Warriors sports team" class="w-100 mb-3">
-                            <p class="text-center">W-WARRIORS sports team</p>
-                        </div>
-                        <div class="col-md-3">
-                            <img src="<?= base_url('assets/images/teams/v-bold.jpeg') ?>" alt="V-Bold" class="w-100 mb-3">
-                            <p class="text-center">V-BOLD sports team</p>
-                        </div>
-                        <div class="col-md-3">
-                            <img src="<?= base_url('assets/images/teams/w-avanta.jpeg') ?>" alt="Wichet wizards avanta" class="w-100 mb-3">
-                            <p class="text-center">Wichet wizards AVANTA</p>
-                        </div>
+                        <?php foreach ($teams as $team): ?>
+                            <div class="col-md-3">
+                                <?php if ($team['logo']): ?>
+                                    <img src="<?= base_url('assets/images/teams/' . esc($team['logo'])) ?>" alt="<?= esc($team['name']) ?>" class="w-100 mb-3">
+                                <?php else: ?>
+                                    <div class="bg-light w-100 mb-3 d-flex align-items-center justify-content-center" style="height: 300px;">
+                                        <span class="text-secondary">No logo</span>
+                                    </div>
+                                <?php endif; ?>
+                                <p class="text-center"><?= esc($team['name']) ?></p>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </section>

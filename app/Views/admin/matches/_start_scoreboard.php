@@ -17,12 +17,12 @@
     $extrasValue = (string) ($ballValues['extras'] ?? '0');
     $extraTypeValue = (string) ($ballValues['extra_type'] ?? '');
     $commentaryValue = (string) ($ballValues['commentary'] ?? '');
-    $completeValue = ! empty($ballValues['complete_innings']);
-    $isWicketValue = ! empty($ballValues['is_wicket']);
+    $completeValue = !empty($ballValues['complete_innings']);
+    $isWicketValue = !empty($ballValues['is_wicket']);
     $wicketTypeValue = (string) ($ballValues['wicket_type'] ?? '');
     $editBallIdValue = (string) ($ballValues['edit_ball_id'] ?? '');
     $isEditingLastBall = $editBallIdValue !== '';
-    $requiresNewBowler = ! empty($activeInnings['requires_new_bowler']);
+    $requiresNewBowler = !empty($activeInnings['requires_new_bowler']);
     $previousBowlerId = isset($activeInnings['current_pair']['bowler_id']) ? (int) $activeInnings['current_pair']['bowler_id'] : null;
     $nextInningsNumber = (int) ($scoreboard['nextInningsNumber'] ?? 0);
     $canStartNextInnings = (int) ($activeInnings['completed'] ?? 0) === 1
@@ -32,7 +32,7 @@
     $nextBowlingSide = (string) ($activeInnings['batting_side'] ?? '');
     $dismissedBatterIds = array_map('intval', $activeInnings['dismissed_batter_ids'] ?? []);
 
-    if (! $isEditingLastBall && $requiresNewBowler && $previousBowlerId !== null && $bowlerValue === (string) $previousBowlerId) {
+    if (!$isEditingLastBall && $requiresNewBowler && $previousBowlerId !== null && $bowlerValue === (string) $previousBowlerId) {
         $bowlerValue = '';
     }
     ?>
@@ -67,7 +67,7 @@
             <div class="scoreboard-hero__meta">
                 <span class="scoreboard-hero__meta-label">Next Ball</span>
                 <div class="scoreboard-hero__meta-value"><?= esc($activeInnings['next_ball_code']) ?></div>
-                <?php if (! empty($activeInnings['current_pair'])): ?>
+                <?php if (!empty($activeInnings['current_pair'])): ?>
                     <span class="scoreboard-hero__meta-label">Striker</span>
                     <div class="scoreboard-hero__meta-value"><?= esc((string) ($activeInnings['current_pair']['striker'] ?? '')) ?></div>
                     <span class="scoreboard-hero__meta-label">Non-striker</span>
@@ -104,7 +104,7 @@
                 </div>
             </div>
 
-            <?php if ((int) $activeInnings['completed'] === 1 && ! $isEditingLastBall): ?>
+            <?php if ((int) $activeInnings['completed'] === 1 && !$isEditingLastBall): ?>
                 <div class="alert alert-warning mb-3">
                     This innings is completed. Only the latest delivery can be edited.
                 </div>
@@ -158,7 +158,7 @@
                         <select class="form-select<?= isset($ballErrors['bowler_player_id']) ? ' is-invalid' : '' ?>" id="wizard_bowler_player_id_<?= esc((string) $inningsId) ?>" name="bowler_player_id">
                             <option value="">Select bowler</option>
                             <?php foreach ($bowlingPlayers as $player): ?>
-                                <?php if (! $isEditingLastBall && $requiresNewBowler && $previousBowlerId !== null && (int) $player['player_id'] === $previousBowlerId) {
+                                <?php if (!$isEditingLastBall && $requiresNewBowler && $previousBowlerId !== null && (int) $player['player_id'] === $previousBowlerId) {
                                     continue;
                                 } ?>
                                 <option value="<?= esc((string) $player['player_id']) ?>" <?= $bowlerValue === (string) $player['player_id'] ? 'selected' : '' ?>><?= esc($player['name']) ?></option>
@@ -167,7 +167,7 @@
                         <?php if (isset($ballErrors['bowler_player_id'])): ?>
                             <div class="invalid-feedback"><?= esc($ballErrors['bowler_player_id']) ?></div>
                         <?php endif; ?>
-                        <?php if (! $isEditingLastBall && $requiresNewBowler && ! isset($ballErrors['bowler_player_id'])): ?>
+                        <?php if (!$isEditingLastBall && $requiresNewBowler && !isset($ballErrors['bowler_player_id'])): ?>
                             <div class="form-text text-warning">Over complete. Select a new bowler before the next ball.</div>
                         <?php endif; ?>
                     </div>
@@ -377,36 +377,20 @@
                                         </td>
                                         <td>
                                             <div><?= esc((string) ($ball['striker_name'] ?? '')) ?> scored <?= esc((string) ($ball['runs_bat'] ?? 0)) ?></div>
-                                            <?php if (! empty($ball['extra_type'])): ?>
-                                                <div class="small text-secondary">Extras: <?= esc((string) ($ball['extras'] ?? 0)) ?> <?= esc(str_replace('_', ' ', (string) $ball['extra_type'])) ?></div>
+                                            <?php if (!empty($ball['extra_type'])): ?>
+                                                <div class="small text-secondary">Extras: <?= esc((string) ($ball['extras'] ?? 0)) ?>                 <?= esc(str_replace('_', ' ', (string) $ball['extra_type'])) ?></div>
                                             <?php endif; ?>
                                             <?php if ((int) ($ball['is_wicket'] ?? 0) === 1): ?>
-                                                <div class="small text-danger">Wicket: <?= esc(str_replace('_', ' ', (string) ($ball['wicket_type'] ?? 'out'))) ?><?= ! empty($ball['dismissed_name']) ? ' - ' . esc((string) $ball['dismissed_name']) : '' ?></div>
+                                                <div class="small text-danger">Wicket: <?= esc(str_replace('_', ' ', (string) ($ball['wicket_type'] ?? 'out'))) ?><?= !empty($ball['dismissed_name']) ? ' - ' . esc((string) $ball['dismissed_name']) : '' ?></div>
                                             <?php endif; ?>
-                                            <?php if (! empty($ball['commentary'])): ?>
+                                            <?php if (!empty($ball['commentary'])): ?>
                                                 <div class="small text-secondary"><?= esc((string) $ball['commentary']) ?></div>
                                             <?php endif; ?>
                                         </td>
                                         <td><?= esc((string) ($ball['score_after_ball'] ?? '')) ?></td>
                                         <td class="text-end">
                                             <?php if ($index === 0): ?>
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-sm btn-primary"
-                                                    data-edit-last-ball
-                                                    data-ball-id="<?= esc((string) ($ball['id'] ?? '')) ?>"
-                                                    data-striker-player-id="<?= esc((string) ($ball['striker_player_id'] ?? '')) ?>"
-                                                    data-non-striker-player-id="<?= esc((string) ($ball['non_striker_player_id'] ?? '')) ?>"
-                                                    data-bowler-player-id="<?= esc((string) ($ball['bowler_player_id'] ?? '')) ?>"
-                                                    data-bowler-name="<?= esc((string) ($ball['bowler_name'] ?? '')) ?>"
-                                                    data-runs-bat="<?= esc((string) ($ball['runs_bat'] ?? '0')) ?>"
-                                                    data-extras="<?= esc((string) ($ball['extras'] ?? '0')) ?>"
-                                                    data-extra-type="<?= esc((string) ($ball['extra_type'] ?? '')) ?>"
-                                                    data-is-wicket="<?= esc((string) ($ball['is_wicket'] ?? '0')) ?>"
-                                                    data-wicket-type="<?= esc((string) ($ball['wicket_type'] ?? '')) ?>"
-                                                    data-dismissed-player-id="<?= esc((string) ($ball['dismissed_player_id'] ?? '')) ?>"
-                                                    data-fielder-player-id="<?= esc((string) ($ball['fielder_player_id'] ?? '')) ?>"
-                                                    data-commentary="<?= esc((string) ($ball['commentary'] ?? '')) ?>">Edit Last</button>
+                                                <button type="button" class="btn btn-sm btn-primary" data-edit-last-ball data-ball-id="<?= esc((string) ($ball['id'] ?? '')) ?>" data-striker-player-id="<?= esc((string) ($ball['striker_player_id'] ?? '')) ?>" data-non-striker-player-id="<?= esc((string) ($ball['non_striker_player_id'] ?? '')) ?>" data-bowler-player-id="<?= esc((string) ($ball['bowler_player_id'] ?? '')) ?>" data-bowler-name="<?= esc((string) ($ball['bowler_name'] ?? '')) ?>" data-runs-bat="<?= esc((string) ($ball['runs_bat'] ?? '0')) ?>" data-extras="<?= esc((string) ($ball['extras'] ?? '0')) ?>" data-extra-type="<?= esc((string) ($ball['extra_type'] ?? '')) ?>" data-is-wicket="<?= esc((string) ($ball['is_wicket'] ?? '0')) ?>" data-wicket-type="<?= esc((string) ($ball['wicket_type'] ?? '')) ?>" data-dismissed-player-id="<?= esc((string) ($ball['dismissed_player_id'] ?? '')) ?>" data-fielder-player-id="<?= esc((string) ($ball['fielder_player_id'] ?? '')) ?>" data-commentary="<?= esc((string) ($ball['commentary'] ?? '')) ?>">Edit Last</button>
                                             <?php endif; ?>
                                         </td>
                                     </tr>

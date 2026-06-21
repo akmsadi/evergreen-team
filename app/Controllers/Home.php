@@ -6,6 +6,7 @@ use App\Models\PlayerModel;
 use App\Models\MatchModel;
 use App\Models\EventModel;
 use App\Models\EventImageModel;
+use App\Models\TeamModel;
 
 class Home extends BaseController
 {
@@ -13,6 +14,7 @@ class Home extends BaseController
     private MatchModel $matches;
     private EventModel $events;
     private EventImageModel $eventImages;
+    private TeamModel $teams;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class Home extends BaseController
         $this->matches = new MatchModel();
         $this->events = new EventModel();
         $this->eventImages = new EventImageModel();
+        $this->teams = new TeamModel();
     }
 
     public function index(): string
@@ -47,6 +50,7 @@ class Home extends BaseController
             'nextMatch' => $nextMatch,
             'players' => $players,
             'events' => $events,
+            'teams' => $this->teams->orderBy('name', 'ASC')->findAll(),
         ]);
     }
 

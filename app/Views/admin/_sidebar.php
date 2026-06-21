@@ -15,6 +15,7 @@
         <li><a class="nav-link<?= ($activeNav ?? '') === 'create-player' ? ' active' : '' ?>" href="<?= site_url('/admin/players/create') ?>"><i class="ti ti-user-plus"></i><span class="nav-text">Add Player</span></a></li>
         <li><a class="nav-link<?= ($activeNav ?? '') === 'accounts' ? ' active' : '' ?>" href="<?= site_url('/admin/accounts') ?>"><i class="ti ti-wallet"></i><span class="nav-text">Accounts</span></a></li>
         <li><a class="nav-link<?= ($activeNav ?? '') === 'events' ? ' active' : '' ?>" href="<?= site_url('/admin/events') ?>"><i class="ti ti-photo"></i><span class="nav-text">Event Gallery</span></a></li>
+        <li><a class="nav-link<?= ($activeNav ?? '') === 'teams' ? ' active' : '' ?>" href="<?= site_url('/admin/teams') ?>"><i class="ti ti-users"></i><span class="nav-text">Teams</span></a></li>
         <li class="px-4 pt-4 pb-2"><small class="nav-text">Account</small></li>
         <li><a class="nav-link" href="<?= site_url('/') ?>"><i class="ti ti-world"></i><span class="nav-text">View Site</span></a></li>
         <li><a class="nav-link" href="<?= site_url('/admin/logout') ?>"><i class="ti ti-logout"></i><span class="nav-text">Logout</span></a></li>

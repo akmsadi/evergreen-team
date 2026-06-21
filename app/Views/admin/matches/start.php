@@ -185,7 +185,7 @@
 <?= $this->section('content') ?>
 <?php $startErrors = session()->getFlashdata('start_errors') ?? []; ?>
 <?php $hasPlayerErrors = isset($startErrors['striker_player_id']) || isset($startErrors['non_striker_player_id']) || isset($startErrors['bowler_player_id']); ?>
-<?php $startCompleted = ! empty($startCompleted); ?>
+<?php $startCompleted = !empty($startCompleted); ?>
 <?php $initialWizardStep = (int) ($initialWizardStep ?? ($startCompleted ? 3 : ($hasPlayerErrors ? 2 : 1))); ?>
 <?php
 $initialTossWinnerSide = (string) old('toss_winner_side');
@@ -201,7 +201,7 @@ if ($initialTossWinnerSide === '') {
 }
 
 $initialTossDecision = (string) old('toss_decision', (string) ($match['toss_decision'] ?? ''));
-if (! in_array($initialTossDecision, ['bat', 'bowl'], true)) {
+if (!in_array($initialTossDecision, ['bat', 'bowl'], true)) {
     $initialTossDecision = '';
 }
 
@@ -408,16 +408,12 @@ foreach ($participants as $participant) {
     </div>
 </div>
 
-<div
-    class="wizard-toast-stack"
-    data-wizard-alerts
-    data-initial-success="<?= esc((string) (session()->getFlashdata('success') ?? '')) ?>"
-    data-initial-error="<?= esc((string) (session()->getFlashdata('error') ?? '')) ?>"></div>
+<div class="wizard-toast-stack" data-wizard-alerts data-initial-success="<?= esc((string) (session()->getFlashdata('success') ?? '')) ?>" data-initial-error="<?= esc((string) (session()->getFlashdata('error') ?? '')) ?>"></div>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         var wizard = document.querySelector('[data-start-match-wizard]');
         var form = wizard ? wizard.querySelector('[data-start-match-form]') : null;
 
@@ -491,7 +487,7 @@ foreach ($participants as $participant) {
                 delay: type === 'success' ? 2500 : 4000,
             });
 
-            toastElement.addEventListener('hidden.bs.toast', function() {
+            toastElement.addEventListener('hidden.bs.toast', function () {
                 toastElement.remove();
             });
 
@@ -503,7 +499,7 @@ foreach ($participants as $participant) {
                 return;
             }
 
-            document.querySelectorAll('input[name="' + payload.csrfToken + '"]').forEach(function(input) {
+            document.querySelectorAll('input[name="' + payload.csrfToken + '"]').forEach(function (input) {
                 input.value = payload.csrfHash;
             });
         }
@@ -524,7 +520,7 @@ foreach ($participants as $participant) {
         }
 
         function clearStartErrors() {
-            ['toss_winner_side', 'toss_decision', 'striker_player_id', 'non_striker_player_id', 'bowler_player_id'].forEach(function(fieldName) {
+            ['toss_winner_side', 'toss_decision', 'striker_player_id', 'non_striker_player_id', 'bowler_player_id'].forEach(function (fieldName) {
                 setFieldError(fieldName, '');
             });
         }
@@ -532,7 +528,7 @@ foreach ($participants as $participant) {
         function applyStartErrors(errors) {
             clearStartErrors();
 
-            Object.keys(errors || {}).forEach(function(fieldName) {
+            Object.keys(errors || {}).forEach(function (fieldName) {
                 setFieldError(fieldName, errors[fieldName]);
             });
         }
@@ -545,8 +541,8 @@ foreach ($participants as $participant) {
                     'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: formData
-            }).then(function(response) {
-                return response.json().then(function(payload) {
+            }).then(function (response) {
+                return response.json().then(function (payload) {
                     payload.httpStatus = response.status;
                     return payload;
                 });
@@ -586,19 +582,19 @@ foreach ($participants as $participant) {
                 'Bat first' :
                 (tossDecisionInput.value === 'bowl' ? 'Bowl first' : '-');
 
-            document.querySelectorAll('[data-batting-side-label]').forEach(function(node) {
+            document.querySelectorAll('[data-batting-side-label]').forEach(function (node) {
                 node.textContent = battingLabel;
             });
 
-            document.querySelectorAll('[data-bowling-side-label]').forEach(function(node) {
+            document.querySelectorAll('[data-bowling-side-label]').forEach(function (node) {
                 node.textContent = bowlingLabel;
             });
 
-            document.querySelectorAll('[data-match-toss-winner]').forEach(function(node) {
+            document.querySelectorAll('[data-match-toss-winner]').forEach(function (node) {
                 node.textContent = tossWinnerLabel;
             });
 
-            document.querySelectorAll('[data-match-toss-decision]').forEach(function(node) {
+            document.querySelectorAll('[data-match-toss-decision]').forEach(function (node) {
                 node.textContent = tossDecisionLabel;
             });
         }
@@ -607,13 +603,13 @@ foreach ($participants as $participant) {
             select.innerHTML = '';
             select.append(new Option(placeholder, ''));
 
-            players.forEach(function(player) {
+            players.forEach(function (player) {
                 select.append(new Option(player.name, String(player.id), false, String(player.id) === selectedValue));
             });
 
-            if (!players.some(function(player) {
-                    return String(player.id) === selectedValue;
-                })) {
+            if (!players.some(function (player) {
+                return String(player.id) === selectedValue;
+            })) {
                 select.value = '';
             }
         }
@@ -638,13 +634,13 @@ foreach ($participants as $participant) {
             stepThree.hidden = stepNumber !== 3;
             currentStep = stepNumber;
 
-            stepIndicators.forEach(function(indicator) {
+            stepIndicators.forEach(function (indicator) {
                 indicator.classList.toggle('active', indicator.dataset.stepIndicator === String(stepNumber));
             });
         }
 
         function initBallEntryForms(root) {
-            root.querySelectorAll('[data-wizard-ball-form]').forEach(function(ballForm) {
+            root.querySelectorAll('[data-wizard-ball-form]').forEach(function (ballForm) {
                 if (ballForm.dataset.initialized === '1') {
                     return;
                 }
@@ -686,9 +682,9 @@ foreach ($participants as $participant) {
                 function syncWicketState() {
                     var enabled = wicketToggle.checked;
 
-                    wicketFieldGroups.forEach(function(group) {
+                    wicketFieldGroups.forEach(function (group) {
                         group.hidden = !enabled;
-                        group.querySelectorAll('select').forEach(function(field) {
+                        group.querySelectorAll('select').forEach(function (field) {
                             field.disabled = !enabled;
                         });
                     });
@@ -702,7 +698,7 @@ foreach ($participants as $participant) {
                 }
 
                 function setActiveButton(activeButton) {
-                    outcomeButtons.forEach(function(button) {
+                    outcomeButtons.forEach(function (button) {
                         button.classList.toggle('active', button === activeButton);
                     });
                 }
@@ -712,7 +708,7 @@ foreach ($participants as $participant) {
                         return;
                     }
 
-                    var hasOption = Array.from(select.options).some(function(option) {
+                    var hasOption = Array.from(select.options).some(function (option) {
                         return option.value === value;
                     });
 
@@ -721,8 +717,8 @@ foreach ($participants as $participant) {
                     }
                 }
 
-                outcomeButtons.forEach(function(button) {
-                    button.addEventListener('click', function() {
+                outcomeButtons.forEach(function (button) {
+                    button.addEventListener('click', function () {
                         runsInput.value = button.dataset.runsBat || '0';
                         extrasInput.value = button.dataset.extras || '0';
                         extraTypeInput.value = button.dataset.extraType || '';
@@ -741,19 +737,19 @@ foreach ($participants as $participant) {
                     });
                 });
 
-                strikerField.addEventListener('change', function() {
+                strikerField.addEventListener('change', function () {
                     if (wicketToggle.checked) {
                         dismissedInput.value = strikerField.value || '';
                     }
                 });
 
-                wicketToggle.addEventListener('change', function() {
+                wicketToggle.addEventListener('change', function () {
                     setActiveButton(null);
                     syncWicketState();
                 });
 
                 if (swapBattersButton && strikerField && nonStrikerField) {
-                    swapBattersButton.addEventListener('click', function() {
+                    swapBattersButton.addEventListener('click', function () {
                         var strikerValue = strikerField.value;
                         strikerField.value = nonStrikerField.value;
                         nonStrikerField.value = strikerValue;
@@ -764,8 +760,8 @@ foreach ($participants as $participant) {
                     });
                 }
 
-                root.querySelectorAll('[data-edit-last-ball]').forEach(function(button) {
-                    button.addEventListener('click', function() {
+                root.querySelectorAll('[data-edit-last-ball]').forEach(function (button) {
+                    button.addEventListener('click', function () {
                         if (editBallIdInput) {
                             editBallIdInput.value = button.dataset.ballId || '';
                         }
@@ -807,19 +803,19 @@ foreach ($participants as $participant) {
                 });
 
                 if (cancelEditButton) {
-                    cancelEditButton.addEventListener('click', function() {
+                    cancelEditButton.addEventListener('click', function () {
                         window.location.reload();
                     });
                 }
 
                 syncEditState();
 
-                ballForm.addEventListener('submit', function(event) {
+                ballForm.addEventListener('submit', function (event) {
                     event.preventDefault();
                     setSubmitting(ballForm.querySelector('button[type="submit"]'), true, 'Saving...');
                     renderAlert('', '');
 
-                    postForm(ballForm.action, new FormData(ballForm)).then(function(payload) {
+                    postForm(ballForm.action, new FormData(ballForm)).then(function (payload) {
                         updateCsrf(payload);
 
                         if (!payload.success) {
@@ -837,9 +833,9 @@ foreach ($participants as $participant) {
                             scoreboardContainer.innerHTML = payload.scoreboardHtml;
                             initBallEntryForms(scoreboardContainer);
                         }
-                    }).catch(function() {
+                    }).catch(function () {
                         renderAlert('danger', 'Unable to update the scoreboard right now.');
-                    }).finally(function() {
+                    }).finally(function () {
                         setSubmitting(ballForm.querySelector('button[type="submit"]'), false, 'Saving...');
                     });
                 });
@@ -848,7 +844,7 @@ foreach ($participants as $participant) {
             });
         }
 
-        nextButton.addEventListener('click', function() {
+        nextButton.addEventListener('click', function () {
             if (!tossWinnerInput.value || !tossDecisionInput.value) {
                 tossWinnerInput.reportValidity();
                 tossDecisionInput.reportValidity();
@@ -860,11 +856,11 @@ foreach ($participants as $participant) {
             showStep(2);
         });
 
-        backButton.addEventListener('click', function() {
+        backButton.addEventListener('click', function () {
             showStep(1);
         });
 
-        form.addEventListener('submit', function(event) {
+        form.addEventListener('submit', function (event) {
             if (currentStep !== 2) {
                 return;
             }
@@ -874,7 +870,7 @@ foreach ($participants as $participant) {
             renderAlert('', '');
             setSubmitting(submitButton, true, 'Starting...');
 
-            postForm(form.action, new FormData(form)).then(function(payload) {
+            postForm(form.action, new FormData(form)).then(function (payload) {
                 updateCsrf(payload);
 
                 if (!payload.success) {
@@ -888,19 +884,19 @@ foreach ($participants as $participant) {
                 initBallEntryForms(scoreboardContainer);
                 showStep(3);
                 renderAlert('success', payload.message || 'Match started.');
-            }).catch(function() {
+            }).catch(function () {
                 renderAlert('danger', 'Unable to start the scoreboard right now.');
-            }).finally(function() {
+            }).finally(function () {
                 setSubmitting(submitButton, false, 'Starting...');
             });
         });
 
-        tossWinnerInput.addEventListener('change', function() {
+        tossWinnerInput.addEventListener('change', function () {
             syncSummary();
             syncPlayerOptions();
         });
 
-        tossDecisionInput.addEventListener('change', function() {
+        tossDecisionInput.addEventListener('change', function () {
             syncSummary();
             syncPlayerOptions();
         });
