@@ -8,11 +8,11 @@
 <?php
 $activeMatches = array_values(array_filter(
     $matches,
-    static fn(array $match): bool => in_array((string) ($match['match_status'] ?? ''), ['scheduled', 'live'], true)
+    static fn(array $match): bool => in_array((string) ($match['match_status'] ?? ''), ['scheduled'], true)
 ));
 $otherMatches = array_values(array_filter(
     $matches,
-    static fn(array $match): bool => ! in_array((string) ($match['match_status'] ?? ''), ['scheduled', 'live'], true)
+    static fn(array $match): bool => !in_array((string) ($match['match_status'] ?? ''), ['scheduled'], true)
 ));
 ?>
 <div class="content-card">
@@ -38,7 +38,7 @@ $otherMatches = array_values(array_filter(
                 <div class="row">
                     <?php foreach ($activeMatches as $match): ?>
                         <div class="col-md-6">
-                            <div class="alert alert-<?= ($match['match_status'] ?? '') === 'live' ? 'success' : 'warning' ?>">
+                            <div class="alert alert-<?= ($match['match_status'] ?? '') === 'scheduled' ? 'success' : 'warning' ?>">
                                 <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
                                     <div>
                                         <h2 class="h4 mb-1"><?= esc($match['team_name']) ?> vs <?= esc($match['opponent_name']) ?></h2>

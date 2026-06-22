@@ -1,7 +1,7 @@
 <?php
 
 use CodeIgniter\Router\RouteCollection;
-use App\Controllers\Home;
+use App\Controllers\HomeController;
 use App\Controllers\AdminAuth;
 use App\Controllers\AdminVenues;
 use App\Controllers\AdminMatches;
@@ -12,8 +12,8 @@ use App\Controllers\AdminTeams;
 /** @var RouteCollection $routes */
 
 // Public routes
-$routes->get('/', [Home::class, 'index']);
-$routes->post('/join-us', [Home::class, 'joinUs']);
+$routes->get('/', [HomeController::class, 'index']);
+$routes->post('/join-us', [HomeController::class, 'joinUs']);
 
 // Auth routes
 $routes->get('/admin/login', [AdminAuth::class, 'login']);
@@ -32,15 +32,11 @@ $routes->post('/admin/venues/(:num)/delete', [AdminVenues::class, 'delete']);
 $routes->get('/admin/matches', [AdminMatches::class, 'index']);
 $routes->get('/admin/matches/create', [AdminMatches::class, 'create']);
 $routes->get('/admin/matches/(:num)/edit', [AdminMatches::class, 'edit']);
-$routes->get('/admin/matches/(:num)/start', [AdminMatches::class, 'start']);
-$routes->get('/admin/matches/(:num)/scoreboard', [AdminMatches::class, 'scoreboard']);
 $routes->get('/admin/matches/(:num)', [AdminMatches::class, 'show']);
 $routes->post('/admin/matches', [AdminMatches::class, 'store']);
-$routes->post('/admin/matches/(:num)/start', [AdminMatches::class, 'storeStart']);
 $routes->post('/admin/matches/(:num)/update', [AdminMatches::class, 'update']);
 $routes->post('/admin/matches/(:num)/delete', [AdminMatches::class, 'delete']);
 $routes->post('/admin/matches/(:num)/innings', [AdminMatches::class, 'storeInnings']);
-$routes->post('/admin/matches/(:num)/balls', [AdminMatches::class, 'storeBall']);
 $routes->post('/admin/matches/(:num)/contributors', [AdminMatches::class, 'updateContributors']);
 $routes->post('/admin/matches/(:num)/expenses', [AdminMatches::class, 'storeExpense']);
 $routes->post('/admin/matches/(:num)/expenses/(:num)/update', [AdminMatches::class, 'updateExpense']);

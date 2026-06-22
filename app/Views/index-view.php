@@ -20,185 +20,20 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
-        <style>
-            .hero-slider {
-                width: 100%;
-                height: 600px;
-            }
-
-            .hero-slider .swiper-slide {
-                position: relative;
-                overflow: hidden;
-            }
-
-            .hero-slider .swiper-slide img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                display: block;
-            }
-
-            .hero-slider .slide-content {
-                position: absolute;
-                inset: 0;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                background: rgba(0, 0, 0, .4);
-                text-align: center;
-                color: #fff;
-                padding: 20px;
-            }
-
-            .hero-slider .slide-content h2 {
-                font-family: 'Bebas Neue', sans-serif;
-                font-size: 4rem;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                margin-bottom: 10px;
-            }
-
-            .hero-slider .slide-content p {
-                font-family: 'Poppins', sans-serif;
-                font-size: 1.2rem;
-            }
-
-            .hero-slider .swiper-button-prev,
-            .hero-slider .swiper-button-next {
-                color: #fff;
-            }
-
-            .hero-slider .swiper-pagination-bullet-active {
-                background: #28a745;
-            }
-
-            @media (max-width: 768px) {
-                .hero-slider {
-                    height: 400px;
-                }
-
-                .hero-slider .slide-content h2 {
-                    font-size: 2.5rem;
-                }
-
-                .hero-slider .slide-content p {
-                    font-size: 1rem;
-                }
-            }
-
-            /** Team slider */
-            .team-slider-container {
-                max-width: 1600px;
-                margin: 0 auto;
-                position: relative;
-                padding: 0 15px;
-                box-sizing: border-box;
-            }
-
-            .team-slider-container .swiper {
-                width: 100%;
-                padding-top: 40px;
-                padding-bottom: 40px;
-            }
-
-            /* BASE STYLE: Mobile First Card Dimensions */
-            .team-slider-container .swiper-slide {
-                background-position: center;
-                background-size: cover;
-                width: 260px;
-                /* Slimmer width for mobile screens */
-                height: 380px;
-                /* Shorter height for mobile screens */
-                border-radius: 16px;
-                overflow: hidden;
-                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-                position: relative;
-                transition: transform 0.5s ease, opacity 0.5s ease;
-                opacity: 0.35;
-            }
-
-            /* TABLET RESPONSIVENESS */
-            @media (min-width: 768px) {
-                .team-slider-container .swiper-slide {
-                    width: 340px;
-                    height: 480px;
-                    border-radius: 20px;
-                }
-            }
-
-            /* DESKTOP / WIDESCREEN RESPONSIVENESS (Up to 1600px) */
-            @media (min-width: 1200px) {
-                .team-slider-container .swiper-slide {
-                    width: 420px;
-                    height: 580px;
-                    border-radius: 24px;
-                }
-            }
-
-            .team-slider-container .swiper-slide-active {
-                opacity: 1;
-            }
-
-            .team-slider-container .card-content {
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent 60%);
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-                padding: 20px;
-                box-sizing: border-box;
-                color: white;
-            }
-
-            /* Responsive typography */
-            @media (min-width: 768px) {
-                .team-slider-container .card-content {
-                    padding: 30px;
-                }
-            }
-
-            .team-slider-container .card-content h3 {
-                margin: 0 0 8px 0;
-                font-size: 1.2rem;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                font-weight: 700;
-            }
-
-            @media (min-width: 768px) {
-                .team-slider-container .card-content h3 {
-                    font-size: 1.6rem;
-                }
-            }
-
-            .team-slider-container .card-content p {
-                margin: 0;
-                font-size: 0.9rem;
-                opacity: 0.8;
-            }
-
-            @media (min-width: 768px) {
-                .team-slider-container .card-content p {
-                    font-size: 1.05rem;
-                }
-            }
-
-            .team-slider-container .swiper-button-next,
-            .team-slider-container .swiper-button-prev {
-                color: #fff;
-                transform: scale(0.9);
-            }
-
-            @media (min-width: 768px) {
-
-                .team-slider-container .swiper-button-next,
-                .team-slider-container .swiper-button-prev {
-                    transform: scale(1.3);
-                }
-            }
-        </style>
+        <script>
+            var eventsGalleryData = <?= json_encode(array_map(function ($e) {
+                return [
+                    'id' => $e['id'],
+                    'title' => $e['title'],
+                    'images' => array_map(function ($img) {
+                        return [
+                            'src' => base_url($img['image_path']),
+                            'caption' => $img['caption'] ?? '',
+                        ];
+                    }, $e['images']),
+                ];
+            }, $events), JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+        </script>
     </head>
 
     <body>
@@ -293,9 +128,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="countdown-panel text-center">
+                        <div class="countdown-panel text-center align-content-center">
                             <?php if ($nextMatch): ?>
-                                <div class="eyebrow mb-3">Next Match</div>
                                 <h2 class="mb-2"><?= esc($nextMatch['team_name'] ?? 'Evergreen Team') ?> vs <?= esc($nextMatch['opponent_name'] ?? 'Opposition') ?></h2>
                                 <p class="mb-1"><span id="nextMatchDate" data-ts="<?= strtotime($nextMatch['scheduled_at']) * 1000 ?>"><?= esc(date('M d, Y - g:i A', strtotime($nextMatch['scheduled_at']))) ?></span></p>
                                 <p class="mb-3"><?= esc($nextMatch['venue'] ?? 'TBA') ?></p>
@@ -321,7 +155,6 @@
                                     </div>
                                 </div>
                             <?php elseif ($lastMatch): ?>
-                                <div class="eyebrow mb-3">Last Match</div>
                                 <h2 class="mb-2"><?= esc($lastMatch['team_name'] ?? 'Evergreen Team') ?> vs <?= esc($lastMatch['opponent_name'] ?? 'Opposition') ?></h2>
                                 <p class="mb-1"><strong>Venue:</strong> <?= esc($lastMatch['venue'] ?? 'N/A') ?></p>
                                 <p class="mb-1"><strong>Result:</strong> <?= esc($lastMatch['result_summary'] ?? 'Match result pending') ?></p>
@@ -360,8 +193,15 @@
 
             <section id="members" class="container-fluid g-5">
                 <div class="content-div py-4 py-md-5 team-slider-container">
-                    <h2 class="section-title mb-2">Team members</h2>
-                    <p class="section-copy mb-3">Meet the individuals who make EverGreen Cricket Club stronger every day.</p>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h2 class="section-title mb-2">Team members</h2>
+                            <p class="section-copy mb-3">Meet the individuals who make EverGreen Cricket Club stronger every day.</p>
+                        </div>
+                        <div class="h4">
+                            Active: <?= esc((string) $playerCount) ?> | Pending: <?= esc((string) $pendingCount) ?>
+                        </div>
+                    </div>
                     <div class="swiper mySwiper">
                         <div class="swiper-wrapper">
                             <?php foreach ($players as $player): ?>
@@ -393,11 +233,10 @@
                             </div>
 
                             <div class="col-lg-3 order-1 order-lg-2 event-list-pane ps-lg-4 mb-4 mb-lg-0">
-                                <p class="event-list-heading">Events</p>
                                 <div class="event-list" id="eventList">
                                     <?php foreach ($events as $i => $event): ?>
                                         <button class="event-list-item<?= $i === 0 ? ' active' : '' ?>" data-event-index="<?= $i ?>" type="button">
-                                            <span class="event-list-title"><?= esc($event['title']) ?></span>
+                                            <h3><?= esc($event['title']) ?></h3>
                                             <span class="event-list-meta"><?= count($event['images']) ?> photo<?= count($event['images']) !== 1 ? 's' : '' ?></span>
                                         </button>
                                     <?php endforeach; ?>
@@ -412,13 +251,13 @@
 
             <section id="join" class="container-fluid g-5">
                 <div class="content-div py-4 py-md-5">
-                    <div class="row g-4 position-relative" style="z-index: 1;">
-                        <div class="col-lg-6">
-                            <p class="eyebrow mb-2">Join Evergreen Team</p>
-                            <h2 class="section-title mb-3">Bring your game. We will build the rest.</h2>
-                            <p class="mb-0">Open to players who want consistent training, real teamwork, and a clear cricket identity built around growth.</p>
+                    <h2 class="section-title mb-2">Join Evergreen Team</h2>
+                    <p class="section-copy mb-3">Send your player details here. We will save your request with pending status for admin review.</p>
+                    <div class="row g-4">
+                        <div class="col-lg-6 align-content-center text-center order-md-2">
+                            <img src="<?= base_url('assets/images/logo/challengers-logo.png') ?>" alt="Join Evergreen Team" style="max-width: 400px;">
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-6 order-md-1">
                             <div class="form-panel p-4 p-md-4">
                                 <?php if (session()->getFlashdata('join_success')): ?>
                                     <div class="alert alert-success"><?= esc(session()->getFlashdata('join_success')) ?></div>
@@ -426,7 +265,6 @@
 
                                 <?php $joinErrors = session()->getFlashdata('join_errors') ?? []; ?>
 
-                                <p class="mb-3 text-secondary">Send your player details here. We will save your request with pending status for admin review.</p>
                                 <form action="<?= site_url('/join-us') ?>" method="post">
                                     <?= csrf_field() ?>
 
@@ -475,221 +313,10 @@
                 <path d="M6.75 10.25L12 5l5.25 5.25" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </button>
-
-        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-        <script>
-            var eventsGalleryData = <?= json_encode(array_map(function ($e) {
-                return [
-                    'id' => $e['id'],
-                    'title' => $e['title'],
-                    'images' => array_map(function ($img) {
-                        return [
-                            'src' => base_url($img['image_path']),
-                            'caption' => $img['caption'] ?? '',
-                        ];
-                    }, $e['images']),
-                ];
-            }, $events), JSON_HEX_TAG | JSON_HEX_AMP) ?>;
-        </script>
-        <script>
-            new Swiper('.hero-slider', {
-                loop: true,
-
-                autoplay: {
-                    delay: 4000,
-                    disableOnInteraction: false
-                },
-
-                pagination: {
-                    el: '.swiper-pagination',
-                    clickable: true
-                },
-
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev'
-                },
-
-                effect: 'fade',
-                fadeEffect: {
-                    crossFade: true
-                },
-
-                speed: 1000
-            });
-
-            const swiper = new Swiper(".mySwiper", {
-                effect: "coverflow",
-                grabCursor: true,
-                centeredSlides: true,
-                slidesPerView: "auto",
-                loop: true,
-
-                // Responsive 3D parameter adjustments
-                breakpoints: {
-                    // Mobile / default settings (under 768px wide)
-                    320: {
-                        coverflowEffect: {
-                            rotate: 0,
-                            stretch: -15,     // Looser pull for smaller cards
-                            depth: 100,       // Less depth so side cards stay visible on mobile layout
-                            modifier: 1,
-                            slideShadows: false,
-                        }
-                    },
-                    // Tablet layouts (768px and up)
-                    768: {
-                        coverflowEffect: {
-                            rotate: 0,
-                            stretch: -30,
-                            depth: 130,
-                            modifier: 1.1,
-                            slideShadows: false,
-                        }
-                    },
-                    // Widescreen layouts (1200px and up)
-                    1200: {
-                        coverflowEffect: {
-                            rotate: 0,
-                            stretch: -40,     // Tight stacking for large 420px cards
-                            depth: 160,       // Full 3D push back
-                            modifier: 1.2,
-                            slideShadows: false,
-                        }
-                    }
-                },
-
-                navigation: {
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
-                },
-            });
-
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-            (() => {
-                const backToTopButton = document.getElementById('backToTopButton');
-
-                if (!backToTopButton) {
-                    return;
-                }
-
-                const toggleBackToTop = () => {
-                    backToTopButton.classList.toggle('is-visible', window.scrollY > 320);
-                };
-
-                backToTopButton.addEventListener('click', () => {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth',
-                    });
-                });
-
-                toggleBackToTop();
-                window.addEventListener('scroll', toggleBackToTop, {
-                    passive: true
-                });
-            })();
-        </script>
-        <script>
-            (() => {
-                // Initialize countdown timer for next match
-                const daysEl = document.getElementById('countdown-days');
-                const hoursEl = document.getElementById('countdown-hours');
-                const minsEl = document.getElementById('countdown-mins');
-                const secsEl = document.getElementById('countdown-secs');
-                const nextMatchDateEl = document.getElementById('nextMatchDate');
-
-                // Only run if countdown elements exist (next match is available)
-                if (!daysEl || !nextMatchDateEl) {
-                    return;
-                }
-
-                const pad = n => String(n).padStart(2, '0');
-
-                const updateCountdown = () => {
-                    const nextMatchDate = new Date(parseInt(nextMatchDateEl.dataset.ts));
-                    const now = new Date();
-                    const difference = nextMatchDate - now;
-
-                    if (difference <= 0) {
-                        daysEl.textContent = '00';
-                        hoursEl.textContent = '00';
-                        minsEl.textContent = '00';
-                        secsEl.textContent = '00';
-                        return;
-                    }
-
-                    daysEl.textContent = pad(Math.floor(difference / (1000 * 60 * 60 * 24)));
-                    hoursEl.textContent = pad(Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-                    minsEl.textContent = pad(Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)));
-                    secsEl.textContent = pad(Math.floor((difference % (1000 * 60)) / 1000));
-                };
-
-                updateCountdown();
-                setInterval(updateCountdown, 1000);
-            })();
-        </script>
-        <script>
-            (() => {
-                const events = window.eventsGalleryData;
-                if (!Array.isArray(events) || !events.length) return;
-
-                const grid = document.getElementById('eventImagesGrid');
-                const noImages = document.getElementById('eventNoImages');
-                const listItems = document.querySelectorAll('.event-list-item');
-                let lightbox = null;
-
-                function renderEvent(index) {
-                    const event = events[index];
-                    grid.innerHTML = '';
-
-                    if (!event.images.length) {
-                        noImages.style.display = '';
-                        if (lightbox) { lightbox.destroy(); lightbox = null; }
-                        return;
-                    }
-
-                    noImages.style.display = 'none';
-
-                    event.images.forEach((img) => {
-                        const a = document.createElement('a');
-                        a.href = img.src;
-                        a.className = 'event-gallery-link glightbox';
-                        a.dataset.gallery = 'event-' + event.id;
-                        a.dataset.description = img.caption || '';
-                        a.dataset.title = img.caption || '';
-
-                        const el = document.createElement('img');
-                        el.src = img.src;
-                        el.alt = img.caption || event.title;
-                        el.loading = 'lazy';
-
-                        a.appendChild(el);
-                        grid.appendChild(a);
-                    });
-
-                    if (lightbox) lightbox.destroy();
-                    lightbox = GLightbox({
-                        selector: '.event-gallery-link',
-                        loop: true,
-                        touchNavigation: true,
-                    });
-                }
-
-                listItems.forEach((btn, i) => {
-                    btn.addEventListener('click', () => {
-                        listItems.forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        renderEvent(i);
-                    });
-                });
-
-                renderEvent(0);
-            })();
-        </script>
+        <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+        <script src="<?= base_url('assets/js/home.js') ?>"></script>
     </body>
 
 </html>

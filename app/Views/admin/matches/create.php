@@ -6,7 +6,7 @@
 
 <?= $this->section('content') ?>
 <div class="content-card">
-    <?php $fieldLockAttr = ! empty($isMatchLocked) ? ' disabled' : ''; ?>
+    <?php $fieldLockAttr = !empty($isMatchLocked) ? ' disabled' : ''; ?>
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
         <div>
             <h1 class="h2 fw-bold mb-2"><?= esc($heading) ?></h1>
@@ -23,7 +23,7 @@
         <div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div>
     <?php endif; ?>
 
-    <?php if (! empty($isMatchLocked)): ?>
+    <?php if (!empty($isMatchLocked)): ?>
         <div class="alert alert-warning">Completed match fields are read-only. Continue using the overview page for finance, contributors, expenses, and scoreboard actions.</div>
     <?php endif; ?>
 
@@ -68,7 +68,7 @@
             <div class="col-md-4">
                 <label for="match_status" class="form-label fw-semibold">Status</label>
                 <select class="form-select<?= isset($errors['match_status']) ? ' is-invalid' : '' ?>" id="match_status" name="match_status" <?= $fieldLockAttr ?>>
-                    <?php foreach (['scheduled', 'live', 'completed', 'abandoned', 'archived'] as $status): ?>
+                    <?php foreach (MATCH_STATUS as $status): ?>
                         <option value="<?= esc($status) ?>" <?= old('match_status', $match['match_status'] ?? 'scheduled') === $status ? 'selected' : '' ?>><?= esc(ucfirst($status)) ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -111,12 +111,12 @@
                 <?php $playersById[(int) $player['id']] = $player; ?>
             <?php endforeach; ?>
             <div class="col-lg-6">
-                <div class="team-panel h-100">
+                <div class="team-panel h-100 border p-3 bg-light">
                     <label class="form-label fw-semibold" id="team_a_squad_label">Team A Squad (<?= esc((string) $teamASquadCount) ?> checked)</label>
                     <div class="panel squad-box p-3 mb-3">
                         <div class="row g-2">
                             <?php foreach ($players as $player): ?>
-                                <div class="col-12">
+                                <div class="col-6">
                                     <div class="form-check">
                                         <input class="form-check-input team-a-player" type="checkbox" id="team_a_player_<?= esc((string) $player['id']) ?>" name="team_a_player_ids[]" value="<?= esc((string) $player['id']) ?>" <?= in_array((int) $player['id'], $teamAPlayerIds, true) ? 'checked' : '' ?><?= $fieldLockAttr ?>>
                                         <label class="form-check-label" for="team_a_player_<?= esc((string) $player['id']) ?>">
@@ -135,7 +135,7 @@
                         <select class="form-select<?= isset($errors['team_a_captain_id']) ? ' is-invalid' : '' ?>" id="team_a_captain_id" name="team_a_captain_id" <?= $fieldLockAttr ?>>
                             <option value="">Select captain</option>
                             <?php foreach ($teamAPlayerIds as $playerId): ?>
-                                <?php if (! isset($playersById[$playerId])) {
+                                <?php if (!isset($playersById[$playerId])) {
                                     continue;
                                 } ?>
                                 <option value="<?= esc((string) $playerId) ?>" <?= old('team_a_captain_id', $teamACaptainId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($playersById[$playerId]['name']) ?></option>
@@ -150,7 +150,7 @@
                         <select class="form-select<?= isset($errors['team_a_keeper_id']) ? ' is-invalid' : '' ?>" id="team_a_keeper_id" name="team_a_keeper_id" <?= $fieldLockAttr ?>>
                             <option value="">Select wicketkeeper</option>
                             <?php foreach ($teamAPlayerIds as $playerId): ?>
-                                <?php if (! isset($playersById[$playerId])) {
+                                <?php if (!isset($playersById[$playerId])) {
                                     continue;
                                 } ?>
                                 <option value="<?= esc((string) $playerId) ?>" <?= old('team_a_keeper_id', $teamAKeeperId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($playersById[$playerId]['name']) ?></option>
@@ -163,12 +163,12 @@
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="team-panel h-100">
+                <div class="team-panel h-100 border p-3 bg-light">
                     <label class="form-label fw-semibold" id="team_b_squad_label">Team B Squad (<?= esc((string) $teamBSquadCount) ?> checked)</label>
                     <div class="panel squad-box p-3 mb-3">
                         <div class="row g-2">
                             <?php foreach ($players as $player): ?>
-                                <div class="col-12">
+                                <div class="col-6">
                                     <div class="form-check">
                                         <input class="form-check-input team-b-player" type="checkbox" id="team_b_player_<?= esc((string) $player['id']) ?>" name="team_b_player_ids[]" value="<?= esc((string) $player['id']) ?>" <?= in_array((int) $player['id'], $teamBPlayerIds, true) ? 'checked' : '' ?><?= $fieldLockAttr ?>>
                                         <label class="form-check-label" for="team_b_player_<?= esc((string) $player['id']) ?>">
@@ -187,7 +187,7 @@
                         <select class="form-select<?= isset($errors['team_b_captain_id']) ? ' is-invalid' : '' ?>" id="team_b_captain_id" name="team_b_captain_id" <?= $fieldLockAttr ?>>
                             <option value="">Select captain</option>
                             <?php foreach ($teamBPlayerIds as $playerId): ?>
-                                <?php if (! isset($playersById[$playerId])) {
+                                <?php if (!isset($playersById[$playerId])) {
                                     continue;
                                 } ?>
                                 <option value="<?= esc((string) $playerId) ?>" <?= old('team_b_captain_id', $teamBCaptainId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($playersById[$playerId]['name']) ?></option>
@@ -202,7 +202,7 @@
                         <select class="form-select<?= isset($errors['team_b_keeper_id']) ? ' is-invalid' : '' ?>" id="team_b_keeper_id" name="team_b_keeper_id" <?= $fieldLockAttr ?>>
                             <option value="">Select wicketkeeper</option>
                             <?php foreach ($teamBPlayerIds as $playerId): ?>
-                                <?php if (! isset($playersById[$playerId])) {
+                                <?php if (!isset($playersById[$playerId])) {
                                     continue;
                                 } ?>
                                 <option value="<?= esc((string) $playerId) ?>" <?= old('team_b_keeper_id', $teamBKeeperId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($playersById[$playerId]['name']) ?></option>
@@ -232,7 +232,7 @@
 
 <?= $this->section('scripts') ?>
 <script>
-    const isMatchLocked = <?= ! empty($isMatchLocked) ? 'true' : 'false' ?>;
+    const isMatchLocked = <?= !empty($isMatchLocked) ? 'true' : 'false' ?>;
 
     const updateSquadLabel = (labelSelector, teamName, checkboxes) => {
         const label = document.querySelector(labelSelector);

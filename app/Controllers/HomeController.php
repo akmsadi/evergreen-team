@@ -2,13 +2,17 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
+
 use App\Models\PlayerModel;
 use App\Models\MatchModel;
 use App\Models\EventModel;
 use App\Models\EventImageModel;
 use App\Models\TeamModel;
 
-class Home extends BaseController
+class HomeController extends BaseController
 {
     private PlayerModel $players;
     private MatchModel $matches;
@@ -16,8 +20,9 @@ class Home extends BaseController
     private EventImageModel $eventImages;
     private TeamModel $teams;
 
-    public function __construct()
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
+        parent::initController($request, $response, $logger);
         helper(['form', 'url']);
         $this->players = new PlayerModel();
         $this->matches = new MatchModel();

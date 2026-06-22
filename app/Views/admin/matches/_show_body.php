@@ -91,8 +91,6 @@ $tossDecisionLabel = match ((string) ($match['toss_decision'] ?? '')) {
     </div>
 </div>
 
-<?= view('admin/matches/_scoreboard_report', ['match' => $match, 'scoreboard' => $scoreboard]) ?>
-
 <div class="card-surface mb-6">
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
         <div>
