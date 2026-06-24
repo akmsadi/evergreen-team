@@ -1,8 +1,4 @@
-<?= $this->extend('admin/default') ?>
-
-<?= $this->section('title') ?>Match Admin<?= $this->endSection() ?>
-
-<?= $this->section('admin_nav') ?>matches<?= $this->endSection() ?>
+<?= $this->extend('admin/template/default') ?>
 
 <?= $this->section('content') ?>
 <div class="content-card">
@@ -14,6 +10,7 @@
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <a href="<?= site_url('/admin/matches/' . $match['id'] . '/edit') ?>" class="btn btn-secondary">Edit Match</a>
+                <a href="<?= site_url('/admin/matches/' . $match['id'] . '/scoreboard') ?>" class="btn btn-secondary">Edit Scoreboard</a>
                 <form action="<?= site_url('/admin/matches/' . $match['id'] . '/clear-scoreboard') ?>" method="post" onsubmit="return confirm('Clear the match scoreboard? All innings and ball data will be deleted. You can then start a new scoreboard.');" class="d-inline d-none">
                     <?= csrf_field() ?>
                     <button type="submit" class="btn btn-outline-warning">Clear Scoreboard</button>

@@ -19,7 +19,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
+        <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>?v=1.3">
         <script>
             var eventsGalleryData = <?= json_encode(array_map(function ($e) {
                 return [
@@ -48,14 +48,14 @@
                     </button>
                     <div class="collapse navbar-collapse justify-content-end" id="mainNavMenu">
                         <div class="d-flex flex-column flex-lg-row gap-2 justify-content-end top-menu py-2 py-lg-0">
-                            <a class="btn text-uppercase" href="#teams">Teams</a>
-                            <a class="btn text-uppercase" href="#members">Members</a>
-                            <a class="btn text-uppercase" href="#gallery">Gallery</a>
-                            <a class="btn text-uppercase" href="#join">Join</a>
+                            <a class="hover-link mx-2" href="#teams">Teams</a>
+                            <a class="hover-link mx-2" href="#members">Members</a>
+                            <a class="hover-link mx-2" href="#gallery">Gallery</a>
+                            <a class="hover-link mx-2" href="#join">Join</a>
                             <?php if (session()->get('is_admin')): ?>
-                                <a class="btn text-uppercase" href="<?= site_url('/admin/dashboard') ?>">Dashboard</a>
+                                <a class="hover-link mx-2" href="<?= site_url('/admin/dashboard') ?>">Dashboard</a>
                             <?php else: ?>
-                                <a class="btn text-uppercase" href="<?= site_url('/admin/login') ?>">Admin</a>
+                                <a class="hover-link mx-2" href="<?= site_url('/admin/login') ?>">Admin</a>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -94,8 +94,17 @@
 
                 <div class="swiper-pagination"></div>
 
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                </div>
+
+                <div class="swiper-button-next">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                </div>
             </div>
 
             <section class="container-fluid g-5">
@@ -106,8 +115,8 @@
                             <h1 class="display-title mb-3">Play bold with<br><span class="accent-text">Evergreen Team</span></h1>
                             <p>We value smart cricket, high standards, and a team-first culture that keeps improving every season. Every session is designed to feel like match preparation, not just attendance.</p>
                             <div class="d-flex flex-wrap gap-3">
-                                <a class="btn btn-outline-dark px-3" href="#join">Join the Squad</a>
-                                <a class="btn btn-outline-dark px-3" href="#stories">Explore Stories</a>
+                                <a class="button-71" href="#join">Join the Squad</a>
+                                <a class="button-71" href="#gallery">Events Gallery</a>
                             </div>
                             <div class="mini-panel">
                                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-4">
@@ -176,15 +185,22 @@
                     <p class="section-copy mb-3">From the nets to match day, these are the teams driving EverGreen forward.</p>
                     <div class="row">
                         <?php foreach ($teams as $team): ?>
-                            <div class="col-md-3">
-                                <?php if ($team['logo']): ?>
-                                    <img src="<?= base_url('assets/images/teams/' . esc($team['logo'])) ?>" alt="<?= esc($team['name']) ?>" class="w-100 mb-3">
-                                <?php else: ?>
-                                    <div class="bg-light w-100 mb-3 d-flex align-items-center justify-content-center" style="height: 300px;">
-                                        <span class="text-secondary">No logo</span>
-                                    </div>
-                                <?php endif; ?>
-                                <p class="text-center"><?= esc($team['name']) ?></p>
+                            <div class="col-lg-3 col-md-6 mb-5 mb-lg-0">
+                                <a href="<?= site_url('/teams/' . $team['id']) ?>">
+                                    <?php if ($team['logo']): ?>
+                                        <img src="<?= base_url('assets/images/teams/' . esc($team['logo'])) ?>" alt="<?= esc($team['name']) ?>" class="w-100 mb-3 team-logo">
+                                    <?php else: ?>
+                                        <div class="bg-light w-100 mb-3 d-flex align-items-center justify-content-center" style="height: 300px;">
+                                            <span class="text-secondary">No logo</span>
+                                        </div>
+                                    <?php endif; ?>
+                                </a>
+                                <!-- From Uiverse.io by satyamchaudharydev -->
+                                <div class="d-flex justify-content-center">
+                                    <a class="hover-link" data-text="<?= esc($team['name']) ?>">
+                                        <p><?= esc($team['name']) ?></p>
+                                    </a>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -193,12 +209,12 @@
 
             <section id="members" class="container-fluid g-5">
                 <div class="content-div py-4 py-md-5 team-slider-container">
-                    <div class="d-flex justify-content-between">
-                        <div>
+                    <div class="row">
+                        <div class="col">
                             <h2 class="section-title mb-2">Team members</h2>
                             <p class="section-copy mb-3">Meet the individuals who make EverGreen Cricket Club stronger every day.</p>
                         </div>
-                        <div class="h4">
+                        <div class="h4 col-sm-auto">
                             Active: <?= esc((string) $playerCount) ?> | Pending: <?= esc((string) $pendingCount) ?>
                         </div>
                     </div>
@@ -254,10 +270,7 @@
                     <h2 class="section-title mb-2">Join Evergreen Team</h2>
                     <p class="section-copy mb-3">Send your player details here. We will save your request with pending status for admin review.</p>
                     <div class="row g-4">
-                        <div class="col-lg-6 align-content-center text-center order-md-2">
-                            <img src="<?= base_url('assets/images/logo/challengers-logo.png') ?>" alt="Join Evergreen Team" style="max-width: 400px;">
-                        </div>
-                        <div class="col-lg-6 order-md-1">
+                        <div class="col-lg-6">
                             <div class="form-panel p-4 p-md-4">
                                 <?php if (session()->getFlashdata('join_success')): ?>
                                     <div class="alert alert-success"><?= esc(session()->getFlashdata('join_success')) ?></div>
@@ -269,37 +282,42 @@
                                     <?= csrf_field() ?>
 
                                     <div class="mb-4">
-                                        <label for="name" class="form-label">Name *</label>
-                                        <input type="text" class="form-control<?= isset($joinErrors['name']) ? ' is-invalid' : '' ?>" id="name" name="name" value="<?= esc(old('name')) ?>">
+                                        <label for="name" class="form-label">Name</label>
+                                        <input type="text" class="form-control form-control-lg<?= isset($joinErrors['name']) ? ' is-invalid' : '' ?>" id="name" name="name" value="<?= esc(old('name')) ?>">
                                         <?php if (isset($joinErrors['name'])): ?>
                                             <div class="invalid-feedback"><?= esc($joinErrors['name']) ?></div>
                                         <?php endif; ?>
                                     </div>
                                     <div class="mb-4 d-none">
-                                        <label for="email" class="form-label fw-semibold">Email</label>
-                                        <input type="email" class="form-control<?= isset($joinErrors['email']) ? ' is-invalid' : '' ?>" id="email" name="email" value="<?= esc(old('email')) ?>">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control form-control-lg<?= isset($joinErrors['email']) ? ' is-invalid' : '' ?>" id="email" name="email" value="<?= esc(old('email')) ?>">
                                         <?php if (isset($joinErrors['email'])): ?>
                                             <div class="invalid-feedback"><?= esc($joinErrors['email']) ?></div>
                                         <?php endif; ?>
                                     </div>
                                     <div class="mb-4">
-                                        <label for="phone" class="form-label fw-semibold">Phone *</label>
-                                        <input type="text" class="form-control<?= isset($joinErrors['phone']) ? ' is-invalid' : '' ?>" id="phone" name="phone" value="<?= esc(old('phone')) ?>">
+                                        <label for="phone" class="form-label">Phone</label>
+                                        <input type="text" class="form-control form-control-lg<?= isset($joinErrors['phone']) ? ' is-invalid' : '' ?>" id="phone" name="phone" value="<?= esc(old('phone')) ?>">
                                         <?php if (isset($joinErrors['phone'])): ?>
                                             <div class="invalid-feedback"><?= esc($joinErrors['phone']) ?></div>
                                         <?php endif; ?>
                                     </div>
                                     <div class="mb-4">
-                                        <label for="address" class="form-label fw-semibold">Address *</label>
-                                        <input type="text" class="form-control<?= isset($joinErrors['address']) ? ' is-invalid' : '' ?>" id="address" name="address" value="<?= esc(old('address')) ?>">
+                                        <label for="address" class="form-label">Address</label>
+                                        <input type="text" class="form-control form-control-lg<?= isset($joinErrors['address']) ? ' is-invalid' : '' ?>" id="address" name="address" value="<?= esc(old('address')) ?>">
                                         <?php if (isset($joinErrors['address'])): ?>
                                             <div class="invalid-feedback"><?= esc($joinErrors['address']) ?></div>
                                         <?php endif; ?>
                                     </div>
-                                    <button type="submit" class="btn btn-evergreen w-100 d-flex align-items-center justify-content-center py-2">Send Player Details</button>
-
+                                    <div class="row align-items-center">
+                                        <div class="col"><button type="submit" class="button-71 py-2">Submit</button></div>
+                                        <div class="col small text-muted text-end">All fields are required</div>
+                                    </div>
                                 </form>
                             </div>
+                        </div>
+                        <div class="col-lg-6 align-content-center text-center">
+                            <img src="<?= base_url('assets/images/logo/challengers-logo.png') ?>" alt="Join Evergreen Team" style="width: 100%; max-width: 400px;">
                         </div>
                     </div>
                 </div>

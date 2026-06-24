@@ -11,7 +11,8 @@ class MatchSummaryBowlersModel extends AuditableModel
     protected $allowedFields  = [
         'match_id',
         'innings_number',
-        'bowler_name',
+        'sort_order',
+        'player_id',
         'overs',
         'maidens',
         'runs',

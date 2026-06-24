@@ -16,7 +16,6 @@ class MatchPlayerModel extends AuditableModel
         'shirt_number',
         'batting_position',
         'is_captain',
-        'is_wicketkeeper',
         'playing_xi',
     ];
 }

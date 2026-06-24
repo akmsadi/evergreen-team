@@ -1,6 +1,4 @@
-<?= $this->extend('admin/default') ?>
-
-<?= $this->section('title') ?>Player Overview<?= $this->endSection() ?>
+<?= $this->extend('admin/template/default') ?>
 
 <?= $this->section('admin_nav') ?>players<?= $this->endSection() ?>
 

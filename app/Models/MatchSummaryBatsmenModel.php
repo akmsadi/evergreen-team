@@ -11,13 +11,15 @@ class MatchSummaryBatsmenModel extends AuditableModel
     protected $allowedFields  = [
         'match_id',
         'innings_number',
-        'batsman_name',
+        'sort_order',
+        'player_id',
         'runs',
         'balls',
         'fours',
         'sixes',
         'dismissal_mode',
         'dismissal_by',
+        'fielder_id',
     ];
 
     public function forMatchInnings(int $matchId, int $inningsNumber): array

@@ -2,12 +2,15 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
+
 use App\Libraries\MatchFinanceService;
 use App\Models\AdminModel;
 use App\Models\MatchModel;
 use App\Models\PlayerModel;
 use App\Models\VenueModel;
-use CodeIgniter\HTTP\ResponseInterface;
 
 class AdminAuth extends BaseController
 {
@@ -15,13 +18,16 @@ class AdminAuth extends BaseController
     private MatchFinanceService $matchFinance;
     private MatchModel $matches;
     private PlayerModel $players;
+    private VenueModel $venues;
 
     protected $dropbox_client_id = 'cnhkizup2jsz2r3';
     protected $dropbox_client_secret = '8loj5xepfbbdekz';
     protected $dropbox_refresh_token = 'K0h1KvLhr2YAAAAAAAAAAS1Pr6FvQAKgFwgqBMIXiBNnwXnxj3oTffLoxX87Sjuq';
 
-    public function __construct()
+
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
+        parent::initController($request, $response, $logger);
         helper(['form', 'url']);
         $this->admins = new AdminModel();
         $this->matchFinance = new MatchFinanceService();
@@ -36,7 +42,7 @@ class AdminAuth extends BaseController
             return redirect()->to('/admin/dashboard');
         }
 
-        return view('admin/login', [
+        return view('admin/login-view', [
             'validation' => service('validation'),
         ]);
     }
@@ -44,11 +50,11 @@ class AdminAuth extends BaseController
     public function attemptLogin()
     {
         $rules = [
-            'login'    => 'required',
+            'login' => 'required',
             'password' => 'required|min_length[6]',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -62,14 +68,14 @@ class AdminAuth extends BaseController
             ->groupEnd()
             ->first();
 
-        if ($admin === null || (int) $admin['is_active'] !== 1 || ! password_verify($password, $admin['password'])) {
+        if ($admin === null || (int) $admin['is_active'] !== 1 || !password_verify($password, $admin['password'])) {
             return redirect()->back()->withInput()->with('auth_error', 'Invalid admin credentials.');
         }
 
         session()->set([
-            'admin_id'       => $admin['id'],
+            'admin_id' => $admin['id'],
             'admin_username' => $admin['username'],
-            'is_admin'       => true,
+            'is_admin' => true,
         ]);
 
         return redirect()->to('/admin/dashboard');
@@ -77,12 +83,12 @@ class AdminAuth extends BaseController
 
     public function dashboard(): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
-        return view('admin/dashboard', [
-            'username' => session()->get('admin_username'),
+        return view('admin/dashboard-view', [
+            'activeNav' => 'dashboard',
             'monthlyMatchCounts' => $this->matches->monthlyCounts(),
             'recentMatches' => $this->matches->recentList(10),
             'recentPlayers' => $this->players->recentList(10),

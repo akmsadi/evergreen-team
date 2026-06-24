@@ -1,6 +1,4 @@
-<?= $this->extend('admin/default') ?>
-
-<?= $this->section('title') ?>Accounts<?= $this->endSection() ?>
+<?= $this->extend('admin/template/default') ?>
 
 <?= $this->section('admin_nav') ?>accounts<?= $this->endSection() ?>
 
@@ -212,13 +210,7 @@
                                 <div class="d-inline-flex gap-2">
                                     <a href="<?= site_url('/admin/players/' . $entry['player']['id'] . '/edit') ?>" class="btn btn-sm btn-primary">Edit</a>
                                     <?php if (($entry['player']['status'] ?? '') === 'approved'): ?>
-                                        <button
-                                            type="button"
-                                            class="btn btn-sm btn-primary"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#createDepositModal"
-                                            data-player-id="<?= esc((string) $entry['player']['id']) ?>"
-                                            data-player-name="<?= esc($entry['player']['name']) ?>">Deposit</button>
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createDepositModal" data-player-id="<?= esc((string) $entry['player']['id']) ?>" data-player-name="<?= esc($entry['player']['name']) ?>">Deposit</button>
                                     <?php endif; ?>
                                 </div>
                             </td>
@@ -389,11 +381,11 @@
 
 <?= $this->section('scripts') ?>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const createDepositModal = document.getElementById('createDepositModal');
 
         if (createDepositModal) {
-            createDepositModal.addEventListener('show.bs.modal', function(event) {
+            createDepositModal.addEventListener('show.bs.modal', function (event) {
                 const trigger = event.relatedTarget;
                 const playerIdField = document.getElementById('create_deposit_player_id');
 

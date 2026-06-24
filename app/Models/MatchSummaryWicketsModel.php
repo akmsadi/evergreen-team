@@ -11,7 +11,7 @@ class MatchSummaryWicketsModel extends AuditableModel
     protected $allowedFields  = [
         'match_id',
         'innings_number',
-        'player_name',
+        'player_id',
         'score_at_dismissal',
         'over_at_dismissal',
     ];

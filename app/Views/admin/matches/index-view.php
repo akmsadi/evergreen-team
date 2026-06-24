@@ -1,8 +1,4 @@
-<?= $this->extend('admin/default') ?>
-
-<?= $this->section('title') ?>Matches<?= $this->endSection() ?>
-
-<?= $this->section('admin_nav') ?>matches<?= $this->endSection() ?>
+<?= $this->extend('admin/template/default') ?>
 
 <?= $this->section('content') ?>
 <?php
@@ -57,7 +53,7 @@ $otherMatches = array_values(array_filter(
                                     <?php if (($match['match_status'] ?? '') === 'live'): ?>
                                         <a href="<?= site_url('/admin/matches/' . $match['id'] . '/start') ?>" class="btn btn-primary">Start</a>
                                     <?php endif; ?>
-                                    <a href="<?= site_url('/admin/matches/' . $match['id'] . '/edit') ?>" class="btn btn-primary">Edit</a>
+                                    <a href="<?= site_url('/admin/matches/' . $match['id']) ?>" class="btn btn-primary">Match Overview</a>
                                     <?php if (($match['match_status'] ?? '') === 'scheduled'): ?>
                                         <form action="<?= site_url('/admin/matches/' . $match['id'] . '/delete') ?>" method="post" onsubmit="return confirm('Archive this match? It will be hidden from the active list but not permanently removed.');">
                                             <?= csrf_field() ?>
@@ -106,6 +102,12 @@ $otherMatches = array_values(array_filter(
                                                 <a href="<?= site_url('/admin/matches/' . $match['id']) ?>" class="btn btn-sm btn-primary">Details</a>
                                             <?php else: ?>
                                                 <a href="<?= site_url('/admin/matches/' . $match['id'] . '/edit') ?>" class="btn btn-sm btn-primary">Edit</a>
+                                            <?php endif; ?>
+                                            <?php if (($match['match_status'] ?? '') === 'archived'): ?>
+                                                <form action="<?= site_url('/admin/matches/' . $match['id'] . '/permanent-delete') ?>" method="post" onsubmit="return confirm('Permanently delete this match? This will remove all match data including players, expenses, and scoreboard records and cannot be undone.');">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                </form>
                                             <?php endif; ?>
                                         </div>
                                     </td>

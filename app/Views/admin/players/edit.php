@@ -1,6 +1,4 @@
-<?= $this->extend('admin/default') ?>
-
-<?= $this->section('title') ?>Edit Player<?= $this->endSection() ?>
+<?= $this->extend('admin/template/default') ?>
 
 <?= $this->section('admin_nav') ?>players<?= $this->endSection() ?>
 
@@ -202,25 +200,22 @@
                                 <td><?= esc(getFormattedDate($match['scheduled_at'] ?? null, '-')) ?></td>
                                 <td>
                                     <div><?= esc($match['role'] ?: 'Player') ?></div>
-                                    <?php if (! empty($match['batting_position'])): ?>
+                                    <?php if (!empty($match['batting_position'])): ?>
                                         <div class="text-secondary small">Batting #<?= esc((string) $match['batting_position']) ?></div>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <div><?= esc($match['side_label']) ?></div>
                                     <div class="text-secondary small">
-                                        <?= ! empty($match['playing_xi']) ? 'Playing XI' : 'Squad only' ?>
-                                        <?php if (! empty($match['is_captain'])): ?>
+                                        <?= !empty($match['playing_xi']) ? 'Playing XI' : 'Squad only' ?>
+                                        <?php if (!empty($match['is_captain'])): ?>
                                             · Captain
-                                        <?php endif; ?>
-                                        <?php if (! empty($match['is_wicketkeeper'])): ?>
-                                            · Wicketkeeper
                                         <?php endif; ?>
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="<?= ! empty($match['is_archived']) ? 'badge-soft-warning' : 'badge-soft-success' ?>">
-                                        <?= esc(! empty($match['is_archived']) ? 'archived' : $match['match_status']) ?>
+                                    <span class="<?= !empty($match['is_archived']) ? 'badge-soft-warning' : 'badge-soft-success' ?>">
+                                        <?= esc(!empty($match['is_archived']) ? 'archived' : $match['match_status']) ?>
                                     </span>
                                 </td>
                                 <td>
@@ -249,7 +244,7 @@
 
 <?= $this->section('scripts') ?>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const field = document.getElementById('guest-of-field');
         const statusSelect = document.getElementById('status');
 
@@ -257,7 +252,7 @@
             return;
         }
 
-        const syncGuestFieldVisibility = function() {
+        const syncGuestFieldVisibility = function () {
             field.classList.toggle('d-none', statusSelect.value !== 'guest');
         };
 

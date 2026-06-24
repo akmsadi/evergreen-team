@@ -84,7 +84,6 @@ class HomeController extends BaseController
 
         $this->players->insert($playerData);
 
-        return redirect()->to(site_url('/') . '#join')
-            ->with('join_success', 'Thanks. Your player details were saved with pending status.');
+        return redirect()->to(site_url('/') . '#join')->with('join_success', 'Thank you for your submission! We have received your details and will let you know once your request has been approved.');
     }
 }

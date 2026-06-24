@@ -1,6 +1,4 @@
-<?= $this->extend('admin/default') ?>
-
-<?= $this->section('title') ?>Event Gallery<?= $this->endSection() ?>
+<?= $this->extend('admin/template/default') ?>
 
 <?= $this->section('admin_nav') ?>events<?= $this->endSection() ?>
 

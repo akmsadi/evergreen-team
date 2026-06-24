@@ -76,9 +76,6 @@ $tossDecisionLabel = match ((string) ($match['toss_decision'] ?? '')) {
                                             <?php if ((int) $participant['is_captain'] === 1): ?>
                                                 <span class="badge rounded-pill text-bg-dark">Captain</span>
                                             <?php endif; ?>
-                                            <?php if ((int) $participant['is_wicketkeeper'] === 1): ?>
-                                                <span class="badge rounded-pill text-bg-secondary">WK</span>
-                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

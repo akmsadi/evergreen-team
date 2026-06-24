@@ -1,6 +1,4 @@
-<?= $this->extend('admin/default') ?>
-
-<?= $this->section('title') ?>Edit Event<?= $this->endSection() ?>
+<?= $this->extend('admin/template/default') ?>
 
 <?= $this->section('admin_nav') ?>events<?= $this->endSection() ?>
 
@@ -12,18 +10,21 @@
         overflow: hidden;
         background: #f8f9fa;
     }
+
     .event-image-card img {
         width: 100%;
         height: 160px;
         object-fit: cover;
         display: block;
     }
+
     .event-image-caption {
         padding: 6px 10px;
         font-size: 0.78rem;
         color: #4b5563;
         min-height: 30px;
     }
+
     .event-image-delete {
         position: absolute;
         top: 6px;
@@ -82,8 +83,8 @@
                     <?= csrf_field() ?>
                     <div class="mb-3">
                         <label for="images" class="form-label fw-semibold">Image Files</label>
-                        <input type="file" class="form-control<?= ! empty($errors) ? ' is-invalid' : '' ?>" id="images" name="images[]" accept="image/jpeg,image/png,image/webp" multiple>
-                        <?php if (! empty($errors)): ?>
+                        <input type="file" class="form-control<?= !empty($errors) ? ' is-invalid' : '' ?>" id="images" name="images[]" accept="image/jpeg,image/png,image/webp" multiple>
+                        <?php if (!empty($errors)): ?>
                             <div class="invalid-feedback d-block">
                                 <?php foreach ($errors as $err): ?>
                                     <div><?= esc($err) ?></div>
@@ -116,7 +117,7 @@
                                 <button type="submit" class="btn btn-danger btn-sm" title="Remove image"><i class="ti ti-trash"></i></button>
                             </form>
                             <div class="event-image-caption">
-                                <?php if (! empty($img['caption'])): ?>
+                                <?php if (!empty($img['caption'])): ?>
                                     <?= esc($img['caption']) ?>
                                 <?php else: ?>
                                     <span class="text-secondary fst-italic">No caption</span>

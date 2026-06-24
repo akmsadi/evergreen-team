@@ -1,6 +1,4 @@
-<?= $this->extend('admin/default') ?>
-
-<?= $this->section('title') ?>Add Player<?= $this->endSection() ?>
+<?= $this->extend('admin/template/default') ?>
 
 <?= $this->section('admin_nav') ?>create-player<?= $this->endSection() ?>
 
@@ -99,7 +97,7 @@
 
 <?= $this->section('scripts') ?>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const field = document.getElementById('guest-of-field');
 
         if (!field) {
@@ -108,12 +106,12 @@
 
         const statusInputs = document.querySelectorAll('input[name="status"]');
 
-        const syncGuestFieldVisibility = function() {
+        const syncGuestFieldVisibility = function () {
             const selected = document.querySelector('input[name="status"]:checked');
             field.classList.toggle('d-none', !selected || selected.value !== 'guest');
         };
 
-        statusInputs.forEach(function(input) {
+        statusInputs.forEach(function (input) {
             input.addEventListener('change', syncGuestFieldVisibility);
         });
 

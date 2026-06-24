@@ -35,7 +35,9 @@ $routes->get('/admin/matches/(:num)/edit', [AdminMatches::class, 'edit']);
 $routes->get('/admin/matches/(:num)', [AdminMatches::class, 'show']);
 $routes->post('/admin/matches', [AdminMatches::class, 'store']);
 $routes->post('/admin/matches/(:num)/update', [AdminMatches::class, 'update']);
+$routes->post('/admin/matches/(:num)/update-status', [AdminMatches::class, 'updateStatus']);
 $routes->post('/admin/matches/(:num)/delete', [AdminMatches::class, 'delete']);
+$routes->post('/admin/matches/(:num)/permanent-delete', [AdminMatches::class, 'permanentDelete']);
 $routes->post('/admin/matches/(:num)/innings', [AdminMatches::class, 'storeInnings']);
 $routes->post('/admin/matches/(:num)/contributors', [AdminMatches::class, 'updateContributors']);
 $routes->post('/admin/matches/(:num)/expenses', [AdminMatches::class, 'storeExpense']);
@@ -43,13 +45,14 @@ $routes->post('/admin/matches/(:num)/expenses/(:num)/update', [AdminMatches::cla
 $routes->post('/admin/matches/(:num)/expenses/(:num)/delete', [AdminMatches::class, 'deleteExpense']);
 $routes->post('/admin/matches/(:num)/clear-scoreboard', [AdminMatches::class, 'clearScoreboard']);
 
-// Match summary routes
-$routes->post('/admin/matches/(:num)/summary/batsmen', [AdminMatches::class, 'storeSummaryBatsman']);
-$routes->post('/admin/matches/(:num)/summary/batsmen/(:num)/delete', [AdminMatches::class, 'deleteSummaryBatsman']);
-$routes->post('/admin/matches/(:num)/summary/bowlers', [AdminMatches::class, 'storeSummaryBowler']);
-$routes->post('/admin/matches/(:num)/summary/bowlers/(:num)/delete', [AdminMatches::class, 'deleteSummaryBowler']);
-$routes->post('/admin/matches/(:num)/summary/wickets', [AdminMatches::class, 'storeSummaryWicket']);
-$routes->post('/admin/matches/(:num)/summary/wickets/(:num)/delete', [AdminMatches::class, 'deleteSummaryWicket']);
+// Match scoreboard routes
+$routes->get('/admin/matches/(:num)/scoreboard', [AdminMatches::class, 'editScoreboard']);
+$routes->get('/admin/matches/(:num)/scoreboard/preview', [AdminMatches::class, 'scoreboardPreview']);
+$routes->post('/admin/matches/(:num)/complete', [AdminMatches::class, 'completeMatch']);
+$routes->post('/admin/matches/(:num)/scoreboard/toss', [AdminMatches::class, 'saveToss']);
+$routes->post('/admin/matches/(:num)/scoreboard/batting/(:num)/save', [AdminMatches::class, 'saveBatting']);
+$routes->post('/admin/matches/(:num)/scoreboard/bowling/(:num)/save', [AdminMatches::class, 'saveBowling']);
+$routes->post('/admin/matches/(:num)/scoreboard/wickets/(:num)/save', [AdminMatches::class, 'saveFallOfWickets']);
 
 // Player routes
 $routes->get('/admin/players', [AdminPlayers::class, 'index']);

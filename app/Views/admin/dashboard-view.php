@@ -1,8 +1,4 @@
-<?= $this->extend('admin/default') ?>
-
-<?= $this->section('title') ?>Admin Dashboard<?= $this->endSection() ?>
-
-<?= $this->section('admin_nav') ?>dashboard<?= $this->endSection() ?>
+<?= $this->extend('admin/template/default') ?>
 
 <?= $this->section('styles') ?>
 <style {csp-style-nonce}>
@@ -70,16 +66,8 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<?php
-$totalMatches = array_sum(array_map(static fn(array $point): int => (int) $point['count'], $monthlyMatchCounts));
-?>
+<?php $totalMatches = array_sum(array_map(static fn(array $point): int => (int) $point['count'], $monthlyMatchCounts)); ?>
 <div class="content-card">
-    <div class="d-flex align-items-start justify-content-between">
-        <div>
-            <h1 class="h2 mb-2">Welcome, <?= esc($username) ?></h1>
-            <p class="text-secondary mb-4">You are signed in to the admin area.</p>
-        </div>
-    </div>
     <div class="panel mb-8">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
             <div>
@@ -252,7 +240,7 @@ $totalMatches = array_sum(array_map(static fn(array $point): int => (int) $point
 <?= $this->section('scripts') ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const chartElement = document.getElementById('monthly-matches-chart');
 
         if (!chartElement || typeof Chart === 'undefined') {
@@ -260,20 +248,20 @@ $totalMatches = array_sum(array_map(static fn(array $point): int => (int) $point
         }
 
         const chartRows = <?= json_encode(array_map(static function (array $point): array {
-                                $label = (string) $point['label'];
-                                $count = (int) $point['count'];
+            $label = (string) $point['label'];
+            $count = (int) $point['count'];
 
-                                return [$label, $count, sprintf('%s: %d match%s', $label, $count, $count === 1 ? '' : 'es')];
-                            }, $monthlyMatchCounts), JSON_THROW_ON_ERROR) ?>;
-        const labels = chartRows.map(function(row) {
+            return [$label, $count, sprintf('%s: %d match%s', $label, $count, $count === 1 ? '' : 'es')];
+        }, $monthlyMatchCounts), JSON_THROW_ON_ERROR) ?>;
+        const labels = chartRows.map(function (row) {
             return row[0];
         });
 
-        const counts = chartRows.map(function(row) {
+        const counts = chartRows.map(function (row) {
             return row[1];
         });
 
-        const tooltipLabels = chartRows.map(function(row) {
+        const tooltipLabels = chartRows.map(function (row) {
             return row[2];
         });
 
@@ -303,7 +291,7 @@ $totalMatches = array_sum(array_map(static fn(array $point): int => (int) $point
                     },
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 return tooltipLabels[context.dataIndex] ?? '';
                             }
                         }

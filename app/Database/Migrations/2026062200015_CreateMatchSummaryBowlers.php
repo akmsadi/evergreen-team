@@ -12,7 +12,7 @@ class CreateMatchSummaryBowlers extends Migration
             'id' => ['type' => 'INT', 'constraint' => 11],
             'match_id' => ['type' => 'INT', 'constraint' => 11],
             'innings_number' => ['type' => 'INT', 'constraint' => 10],
-            'bowler_name' => ['type' => 'VARCHAR', 'constraint' => 255],
+            'player_id' => ['type' => 'INT', 'constraint' => 11],
             'overs' => ['type' => 'DECIMAL', 'constraint' => 5, 'null' => true],
             'maidens' => ['type' => 'INT', 'constraint' => 10, 'null' => true],
             'runs' => ['type' => 'INT', 'constraint' => 10, 'null' => true],
@@ -21,7 +21,7 @@ class CreateMatchSummaryBowlers extends Migration
             'updated_at' => ['type' => 'DATETIME', 'null' => true]
         ]);
 
-        // Review keys and foreign keys manually after generation.
+        $this->forge->addForeignKey('player_id', 'players', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('match_summary_bowlers', true);
     }
 

@@ -57,7 +57,7 @@ class MatchFinanceService
     public function getParticipants(int $matchId): array
     {
         return $this->matchPlayers
-            ->select('match_players.player_id, match_players.side, match_players.playing_xi, match_players.is_captain, match_players.is_wicketkeeper, players.name')
+            ->select('match_players.player_id, match_players.side, match_players.playing_xi, match_players.is_captain, players.name')
             ->join('players', 'players.id = match_players.player_id')
             ->where('match_players.match_id', $matchId)
             ->orderBy('players.name', 'ASC')
@@ -506,7 +506,7 @@ class MatchFinanceService
     public function getPlayerMatchBreakdown(int $playerId): array
     {
         $matches = $this->matchPlayers
-            ->select('match_players.match_id, match_players.side, match_players.role, match_players.batting_position, match_players.playing_xi, match_players.is_captain, match_players.is_wicketkeeper, matches.team_name, matches.opponent_name, COALESCE(venues.name, matches.venue) AS venue, matches.scheduled_at, matches.match_status')
+            ->select('match_players.match_id, match_players.side, match_players.role, match_players.batting_position, match_players.playing_xi, match_players.is_captain, matches.team_name, matches.opponent_name, COALESCE(venues.name, matches.venue) AS venue, matches.scheduled_at, matches.match_status')
             ->join('matches', 'matches.id = match_players.match_id')
             ->join('venues', 'venues.id = matches.venue_id', 'left')
             ->where('match_players.player_id', $playerId)

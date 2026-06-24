@@ -1,6 +1,4 @@
-<?= $this->extend('admin/default') ?>
-
-<?= $this->section('title') ?><?= esc($pageTitle) ?><?= $this->endSection() ?>
+<?= $this->extend('admin/template/default') ?>
 
 <?= $this->section('admin_nav') ?><?= ($match ?? null) === null ? 'create-match' : 'matches' ?><?= $this->endSection() ?>
 
@@ -24,7 +22,18 @@
     <?php endif; ?>
 
     <?php if (!empty($isMatchLocked)): ?>
-        <div class="alert alert-warning">Completed match fields are read-only. Continue using the overview page for finance, contributors, expenses, and scoreboard actions.</div>
+        <div class="alert alert-warning d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+            <span>Completed match fields are read-only. Continue using the overview page for finance, contributors, expenses, and scoreboard actions.</span>
+            <form action="<?= site_url('/admin/matches/' . $match['id'] . '/update-status') ?>" method="post" class="d-flex gap-2 align-items-center flex-shrink-0">
+                <?= csrf_field() ?>
+                <select name="match_status" class="form-select form-select-sm" style="width:auto">
+                    <?php foreach (MATCH_STATUS as $status): ?>
+                        <option value="<?= esc($status) ?>" <?= ($match['match_status'] ?? '') === $status ? 'selected' : '' ?>><?= esc(ucfirst($status)) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary text-nowrap">Update Status</button>
+            </form>
+        </div>
     <?php endif; ?>
 
     <?php $errors = session()->getFlashdata('errors') ?? []; ?>
@@ -145,21 +154,6 @@
                             <div class="invalid-feedback d-block"><?= esc($errors['team_a_captain_id']) ?></div>
                         <?php endif; ?>
                     </div>
-                    <div>
-                        <label for="team_a_keeper_id" class="form-label fw-semibold">Team A Wicketkeeper</label>
-                        <select class="form-select<?= isset($errors['team_a_keeper_id']) ? ' is-invalid' : '' ?>" id="team_a_keeper_id" name="team_a_keeper_id" <?= $fieldLockAttr ?>>
-                            <option value="">Select wicketkeeper</option>
-                            <?php foreach ($teamAPlayerIds as $playerId): ?>
-                                <?php if (!isset($playersById[$playerId])) {
-                                    continue;
-                                } ?>
-                                <option value="<?= esc((string) $playerId) ?>" <?= old('team_a_keeper_id', $teamAKeeperId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($playersById[$playerId]['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <?php if (isset($errors['team_a_keeper_id'])): ?>
-                            <div class="invalid-feedback d-block"><?= esc($errors['team_a_keeper_id']) ?></div>
-                        <?php endif; ?>
-                    </div>
                 </div>
             </div>
             <div class="col-lg-6">
@@ -195,21 +189,6 @@
                         </select>
                         <?php if (isset($errors['team_b_captain_id'])): ?>
                             <div class="invalid-feedback d-block"><?= esc($errors['team_b_captain_id']) ?></div>
-                        <?php endif; ?>
-                    </div>
-                    <div>
-                        <label for="team_b_keeper_id" class="form-label fw-semibold">Team B Wicketkeeper</label>
-                        <select class="form-select<?= isset($errors['team_b_keeper_id']) ? ' is-invalid' : '' ?>" id="team_b_keeper_id" name="team_b_keeper_id" <?= $fieldLockAttr ?>>
-                            <option value="">Select wicketkeeper</option>
-                            <?php foreach ($teamBPlayerIds as $playerId): ?>
-                                <?php if (!isset($playersById[$playerId])) {
-                                    continue;
-                                } ?>
-                                <option value="<?= esc((string) $playerId) ?>" <?= old('team_b_keeper_id', $teamBKeeperId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($playersById[$playerId]['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <?php if (isset($errors['team_b_keeper_id'])): ?>
-                            <div class="invalid-feedback d-block"><?= esc($errors['team_b_keeper_id']) ?></div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -262,9 +241,7 @@
         updateSquadLabel('#team_a_squad_label', 'Team A', teamACheckboxes);
         updateSquadLabel('#team_b_squad_label', 'Team B', teamBCheckboxes);
         syncLeadershipOptions(teamACheckboxes, document.querySelector('#team_a_captain_id'), 'Select captain');
-        syncLeadershipOptions(teamACheckboxes, document.querySelector('#team_a_keeper_id'), 'Select wicketkeeper');
         syncLeadershipOptions(teamBCheckboxes, document.querySelector('#team_b_captain_id'), 'Select captain');
-        syncLeadershipOptions(teamBCheckboxes, document.querySelector('#team_b_keeper_id'), 'Select wicketkeeper');
     };
 
     const syncLeadershipOptions = (checkboxes, select, placeholder) => {

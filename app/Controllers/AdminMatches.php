@@ -2,6 +2,10 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
+
 use App\Libraries\AuditLogger;
 use App\Models\MatchBallModel;
 use App\Libraries\MatchFinanceService;
@@ -12,7 +16,6 @@ use App\Models\MatchPlayerModel;
 use App\Models\PlayerModel;
 use App\Models\VenueModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
-use CodeIgniter\HTTP\ResponseInterface;
 
 class AdminMatches extends BaseController
 {
@@ -26,8 +29,9 @@ class AdminMatches extends BaseController
     private PlayerModel $players;
     private VenueModel $venues;
 
-    public function __construct()
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
+        parent::initController($request, $response, $logger);
         helper(['form', 'url']);
         $this->auditLogger = new AuditLogger();
         $this->matchBalls = new MatchBallModel();
@@ -46,8 +50,8 @@ class AdminMatches extends BaseController
             return redirect()->to('/admin/login');
         }
 
-        return view('admin/matches/index', [
-            'username' => session()->get('admin_username'),
+        return view('admin/matches/index-view', [
+            'activeNav' => 'matches',
             'matches' => $this->matches->orderedList(),
         ]);
     }
@@ -140,6 +144,28 @@ class AdminMatches extends BaseController
         return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Match updated successfully.');
     }
 
+    public function updateStatus(int $matchId): ResponseInterface
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        if ($this->matches->find($matchId) === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $status = (string) $this->request->getPost('match_status');
+        $allowed = ['scheduled', 'live', 'completed', 'abandoned', 'archived'];
+
+        if (!in_array($status, $allowed, true)) {
+            return redirect()->back()->with('error', 'Invalid status.');
+        }
+
+        $this->matches->update($matchId, ['match_status' => $status]);
+
+        return redirect()->to('/admin/matches/' . $matchId . '/edit')->with('success', 'Status updated to ' . ucfirst($status) . '.');
+    }
+
     public function delete(int $matchId)
     {
         if (!session()->get('is_admin')) {
@@ -163,6 +189,45 @@ class AdminMatches extends BaseController
         return redirect()->to('/admin/matches')->with('success', 'Match archived successfully.');
     }
 
+    public function permanentDelete(int $matchId)
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        $match = $this->matches->find($matchId);
+
+        if ($match === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        if (($match['match_status'] ?? '') !== 'archived') {
+            return redirect()->to('/admin/matches')->with('error', 'Only archived matches can be permanently deleted.');
+        }
+
+        $db = db_connect();
+        $expenseIds = array_column(
+            $db->table('match_expenses')->select('id')->where('match_id', $matchId)->get()->getResultArray(),
+            'id'
+        );
+        if ($expenseIds !== []) {
+            $db->table('match_expense_contributors')->whereIn('expense_id', $expenseIds)->delete();
+        }
+        $db->table('match_expenses')->where('match_id', $matchId)->delete();
+        $db->table('match_player_deposits')->where('match_id', $matchId)->delete();
+        $db->table('match_contributors')->where('match_id', $matchId)->delete();
+        $db->table('match_summary_batsmen')->where('match_id', $matchId)->delete();
+        $db->table('match_summary_bowlers')->where('match_id', $matchId)->delete();
+        $db->table('match_summary_wickets')->where('match_id', $matchId)->delete();
+        $db->table('match_summary_extras')->where('match_id', $matchId)->delete();
+        $db->table('match_balls')->where('match_id', $matchId)->delete();
+        $db->table('match_innings')->where('match_id', $matchId)->delete();
+        $db->table('match_players')->where('match_id', $matchId)->delete();
+        $this->matches->delete($matchId);
+
+        return redirect()->to('/admin/matches')->with('success', 'Match permanently deleted.');
+    }
+
     public function show(int $matchId): ResponseInterface|string
     {
         if (!session()->get('is_admin')) {
@@ -177,8 +242,8 @@ class AdminMatches extends BaseController
 
         $participants = $this->matchFinance->getParticipants($matchId);
 
-        return view('admin/matches/show', [
-            'username' => session()->get('admin_username'),
+        return view('admin/matches/show-view', [
+            'activeNav' => 'matches',
             'match' => $match,
             'participants' => $participants,
             'matchContributorIds' => $this->matchFinance->getMatchContributorIds($matchId),
@@ -494,24 +559,14 @@ class AdminMatches extends BaseController
         }
 
         $teamACaptainId = (int) $this->request->getPost('team_a_captain_id');
-        $teamAKeeperId = (int) $this->request->getPost('team_a_keeper_id');
         $teamBCaptainId = (int) $this->request->getPost('team_b_captain_id');
-        $teamBKeeperId = (int) $this->request->getPost('team_b_keeper_id');
 
         if ($teamACaptainId > 0 && !in_array($teamACaptainId, $teamAPlayers, true)) {
             return redirect()->back()->withInput()->with('errors', ['team_a_captain_id' => 'Select a Team A captain from the Team A squad.']);
         }
 
-        if ($teamAKeeperId > 0 && !in_array($teamAKeeperId, $teamAPlayers, true)) {
-            return redirect()->back()->withInput()->with('errors', ['team_a_keeper_id' => 'Select a Team A wicketkeeper from the Team A squad.']);
-        }
-
         if ($teamBCaptainId > 0 && !in_array($teamBCaptainId, $teamBPlayers, true)) {
             return redirect()->back()->withInput()->with('errors', ['team_b_captain_id' => 'Select a Team B captain from the Team B squad.']);
-        }
-
-        if ($teamBKeeperId > 0 && !in_array($teamBKeeperId, $teamBPlayers, true)) {
-            return redirect()->back()->withInput()->with('errors', ['team_b_keeper_id' => 'Select a Team B wicketkeeper from the Team B squad.']);
         }
 
         return null;
@@ -584,9 +639,7 @@ class AdminMatches extends BaseController
         $this->matchPlayers->where('match_id', $matchId)->delete();
 
         $teamACaptainId = (int) $this->request->getPost('team_a_captain_id');
-        $teamAKeeperId = (int) $this->request->getPost('team_a_keeper_id');
         $teamBCaptainId = (int) $this->request->getPost('team_b_captain_id');
-        $teamBKeeperId = (int) $this->request->getPost('team_b_keeper_id');
 
         foreach ($teamAPlayers as $index => $playerId) {
             $this->matchPlayers->insert([
@@ -595,7 +648,6 @@ class AdminMatches extends BaseController
                 'side' => 'team_a',
                 'batting_position' => $index + 1,
                 'is_captain' => $playerId === $teamACaptainId ? 1 : 0,
-                'is_wicketkeeper' => $playerId === $teamAKeeperId ? 1 : 0,
                 'playing_xi' => 1,
             ]);
         }
@@ -607,7 +659,6 @@ class AdminMatches extends BaseController
                 'side' => 'team_b',
                 'batting_position' => $index + 1,
                 'is_captain' => $playerId === $teamBCaptainId ? 1 : 0,
-                'is_wicketkeeper' => $playerId === $teamBKeeperId ? 1 : 0,
                 'playing_xi' => $index < 11 ? 1 : 0,
             ]);
         }
@@ -659,9 +710,7 @@ class AdminMatches extends BaseController
         $teamAPlayerIds = [];
         $teamBPlayerIds = [];
         $teamACaptainId = null;
-        $teamAKeeperId = null;
         $teamBCaptainId = null;
-        $teamBKeeperId = null;
 
         if ($match !== null) {
             $participants = $this->matchFinance->getParticipants((int) $match['id']);
@@ -674,18 +723,12 @@ class AdminMatches extends BaseController
                     if ((int) $participant['is_captain'] === 1) {
                         $teamACaptainId = $playerId;
                     }
-                    if ((int) $participant['is_wicketkeeper'] === 1) {
-                        $teamAKeeperId = $playerId;
-                    }
                 }
 
                 if ($participant['side'] === 'team_b') {
                     $teamBPlayerIds[] = $playerId;
                     if ((int) $participant['is_captain'] === 1) {
                         $teamBCaptainId = $playerId;
-                    }
-                    if ((int) $participant['is_wicketkeeper'] === 1) {
-                        $teamBKeeperId = $playerId;
                     }
                 }
             }
@@ -701,7 +744,6 @@ class AdminMatches extends BaseController
             'match' => $match,
             'isMatchLocked' => $match !== null && (($match['match_status'] ?? '') === 'completed'),
             'formAction' => $match === null ? site_url('/admin/matches') : site_url('/admin/matches/' . $match['id'] . '/update'),
-            'pageTitle' => $match === null ? 'Add Match' : 'Edit Match',
             'heading' => $match === null ? 'Create Match' : 'Edit Match',
             'intro' => $match === null
                 ? 'Create an internal match by splitting the available players into two teams.'
@@ -710,10 +752,197 @@ class AdminMatches extends BaseController
             'teamAPlayerIds' => $teamAPlayerIds,
             'teamBPlayerIds' => $teamBPlayerIds,
             'teamACaptainId' => $teamACaptainId,
-            'teamAKeeperId' => $teamAKeeperId,
             'teamBCaptainId' => $teamBCaptainId,
-            'teamBKeeperId' => $teamBKeeperId,
         ];
+    }
+
+    public function editScoreboard(int $matchId): ResponseInterface|string
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        $match = $this->matches->findWithVenue($matchId);
+
+        if ($match === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        if (($match['match_status'] ?? '') === 'completed') {
+            return redirect()->to('/admin/matches/' . $matchId . '/scoreboard/preview');
+        }
+
+        $matchNumber = $this->matches->where('scheduled_at <', $match['scheduled_at'])->countAllResults() + 1;
+
+        $db = db_connect();
+
+        $matchPlayerRows = $db->table('match_players mp')
+            ->select('mp.player_id, mp.side, mp.batting_position, p.name')
+            ->join('players p', 'p.id = mp.player_id')
+            ->where('mp.match_id', $matchId)
+            ->orderBy('mp.batting_position', 'ASC')
+            ->orderBy('p.name', 'ASC')
+            ->get()->getResultArray();
+
+        $teamAPlayers = array_values(array_filter($matchPlayerRows, static fn($r) => $r['side'] === 'team_a'));
+        $teamBPlayers = array_values(array_filter($matchPlayerRows, static fn($r) => $r['side'] === 'team_b'));
+
+        $tossWinner = (string) ($match['toss_winner'] ?? '');
+        $tossDecision = (string) ($match['toss_decision'] ?? '');
+
+        if ($tossWinner === 'team_a' && $tossDecision === 'bat') {
+            $inns1BattingSide = 'team_a';
+        } elseif ($tossWinner === 'team_a' && $tossDecision === 'bowl') {
+            $inns1BattingSide = 'team_b';
+        } elseif ($tossWinner === 'team_b' && $tossDecision === 'bat') {
+            $inns1BattingSide = 'team_b';
+        } elseif ($tossWinner === 'team_b' && $tossDecision === 'bowl') {
+            $inns1BattingSide = 'team_a';
+        } else {
+            $inns1BattingSide = 'team_a';
+        }
+
+        $existingBatsmen = $db->table('match_summary_batsmen')
+            ->where('match_id', $matchId)
+            ->get()->getResultArray();
+        $batsmenByInnings = [];
+        foreach ($existingBatsmen as $row) {
+            $batsmenByInnings[(int) $row['innings_number']][(int) $row['player_id']] = $row;
+        }
+
+        $existingBowlers = $db->table('match_summary_bowlers')
+            ->where('match_id', $matchId)
+            ->get()->getResultArray();
+        $bowlersByInnings = [];
+        foreach ($existingBowlers as $row) {
+            $bowlersByInnings[(int) $row['innings_number']][(int) $row['player_id']] = $row;
+        }
+
+        $wickets = $db->table('match_summary_wickets msw')
+            ->select('msw.*, p.name AS player_name')
+            ->join('players p', 'p.id = msw.player_id', 'left')
+            ->where('msw.match_id', $matchId)
+            ->orderBy('msw.innings_number', 'ASC')
+            ->orderBy('msw.id', 'ASC')
+            ->get()->getResultArray();
+
+        $existingExtras = $db->table('match_summary_extras')
+            ->where('match_id', $matchId)
+            ->get()->getResultArray();
+        $extrasByInnings = [];
+        foreach ($existingExtras as $row) {
+            $extrasByInnings[(int) $row['innings_number']] = $row;
+        }
+
+        $allPlayers = $this->players
+            ->where('status !=', 'rejected')
+            ->orderBy('name', 'ASC')
+            ->findAll();
+
+        return view('admin/matches/scoreboard-view', [
+            'activeNav'        => 'matches',
+            'match'            => $match,
+            'matchNumber'      => $matchNumber,
+            'teamAPlayers'     => $teamAPlayers,
+            'teamBPlayers'     => $teamBPlayers,
+            'inns1BattingSide' => $inns1BattingSide,
+            'batsmenByInnings' => $batsmenByInnings,
+            'bowlersByInnings' => $bowlersByInnings,
+            'wickets'          => $wickets,
+            'extrasByInnings'  => $extrasByInnings,
+            'allPlayers'       => $allPlayers,
+        ]);
+    }
+
+    public function saveToss(int $matchId): ResponseInterface
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        if ($this->matches->find($matchId) === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $this->matches->update($matchId, [
+            'toss_winner' => $this->emptyToNull((string) $this->request->getPost('toss_winner')),
+            'toss_decision' => $this->emptyToNull((string) $this->request->getPost('toss_decision')),
+        ]);
+
+        return redirect()->to('/admin/matches/' . $matchId . '/scoreboard')->with('success', 'Toss saved.');
+    }
+
+    public function saveBatting(int $matchId, int $inningsNumber): ResponseInterface
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        if ($this->matches->find($matchId) === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $model = new \App\Models\MatchSummaryBatsmenModel();
+        $model->where('match_id', $matchId)->where('innings_number', $inningsNumber)->delete();
+
+        foreach ((array) $this->request->getPost('batsmen') as $playerId => $data) {
+            $model->insert([
+                'match_id' => $matchId,
+                'innings_number' => $inningsNumber,
+                'sort_order' => (int) ($data['sort_order'] ?? 0),
+                'player_id' => (int) $playerId,
+                'runs' => ($data['runs'] ?? '') !== '' ? (int) $data['runs'] : null,
+                'balls' => ($data['balls'] ?? '') !== '' ? (int) $data['balls'] : null,
+                'fours' => ($data['fours'] ?? '') !== '' ? (int) $data['fours'] : null,
+                'sixes' => ($data['sixes'] ?? '') !== '' ? (int) $data['sixes'] : null,
+                'dismissal_mode' => $this->emptyToNull((string) ($data['dismissal_mode'] ?? '')),
+                'dismissal_by'   => ($data['dismissal_by'] ?? '') !== '' ? (int) $data['dismissal_by'] : null,
+                'fielder_id'     => ($data['fielder_id'] ?? '') !== '' ? (int) $data['fielder_id'] : null,
+            ]);
+        }
+
+        $extrasData  = (array) ($this->request->getPost('extras') ?? []);
+        $extrasModel = new \App\Models\MatchSummaryExtrasModel();
+        $extrasModel->where('match_id', $matchId)->where('innings_number', $inningsNumber)->delete();
+        $extrasModel->insert([
+            'match_id'       => $matchId,
+            'innings_number' => $inningsNumber,
+            'byes'           => (int) ($extrasData['byes'] ?? 0),
+            'leg_byes'       => (int) ($extrasData['leg_byes'] ?? 0),
+            'wides'          => (int) ($extrasData['wides'] ?? 0),
+            'no_balls'       => (int) ($extrasData['no_balls'] ?? 0),
+        ]);
+
+        return redirect()->to('/admin/matches/' . $matchId . '/scoreboard')->with('success', 'Innings ' . $inningsNumber . ' batting saved.');
+    }
+
+    public function saveBowling(int $matchId, int $inningsNumber): ResponseInterface
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        if ($this->matches->find($matchId) === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $model = new \App\Models\MatchSummaryBowlersModel();
+        $model->where('match_id', $matchId)->where('innings_number', $inningsNumber)->delete();
+
+        foreach ((array) $this->request->getPost('bowlers') as $playerId => $data) {
+            $model->insert([
+                'match_id' => $matchId,
+                'innings_number' => $inningsNumber,
+                'sort_order' => (int) ($data['sort_order'] ?? 0),
+                'player_id' => (int) $playerId,
+                'overs' => ($data['overs'] ?? '') !== '' ? (float) $data['overs'] : null,
+                'maidens' => ($data['maidens'] ?? '') !== '' ? (int) $data['maidens'] : null,
+                'runs' => ($data['runs'] ?? '') !== '' ? (int) $data['runs'] : null,
+                'wickets' => ($data['wickets'] ?? '') !== '' ? (int) $data['wickets'] : null,
+            ]);
+        }
+
+        return redirect()->to('/admin/matches/' . $matchId . '/scoreboard')->with('success', 'Innings ' . $inningsNumber . ' bowling saved.');
     }
 
     public function storeSummaryBatsman(int $matchId)
@@ -730,16 +959,16 @@ class AdminMatches extends BaseController
         $summaryBatsmen->insert([
             'match_id' => $matchId,
             'innings_number' => (int) $this->request->getPost('innings_number'),
-            'batsman_name' => trim((string) $this->request->getPost('batsman_name')),
+            'player_id' => (int) $this->request->getPost('player_id'),
             'runs' => (int) $this->request->getPost('runs') ?? 0,
             'balls' => (int) $this->request->getPost('balls') ?? 0,
             'fours' => (int) $this->request->getPost('fours') ?? 0,
             'sixes' => (int) $this->request->getPost('sixes') ?? 0,
             'dismissal_mode' => $this->emptyToNull((string) $this->request->getPost('dismissal_mode')),
-            'dismissal_by' => $this->emptyToNull((string) $this->request->getPost('dismissal_by')),
+            'dismissal_by' => ($this->request->getPost('dismissal_by') ?? '') !== '' ? (int) $this->request->getPost('dismissal_by') : null,
         ]);
 
-        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Batsman added to summary.');
+        return redirect()->to('/admin/matches/' . $matchId . '/scoreboard')->with('success', 'Batsman added.');
     }
 
     public function deleteSummaryBatsman(int $matchId, int $batsmanId)
@@ -758,7 +987,7 @@ class AdminMatches extends BaseController
         }
 
         $summaryBatsmen->delete($batsmanId);
-        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Batsman removed from summary.');
+        return redirect()->to('/admin/matches/' . $matchId . '/scoreboard')->with('success', 'Batsman removed.');
     }
 
     public function storeSummaryBowler(int $matchId)
@@ -775,14 +1004,14 @@ class AdminMatches extends BaseController
         $summaryBowlers->insert([
             'match_id' => $matchId,
             'innings_number' => (int) $this->request->getPost('innings_number'),
-            'bowler_name' => trim((string) $this->request->getPost('bowler_name')),
+            'player_id' => (int) $this->request->getPost('player_id'),
             'overs' => (float) $this->request->getPost('overs') ?? 0,
             'maidens' => (int) $this->request->getPost('maidens') ?? 0,
             'runs' => (int) $this->request->getPost('runs') ?? 0,
             'wickets' => (int) $this->request->getPost('wickets') ?? 0,
         ]);
 
-        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Bowler added to summary.');
+        return redirect()->to('/admin/matches/' . $matchId . '/scoreboard')->with('success', 'Bowler added.');
     }
 
     public function deleteSummaryBowler(int $matchId, int $bowlerId)
@@ -801,10 +1030,10 @@ class AdminMatches extends BaseController
         }
 
         $summaryBowlers->delete($bowlerId);
-        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Bowler removed from summary.');
+        return redirect()->to('/admin/matches/' . $matchId . '/scoreboard')->with('success', 'Bowler removed.');
     }
 
-    public function storeSummaryWicket(int $matchId)
+    public function completeMatch(int $matchId): ResponseInterface
     {
         if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
@@ -814,19 +1043,105 @@ class AdminMatches extends BaseController
             throw PageNotFoundException::forPageNotFound('Match not found.');
         }
 
-        $summaryWickets = new \App\Models\MatchSummaryWicketsModel();
-        $summaryWickets->insert([
-            'match_id' => $matchId,
-            'innings_number' => (int) $this->request->getPost('innings_number'),
-            'player_name' => trim((string) $this->request->getPost('player_name')),
-            'score_at_dismissal' => (int) $this->request->getPost('score_at_dismissal'),
-            'over_at_dismissal' => (float) $this->request->getPost('over_at_dismissal'),
+        $this->matches->update($matchId, ['match_status' => 'completed']);
+
+        return redirect()->to('/admin/matches/' . $matchId . '/scoreboard/preview')->with('success', 'Match marked as completed.');
+    }
+
+    public function scoreboardPreview(int $matchId): ResponseInterface|string
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+
+        $match = $this->matches->findWithVenue($matchId);
+        if ($match === null) {
+            throw PageNotFoundException::forPageNotFound('Match not found.');
+        }
+
+        $matchNumber = $this->matches->where('scheduled_at <', $match['scheduled_at'])->countAllResults() + 1;
+
+        $tossWinner   = (string) ($match['toss_winner'] ?? '');
+        $tossDecision = (string) ($match['toss_decision'] ?? '');
+
+        if ($tossWinner === 'team_a' && $tossDecision === 'bat') {
+            $inns1BattingSide = 'team_a';
+        } elseif ($tossWinner === 'team_a' && $tossDecision === 'bowl') {
+            $inns1BattingSide = 'team_b';
+        } elseif ($tossWinner === 'team_b' && $tossDecision === 'bat') {
+            $inns1BattingSide = 'team_b';
+        } elseif ($tossWinner === 'team_b' && $tossDecision === 'bowl') {
+            $inns1BattingSide = 'team_a';
+        } else {
+            $inns1BattingSide = 'team_a';
+        }
+
+        $db = db_connect();
+
+        $battingRows = $db->table('match_summary_batsmen msb')
+            ->select('msb.*, p.name AS player_name, p2.name AS dismissal_by_name, p3.name AS fielder_name')
+            ->join('players p', 'p.id = msb.player_id')
+            ->join('players p2', 'p2.id = msb.dismissal_by', 'left')
+            ->join('players p3', 'p3.id = msb.fielder_id', 'left')
+            ->where('msb.match_id', $matchId)
+            ->orderBy('msb.innings_number', 'ASC')
+            ->orderBy('msb.sort_order', 'ASC')
+            ->orderBy('msb.id', 'ASC')
+            ->get()->getResultArray();
+
+        $battingByInnings = [];
+        foreach ($battingRows as $row) {
+            $battingByInnings[(int) $row['innings_number']][] = $row;
+        }
+
+        $bowlingRows = $db->table('match_summary_bowlers msb')
+            ->select('msb.*, p.name AS player_name')
+            ->join('players p', 'p.id = msb.player_id')
+            ->where('msb.match_id', $matchId)
+            ->orderBy('msb.innings_number', 'ASC')
+            ->orderBy('msb.sort_order', 'ASC')
+            ->orderBy('msb.id', 'ASC')
+            ->get()->getResultArray();
+
+        $bowlingByInnings = [];
+        foreach ($bowlingRows as $row) {
+            $bowlingByInnings[(int) $row['innings_number']][] = $row;
+        }
+
+        $wicketRows = $db->table('match_summary_wickets msw')
+            ->select('msw.*, p.name AS player_name')
+            ->join('players p', 'p.id = msw.player_id', 'left')
+            ->where('msw.match_id', $matchId)
+            ->orderBy('msw.innings_number', 'ASC')
+            ->orderBy('msw.id', 'ASC')
+            ->get()->getResultArray();
+
+        $wicketsByInnings = [];
+        foreach ($wicketRows as $row) {
+            $wicketsByInnings[(int) $row['innings_number']][] = $row;
+        }
+
+        $extrasRows = $db->table('match_summary_extras')
+            ->where('match_id', $matchId)
+            ->get()->getResultArray();
+        $extrasByInnings = [];
+        foreach ($extrasRows as $row) {
+            $extrasByInnings[(int) $row['innings_number']] = $row;
+        }
+
+        return view('admin/matches/scoreboard-preview-view', [
+            'activeNav'        => 'matches',
+            'match'            => $match,
+            'matchNumber'      => $matchNumber,
+            'inns1BattingSide' => $inns1BattingSide,
+            'battingByInnings' => $battingByInnings,
+            'bowlingByInnings' => $bowlingByInnings,
+            'wicketsByInnings' => $wicketsByInnings,
+            'extrasByInnings'  => $extrasByInnings,
         ]);
-
-        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Wicket added to summary.');
     }
 
-    public function deleteSummaryWicket(int $matchId, int $wicketId)
+    public function saveFallOfWickets(int $matchId, int $inningsNumber): ResponseInterface
     {
         if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
@@ -836,12 +1151,23 @@ class AdminMatches extends BaseController
             throw PageNotFoundException::forPageNotFound('Match not found.');
         }
 
-        $summaryWickets = new \App\Models\MatchSummaryWicketsModel();
-        if ($summaryWickets->find($wicketId) === null) {
-            throw PageNotFoundException::forPageNotFound('Wicket not found.');
+        $model = new \App\Models\MatchSummaryWicketsModel();
+        $model->where('match_id', $matchId)->where('innings_number', $inningsNumber)->delete();
+
+        foreach ((array) $this->request->getPost('wickets') as $row) {
+            $playerId = (int) ($row['player_id'] ?? 0);
+            if ($playerId <= 0) {
+                continue;
+            }
+            $model->insert([
+                'match_id'           => $matchId,
+                'innings_number'     => $inningsNumber,
+                'player_id'          => $playerId,
+                'score_at_dismissal' => (int) ($row['score_at_dismissal'] ?? 0),
+                'over_at_dismissal'  => (float) ($row['over_at_dismissal'] ?? 0),
+            ]);
         }
 
-        $summaryWickets->delete($wicketId);
-        return redirect()->to('/admin/matches/' . $matchId)->with('success', 'Wicket removed from summary.');
+        return redirect()->to('/admin/matches/' . $matchId . '/scoreboard')->with('success', 'Innings ' . $inningsNumber . ' fall of wickets saved.');
     }
 }
