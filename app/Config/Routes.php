@@ -57,6 +57,8 @@ $routes->post('/admin/matches/(:num)/scoreboard/wickets/(:num)/save', [AdminMatc
 // Player routes
 $routes->get('/admin/players', [AdminPlayers::class, 'index']);
 $routes->get('/admin/accounts', [AdminPlayers::class, 'accounts']);
+$routes->get('/admin/deposits', [AdminPlayers::class, 'deposits']);
+$routes->get('/admin/finance-overview', [AdminPlayers::class, 'financeOverview']);
 $routes->get('/admin/players/create', [AdminPlayers::class, 'create']);
 $routes->get('/admin/players/(:num)/edit', [AdminPlayers::class, 'edit']);
 $routes->post('/admin/players', [AdminPlayers::class, 'store']);

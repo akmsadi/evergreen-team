@@ -13,19 +13,19 @@ $sideLabel = static function (string $side) use ($match): string {
 };
 
 $dismissalText = static function (array $row): string {
-    $mode    = $row['dismissal_mode'] ?? '';
-    $bowler  = $row['dismissal_by_name'] ?? '';
+    $mode = $row['dismissal_mode'] ?? '';
+    $bowler = $row['dismissal_by_name'] ?? '';
     $fielder = $row['fielder_name'] ?? '';
     return match ($mode) {
-        'bowled'       => 'b ' . $bowler,
-        'caught'       => $fielder ? 'c ' . $fielder . ' b ' . $bowler : 'c &amp; b ' . $bowler,
-        'lbw'          => 'lbw b ' . $bowler,
-        'run_out'      => 'run out (' . implode('/', array_filter([$fielder, $bowler])) . ')',
-        'stumped'      => 'st ' . $fielder . ' b ' . $bowler,
-        'hit_wicket'   => 'hit wkt b ' . $bowler,
-        'not_out'      => 'not out',
+        'bowled' => 'b ' . $bowler,
+        'caught' => $fielder ? 'c ' . $fielder . ' b ' . $bowler : 'c &amp; b ' . $bowler,
+        'lbw' => 'lbw b ' . $bowler,
+        'run_out' => 'run out (' . implode('/', array_filter([$fielder, $bowler])) . ')',
+        'stumped' => 'st ' . $fielder . ' b ' . $bowler,
+        'hit_wicket' => 'hit wkt b ' . $bowler,
+        'not_out' => 'not out',
         'retired_hurt' => 'ret hurt',
-        default        => $mode ? esc(ucwords(str_replace('_', ' ', $mode))) : '—',
+        default => $mode ? esc(ucwords(str_replace('_', ' ', $mode))) : '—',
     };
 };
 ?>
@@ -63,12 +63,14 @@ $dismissalText = static function (array $row): string {
         <?php
         $battingSide = $inns === 1 ? $inns1BattingSide : $inns2BattingSide;
         $bowlingSide = $inns === 1 ? $inns1BowlingSide : $inns2BowlingSide;
-        $batRows     = $battingByInnings[$inns] ?? [];
-        $bowlRows    = $bowlingByInnings[$inns] ?? [];
-        $fowRows     = $wicketsByInnings[$inns] ?? [];
-        $extrasRow   = $extrasByInnings[$inns] ?? [];
+        $batRows = $battingByInnings[$inns] ?? [];
+        $bowlRows = $bowlingByInnings[$inns] ?? [];
+        $fowRows = $wicketsByInnings[$inns] ?? [];
+        $extrasRow = $extrasByInnings[$inns] ?? [];
 
-        if ($batRows === [] && $bowlRows === []) { continue; }
+        if ($batRows === [] && $bowlRows === []) {
+            continue;
+        }
         ?>
         <div class="card mb-4">
             <div class="card-header fw-semibold">
@@ -77,7 +79,7 @@ $dismissalText = static function (array $row): string {
             <div class="card-body p-0">
                 <?php if ($batRows !== []): ?>
                     <div class="table-responsive">
-                        <table class="table table-sm mb-0">
+                        <table class="table mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width:36px">#</th>
@@ -103,7 +105,7 @@ $dismissalText = static function (array $row): string {
                                 <?php endforeach; ?>
                             </tbody>
                             <?php
-                            $totalRuns  = array_sum(array_column(array_filter($batRows, static fn($r) => $r['runs'] !== null), 'runs'));
+                            $totalRuns = array_sum(array_column(array_filter($batRows, static fn($r) => $r['runs'] !== null), 'runs'));
                             $totalBalls = array_sum(array_column(array_filter($batRows, static fn($r) => $r['balls'] !== null), 'balls'));
                             $totalFours = array_sum(array_column(array_filter($batRows, static fn($r) => $r['fours'] !== null), 'fours'));
                             $totalSixes = array_sum(array_column(array_filter($batRows, static fn($r) => $r['sixes'] !== null), 'sixes'));
@@ -154,7 +156,7 @@ $dismissalText = static function (array $row): string {
             <div class="card-body p-0">
                 <?php if ($bowlRows !== []): ?>
                     <div class="table-responsive">
-                        <table class="table table-sm mb-0">
+                        <table class="table mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width:36px">#</th>

@@ -4,13 +4,12 @@
 
 <?= $this->section('content') ?>
 <?php $errors = session()->getFlashdata('errors') ?? []; ?>
-<div class="content-stack">
-    <div class="panel p-4 p-md-5 mb-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+<div class="content-card">
+    <div class="panel mb-8">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
             <div>
-                <p class="text-uppercase text-success fw-bold small mb-2">Player Profile</p>
-                <h1 class="h2 fw-bold mb-2"><?= esc($player['name']) ?></h1>
-                <p class="text-secondary mb-0">Update player details and review deposits, match participation, and total contribution across matches.</p>
+                <h2 class="h4 mb-2"><?= esc($player['name']) ?></h2>
+                <p class="text-secondary mb-0">Player Profile</p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <a href="<?= site_url('/admin/players') ?>" class="btn btn-light border">Back to Players</a>
@@ -23,41 +22,34 @@
         <div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div>
     <?php endif; ?>
 
-    <div class="row g-4 mb-4">
+    <div class="row g-4 mb-8">
         <div class="col-md-3">
             <div class="summary-card p-4 h-100">
-                <div class="text-secondary small text-uppercase mb-2">Matches</div>
+                <div class="summary-label mb-2">Matches</div>
                 <div class="summary-value"><?= esc((string) $wallet['match_count']) ?></div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="summary-card p-4 h-100">
-                <div class="text-secondary small text-uppercase mb-2">Deposited</div>
+                <div class="summary-label mb-2">Deposited</div>
                 <div class="summary-value"><?= esc(number_format((float) $wallet['deposited'], 2)) ?></div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="summary-card p-4 h-100">
-                <div class="text-secondary small text-uppercase mb-2">Match Contribution</div>
+                <div class="summary-label mb-2">Match Contribution</div>
                 <div class="summary-value"><?= esc(number_format((float) $matchContributionTotal, 2)) ?></div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="summary-card p-4 h-100">
-                <div class="text-secondary small text-uppercase mb-2">Balance</div>
+                <div class="summary-label mb-2">Balance</div>
                 <div class="summary-value"><?= esc(number_format((float) $wallet['balance'], 2)) ?></div>
-                <?php if ($wallet['status'] === 'overpaid'): ?>
-                    <span class="badge-soft-success mt-3 d-inline-block">Overpaid</span>
-                <?php elseif ($wallet['status'] === 'underpaid'): ?>
-                    <span class="badge-soft-danger mt-3 d-inline-block">Underpaid</span>
-                <?php else: ?>
-                    <span class="badge-soft-warning mt-3 d-inline-block">Settled</span>
-                <?php endif; ?>
             </div>
         </div>
     </div>
 
-    <div class="content-card p-4 mb-4">
+    <div class="panel mb-8">
         <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
             <div>
                 <h2 class="h4 fw-bold mb-1">Edit Player</h2>
@@ -90,7 +82,7 @@
             <div class="col-md-6">
                 <label for="status" class="form-label fw-semibold">Status</label>
                 <select class="form-select<?= isset($errors['status']) ? ' is-invalid' : '' ?>" id="status" name="status">
-                    <?php foreach (['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected', 'guest' => 'Guest'] as $value => $label): ?>
+                    <?php foreach (['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected', 'guest' => 'Guest', 'external' => 'External'] as $value => $label): ?>
                         <option value="<?= esc($value) ?>" <?= old('status', $player['status']) === $value ? 'selected' : '' ?>><?= esc($label) ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -133,43 +125,10 @@
         </div>
     </div>
 
-    <div class="content-card p-4 mb-4">
-        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-            <div>
-                <h2 class="h4 fw-bold mb-1">Deposit Ledger</h2>
-                <p class="text-secondary mb-0">Every wallet deposit recorded for this player.</p>
-            </div>
-        </div>
-        <?php if ($deposits === []): ?>
-            <p class="text-secondary mb-0">No deposits recorded for this player yet.</p>
-        <?php else: ?>
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>Amount</th>
-                            <th>Note</th>
-                            <th>Created</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($deposits as $deposit): ?>
-                            <tr>
-                                <td><?= esc(number_format((float) $deposit['amount'], 2)) ?></td>
-                                <td><?= esc($deposit['notes'] ?: '-') ?></td>
-                                <td><?= esc(getFormattedDate($deposit['created_at'] ?? null, '-')) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
-    </div>
-
     <div class="content-card p-4">
         <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
             <div>
-                <h2 class="h4 fw-bold mb-1">Match Details</h2>
+                <h2 class="h4 mb-1">Match Details</h2>
                 <p class="text-secondary mb-0">Match appearances and this player's contribution share in each fixture.</p>
             </div>
         </div>

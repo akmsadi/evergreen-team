@@ -7,12 +7,13 @@
     <ul class="nav flex-column">
         <li class="px-4 py-2"><small class="nav-text">Main</small></li>
         <li><a class="nav-link<?= $activeNav === 'dashboard' ? ' active' : '' ?>" href="<?= site_url('/admin/dashboard') ?>"><i class="ti ti-home"></i><span class="nav-text">Dashboard</span></a></li>
-        <li><a class="nav-link<?= $activeNav === 'matches' ? ' active' : '' ?>" href="<?= site_url('/admin/matches') ?>"><i class="ti ti-cricket"></i><span class="nav-text">Match Overview</span></a></li>
+        <li><a class="nav-link<?= $activeNav === 'matches' ? ' active' : '' ?>" href="<?= site_url('/admin/matches') ?>"><i class="ti ti-cricket"></i><span class="nav-text">Matches</span></a></li>
         <li><a class="nav-link<?= $activeNav === 'create-match' ? ' active' : '' ?>" href="<?= site_url('/admin/matches/create') ?>"><i class="ti ti-plus"></i><span class="nav-text">Add Match</span></a></li>
         <li><a class="nav-link<?= $activeNav === 'venues' ? ' active' : '' ?>" href="<?= site_url('/admin/venues') ?>"><i class="ti ti-map-pin"></i><span class="nav-text">Venues</span></a></li>
-        <li><a class="nav-link<?= $activeNav === 'players' ? ' active' : '' ?>" href="<?= site_url('/admin/players') ?>"><i class="ti ti-users"></i><span class="nav-text">Player Overview</span></a></li>
+        <li><a class="nav-link<?= $activeNav === 'players' ? ' active' : '' ?>" href="<?= site_url('/admin/players') ?>"><i class="ti ti-users"></i><span class="nav-text">Players</span></a></li>
         <li><a class="nav-link<?= $activeNav === 'create-player' ? ' active' : '' ?>" href="<?= site_url('/admin/players/create') ?>"><i class="ti ti-user-plus"></i><span class="nav-text">Add Player</span></a></li>
         <li><a class="nav-link<?= $activeNav === 'accounts' ? ' active' : '' ?>" href="<?= site_url('/admin/accounts') ?>"><i class="ti ti-wallet"></i><span class="nav-text">Accounts</span></a></li>
+        <li><a class="nav-link<?= $activeNav === 'deposits' ? ' active' : '' ?>" href="<?= site_url('/admin/deposits') ?>"><i class="ti ti-wallet"></i><span class="nav-text">Deposits</span></a></li>
         <li><a class="nav-link<?= $activeNav === 'events' ? ' active' : '' ?>" href="<?= site_url('/admin/events') ?>"><i class="ti ti-photo"></i><span class="nav-text">Event Gallery</span></a></li>
         <li><a class="nav-link<?= $activeNav === 'teams' ? ' active' : '' ?>" href="<?= site_url('/admin/teams') ?>"><i class="ti ti-users"></i><span class="nav-text">Teams</span></a></li>
         <li class="px-4 pt-4 pb-2"><small class="nav-text">Account</small></li>

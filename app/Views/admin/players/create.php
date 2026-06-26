@@ -37,7 +37,7 @@
 
             <div class="mb-3">
                 <label for="phone" class="form-label fw-semibold">Phone</label>
-                <input type="text" class="form-control<?= isset($errors['phone']) ? ' is-invalid' : '' ?>" id="phone" name="phone" value="<?= esc(old('phone')) ?>">
+                <input type="text" class="form-control<?= isset($errors['phone']) ? ' is-invalid' : '' ?>" id="phone" name="phone" value="<?= esc(old('phone') ?? '0123456789') ?>">
                 <?php if (isset($errors['phone'])): ?>
                     <div class="invalid-feedback"><?= esc($errors['phone']) ?></div>
                 <?php endif; ?>
@@ -45,7 +45,7 @@
 
             <div class="mb-4">
                 <label for="address" class="form-label fw-semibold">Address</label>
-                <textarea class="form-control<?= isset($errors['address']) ? ' is-invalid' : '' ?>" id="address" name="address" rows="4"><?= esc(old('address')) ?></textarea>
+                <textarea class="form-control<?= isset($errors['address']) ? ' is-invalid' : '' ?>" id="address" name="address" rows="4"><?= esc(old('address') ?? 'Oxygen') ?></textarea>
                 <?php if (isset($errors['address'])): ?>
                     <div class="invalid-feedback"><?= esc($errors['address']) ?></div>
                 <?php endif; ?>
@@ -68,6 +68,10 @@
                 <div class="form-check form-check-inline">
                     <input class="form-check-input<?= isset($errors['status']) ? ' is-invalid' : '' ?>" type="radio" name="status" id="status_guest" value="guest" <?= old('status') === 'guest' ? 'checked' : '' ?>>
                     <label class="form-check-label" for="status_guest">Guest</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input checked class="form-check-input<?= isset($errors['status']) ? ' is-invalid' : '' ?>" type="radio" name="status" id="status_external" value="external" <?= old('status') === 'external' ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="status_external">External</label>
                 </div>
                 <?php if (isset($errors['status'])): ?>
                     <div class="text-danger small mt-2"><?= esc($errors['status']) ?></div>

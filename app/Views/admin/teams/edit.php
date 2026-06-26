@@ -95,7 +95,7 @@
             <p class="text-secondary mb-0">No players in this team yet.</p>
         <?php else: ?>
             <div class="table-responsive">
-                <table class="table table-sm table-hover align-middle admin-table">
+                <table class="table table-hover align-middle admin-table">
                     <thead>
                         <tr>
                             <th>Name</th>

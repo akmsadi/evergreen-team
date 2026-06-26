@@ -298,7 +298,7 @@
             <div class="col-lg-5">
                 <h3 class="h6 fw-bold mb-3">Batting Card</h3>
                 <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
+                    <table class="table align-middle mb-0">
                         <thead>
                             <tr>
                                 <th>Batter</th>
@@ -330,7 +330,7 @@
                     <p class="text-secondary small mb-0">No bowling figures yet.</p>
                 <?php else: ?>
                     <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
+                        <table class="table align-middle mb-0">
                             <thead>
                                 <tr>
                                     <th>Bowler</th>
@@ -359,7 +359,7 @@
                     <p class="text-secondary small mb-0">No deliveries logged yet.</p>
                 <?php else: ?>
                     <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
+                        <table class="table align-middle mb-0">
                             <thead>
                                 <tr>
                                     <th>Ball</th>

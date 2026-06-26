@@ -90,10 +90,11 @@ class AdminAuth extends BaseController
         return view('admin/dashboard-view', [
             'activeNav' => 'dashboard',
             'monthlyMatchCounts' => $this->matches->monthlyCounts(),
-            'recentMatches' => $this->matches->recentList(10),
-            'recentPlayers' => $this->players->recentList(10),
+            'recentMatches' => $this->matches->recentList(5),
+            'recentPlayers' => $this->players->recentList(5),
             'topBatsmen' => $this->matchFinance->getTopBatsmen(),
             'topBowlers' => $this->matchFinance->getTopBowlers(),
+            'matchExpenseChart' => $this->matchFinance->getMatchExpenseChartData(10),
         ]);
     }
 

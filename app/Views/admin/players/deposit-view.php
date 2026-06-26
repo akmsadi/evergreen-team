@@ -1,7 +1,5 @@
 <?= $this->extend('admin/template/default') ?>
 
-<?= $this->section('admin_nav') ?>accounts<?= $this->endSection() ?>
-
 <?= $this->section('styles') ?>
 <style {csp-style-nonce}>
     .account-summary-card {
@@ -72,177 +70,23 @@
 <div class="content-card">
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
-            <h1 class="h2 mb-2">Accounts</h1>
-            <p class="text-secondary mb-0">Manage player balances, wallet deposits, assigned expenses, and payment status from one place.</p>
+            <h1 class="h2 mb-2">Deposits</h1>
+            <p class="text-secondary mb-0">All player wallet deposits are managed here.</p>
         </div>
         <div class="d-flex gap-2 flex-wrap">
+            <a href="<?= site_url('/admin/finance-overview') ?>" class="btn btn-light border">Finance Overview</a>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDepositModal">Add Deposit</button>
         </div>
     </div>
-
     <?php if (session()->getFlashdata('success')): ?>
         <div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div>
     <?php endif; ?>
-
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="summary-card account-summary-card account-summary-card--owed p-4 h-100">
-                <div class="account-summary-card__label">Total Expenses</div>
-                <div class="account-summary-card__value"><?= esc(number_format($totalOwed, 2)) ?></div>
-                <div class="account-summary-card__note">Total expenses from matches.</div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="summary-card account-summary-card account-summary-card--deposited p-4 h-100">
-                <div class="account-summary-card__label">Deposited</div>
-                <div class="account-summary-card__value"><?= esc(number_format($totalDeposited, 2)) ?></div>
-                <div class="account-summary-card__note">Total player deposits recorded.</div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="summary-card account-summary-card account-summary-card--balance p-4 h-100">
-                <div class="account-summary-card__label">Net Balance</div>
-                <div class="account-summary-card__value"><?= esc(number_format($totalBalance, 2)) ?></div>
-                <div class="account-summary-card__note">Positive means overpaid, negative means still outstanding.</div>
-            </div>
-        </div>
-    </div>
-
     <div class="panel">
-        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-            <div>
-                <h2 class="h4 mb-1">Match Expenses</h2>
-                <p class="text-secondary mb-0">Review total recorded expenses for each match from the accounts overview.</p>
-            </div>
-        </div>
-        <?php if ($matchExpenseSummary === []): ?>
-            <p class="text-secondary mb-0">No match expenses recorded yet.</p>
-        <?php else: ?>
-            <div class="table-responsive">
-                <table class="table table-sm table-hover align-middle admin-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Match</th>
-                            <th>Venue</th>
-                            <th>Status</th>
-                            <th class="text-end">Expense Items</th>
-                            <th class="text-end">Contributors</th>
-                            <th class="text-end">Total Expense</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($matchExpenseSummary as $matchExpense): ?>
-                            <tr>
-                                <td><?= esc(getFormattedDate($matchExpense['scheduled_at'] ?? null, '-')) ?></td>
-                                <td>
-                                    <div class="fw-semibold"><?= esc($matchExpense['team_name']) ?></div>
-                                    <div class="text-secondary small">vs <?= esc($matchExpense['opponent_name']) ?></div>
-                                </td>
-                                <td><?= esc($matchExpense['venue'] ?: '-') ?></td>
-                                <td class="text-capitalize"><?= esc($matchExpense['match_status']) ?></td>
-                                <td class="text-end"><?= esc((string) $matchExpense['expense_count']) ?></td>
-                                <td class="text-end"><?= esc((string) $matchExpense['contributor_count']) ?></td>
-                                <td class="text-end"><?= esc(number_format((float) $matchExpense['total_expense'], 2)) ?></td>
-                                <td class="text-end">
-                                    <a href="<?= site_url('/admin/matches/' . $matchExpense['match_id']) ?>" class="btn btn-sm btn-primary">Open Match</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="4" class="text-end">Total</th>
-                            <th class="text-end"><?= esc((string) $totalMatchExpenseItems) ?></th>
-                            <th class="text-end"><?= esc((string) $totalMatchExpenseContributors) ?></th>
-                            <th class="text-end"><?= esc(number_format($totalMatchExpenses, 2)) ?></th>
-                            <th></th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <div class="panel mt-6">
-        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-            <div>
-                <h2 class="h4 mb-1">Player Accounts</h2>
-                <p class="text-secondary mb-0">Review total recorded expenses for each player from the accounts overview.</p>
-            </div>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-sm table-hover align-middle admin-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Status</th>
-                        <th>Matches</th>
-                        <th class="text-end">Deposited</th>
-                        <th class="text-end">Owed</th>
-                        <th class="text-end">Balance</th>
-                        <th>Payment Status</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($playerOverview as $entry): ?>
-                        <tr>
-                            <td><?= esc($entry['player']['name']) ?></td>
-                            <td><?= esc($entry['player']['phone']) ?></td>
-                            <td class="text-capitalize"><?= esc($entry['player']['status']) ?></td>
-                            <td><?= esc((string) $entry['match_count']) ?></td>
-                            <td class="text-end"><?= esc(number_format((float) $entry['deposited'], 2)) ?></td>
-                            <td class="text-end"><?= esc(number_format((float) $entry['owed'], 2)) ?></td>
-                            <td class="text-end"><?= esc(number_format((float) $entry['balance'], 2)) ?></td>
-                            <td>
-                                <?php if ($entry['status'] === 'overpaid'): ?>
-                                    <span class="badge-soft-success">Overpaid</span>
-                                <?php elseif ($entry['status'] === 'underpaid'): ?>
-                                    <span class="badge-soft-danger">Underpaid</span>
-                                <?php else: ?>
-                                    <span class="badge-soft-warning">Settled</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-end">
-                                <div class="d-inline-flex gap-2">
-                                    <a href="<?= site_url('/admin/players/' . $entry['player']['id'] . '/edit') ?>" class="btn btn-sm btn-primary">Edit</a>
-                                    <?php if (($entry['player']['status'] ?? '') === 'approved'): ?>
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createDepositModal" data-player-id="<?= esc((string) $entry['player']['id']) ?>" data-player-name="<?= esc($entry['player']['name']) ?>">Deposit</button>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th colspan="4" class="text-end">Total</th>
-                        <th class="text-end"><?= esc(number_format($totalDeposited, 2)) ?></th>
-                        <th class="text-end"><?= esc(number_format($totalOwed, 2)) ?></th>
-                        <th class="text-end"><?= esc(number_format($totalBalance, 2)) ?></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </div>
-
-    <div class="panel mt-6">
-        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-            <div>
-                <h2 class="h4 mb-1">Deposit Ledger</h2>
-                <p class="text-secondary mb-0">All player wallet deposits are managed here.</p>
-            </div>
-        </div>
         <?php if ($deposits === []): ?>
             <p class="text-secondary mb-0">No player deposits recorded yet.</p>
         <?php else: ?>
             <div class="table-responsive">
-                <table class="table table-sm table-hover align-middle admin-table">
+                <table class="table table-hover align-middle admin-table">
                     <thead>
                         <tr>
                             <th>Player</th>
@@ -314,7 +158,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="create_deposit_amount" class="form-label fw-semibold">Amount</label>
-                        <input type="number" step="0.01" min="0.01" class="form-control<?= isset($depositErrors['deposit_amount']) ? ' is-invalid' : '' ?>" id="create_deposit_amount" name="deposit_amount" value="<?= esc(old('deposit_amount')) ?>">
+                        <input type="number" step="0.01" class="form-control<?= isset($depositErrors['deposit_amount']) ? ' is-invalid' : '' ?>" id="create_deposit_amount" name="deposit_amount" value="<?= esc(old('deposit_amount')) ?>">
                         <?php if (isset($depositErrors['deposit_amount'])): ?>
                             <div class="invalid-feedback"><?= esc($depositErrors['deposit_amount']) ?></div>
                         <?php endif; ?>
@@ -358,7 +202,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit_deposit_amount_<?= esc((string) $deposit['id']) ?>" class="form-label fw-semibold">Amount</label>
-                            <input type="number" step="0.01" min="0.01" class="form-control<?= $depositEditId === (int) $deposit['id'] && isset($depositUpdateErrors['deposit_amount']) ? ' is-invalid' : '' ?>" id="edit_deposit_amount_<?= esc((string) $deposit['id']) ?>" name="deposit_amount" value="<?= esc($depositEditId === (int) $deposit['id'] ? old('deposit_amount', $deposit['amount']) : $deposit['amount']) ?>">
+                            <input type="number" step="0.01" class="form-control<?= $depositEditId === (int) $deposit['id'] && isset($depositUpdateErrors['deposit_amount']) ? ' is-invalid' : '' ?>" id="edit_deposit_amount_<?= esc((string) $deposit['id']) ?>" name="deposit_amount" value="<?= esc($depositEditId === (int) $deposit['id'] ? old('deposit_amount', $deposit['amount']) : $deposit['amount']) ?>">
                             <?php if ($depositEditId === (int) $deposit['id'] && isset($depositUpdateErrors['deposit_amount'])): ?>
                                 <div class="invalid-feedback"><?= esc($depositUpdateErrors['deposit_amount']) ?></div>
                             <?php endif; ?>

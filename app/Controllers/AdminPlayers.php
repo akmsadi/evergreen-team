@@ -2,11 +2,14 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
+
 use App\Libraries\MatchFinanceService;
 use App\Models\MatchPlayerDepositModel;
 use App\Models\PlayerModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
-use CodeIgniter\HTTP\ResponseInterface;
 
 class AdminPlayers extends BaseController
 {
@@ -14,8 +17,9 @@ class AdminPlayers extends BaseController
     private MatchPlayerDepositModel $matchPlayerDeposits;
     private PlayerModel $players;
 
-    public function __construct()
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
+        parent::initController($request, $response, $logger);
         helper(['form', 'url']);
         $this->matchFinance = new MatchFinanceService();
         $this->matchPlayerDeposits = new MatchPlayerDepositModel();
@@ -24,25 +28,52 @@ class AdminPlayers extends BaseController
 
     public function index(): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
-        return view('admin/players/index', $this->buildPlayersOverviewData());
+        return view('admin/players/index-view', $this->buildPlayersOverviewData());
     }
 
     public function accounts(): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+        $data = $this->buildPlayersOverviewData();
+        $data['activeNav'] = 'accounts';
+        return view('admin/players/accounts-view', $data);
+    }
+
+    public function deposits(): ResponseInterface|string
+    {
+        if (!session()->get('is_admin')) {
+            return redirect()->to('/admin/login');
+        }
+        $data = $this->buildPlayersOverviewData();
+        $data['activeNav'] = 'deposits';
+        return view('admin/players/deposit-view', $data);
+    }
+
+    public function financeOverview(): ResponseInterface|string
+    {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
-        return view('admin/players/accounts', $this->buildPlayersOverviewData());
+        $players = $this->players->where('status', 'approved')->orderBy('name', 'ASC')->findAll();
+        $matrix = $this->matchFinance->buildFinanceMatrix($players);
+
+        return view('admin/players/finance-overview-view', [
+            'username' => session()->get('admin_username'),
+            'matches' => $matrix['matches'],
+            'playerRows' => $matrix['playerRows'],
+        ]);
     }
 
     public function create(): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -54,7 +85,7 @@ class AdminPlayers extends BaseController
 
     public function edit(int $playerId): ResponseInterface|string
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -74,8 +105,7 @@ class AdminPlayers extends BaseController
         ];
         $matchBreakdown = $this->matchFinance->getPlayerMatchBreakdown($playerId);
 
-        return view('admin/players/edit', [
-            'username' => session()->get('admin_username'),
+        return view('admin/players/edit-view', [
             'player' => $player,
             'approvedPlayers' => $this->approvedPlayers($playerId),
             'wallet' => $wallet,
@@ -87,11 +117,11 @@ class AdminPlayers extends BaseController
 
     public function store()
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
-        if (! $this->validate($this->playerRules())) {
+        if (!$this->validate($this->playerRules())) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -108,7 +138,7 @@ class AdminPlayers extends BaseController
 
     public function update(int $playerId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -116,7 +146,7 @@ class AdminPlayers extends BaseController
             throw PageNotFoundException::forPageNotFound('Player not found.');
         }
 
-        if (! $this->validate($this->playerRules())) {
+        if (!$this->validate($this->playerRules())) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -133,7 +163,7 @@ class AdminPlayers extends BaseController
 
     public function delete(int $playerId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -148,7 +178,7 @@ class AdminPlayers extends BaseController
 
     public function storeDeposit()
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -170,7 +200,7 @@ class AdminPlayers extends BaseController
 
     public function updateDeposit(int $depositId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -196,7 +226,7 @@ class AdminPlayers extends BaseController
 
     public function deleteDeposit(int $depositId)
     {
-        if (! session()->get('is_admin')) {
+        if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
 
@@ -213,11 +243,11 @@ class AdminPlayers extends BaseController
     {
         $rules = [
             'deposit_player_id' => 'required|integer|greater_than[0]',
-            'deposit_amount' => 'required|decimal|greater_than[0]',
+            'deposit_amount' => 'required|decimal',
             'deposit_notes' => 'permit_empty|string',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             $errorKey = $mode === 'edit' ? 'deposit_update_errors' : 'deposit_errors';
 
             $redirect = redirect()->to('/admin/accounts')
@@ -277,7 +307,7 @@ class AdminPlayers extends BaseController
             'email' => 'permit_empty|valid_email',
             'phone' => 'required|min_length[7]',
             'address' => 'required|min_length[5]',
-            'status' => 'required|in_list[pending,approved,rejected,guest]',
+            'status' => 'required|in_list[pending,approved,rejected,guest,external]',
         ];
     }
 
@@ -352,11 +382,11 @@ class AdminPlayers extends BaseController
     private function buildPlayersOverviewData(): array
     {
         $players = $this->players->orderBy('name', 'ASC')->findAll();
-
         return [
-            'username' => session()->get('admin_username'),
             'players' => $players,
-            'approvedPlayers' => $this->approvedPlayers(),
+            'approvedPlayers' => $this->getApprovedPlayers($players),
+            'guestPlayers' => $this->getGuestPlayers($players),
+            'externalPlayers' => $this->getExternalPlayers($players),
             'playerOverview' => $this->matchFinance->buildPlayerOverview($players),
             'deposits' => $this->matchFinance->getAllDeposits(),
             'matchExpenseSummary' => $this->matchFinance->getMatchExpenseSummary(),
@@ -365,6 +395,39 @@ class AdminPlayers extends BaseController
             'pendingCount' => count(array_filter($players, static fn(array $player): bool => ($player['status'] ?? '') === 'pending')),
             'rejectedCount' => count(array_filter($players, static fn(array $player): bool => ($player['status'] ?? '') === 'rejected')),
         ];
+    }
+
+    private function getApprovedPlayers($players): array
+    {
+        $approvedPlayers = [];
+        foreach ($players as $player) {
+            if ($player['status'] == 'approved') {
+                $approvedPlayers[] = $player;
+            }
+        }
+        return $approvedPlayers;
+    }
+
+    private function getGuestPlayers($players): array
+    {
+        $guestPlayers = [];
+        foreach ($players as $player) {
+            if ($player['status'] == 'guest') {
+                $guestPlayers[] = $player;
+            }
+        }
+        return $guestPlayers;
+    }
+
+    private function getExternalPlayers($players): array
+    {
+        $externalPlayers = [];
+        foreach ($players as $player) {
+            if ($player['status'] == 'external') {
+                $externalPlayers[] = $player;
+            }
+        }
+        return $externalPlayers;
     }
 
     private function normalizeAmount(string $value): string

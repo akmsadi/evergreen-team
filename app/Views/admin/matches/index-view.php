@@ -12,7 +12,7 @@ $otherMatches = array_values(array_filter(
 ));
 ?>
 <div class="content-card">
-    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-8">
         <div>
             <h1 class="h2 mb-2">Matches</h1>
             <p class="text-secondary mb-0">Open a match to manage participant expenses, deposits, and balances.</p>
@@ -70,14 +70,8 @@ $otherMatches = array_values(array_filter(
 
         <?php if ($otherMatches !== []): ?>
             <div class="panel">
-                <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-                    <div>
-                        <h2 class="h4 mb-1">Other Matches</h2>
-                        <p class="text-secondary mb-0">Completed, archived, and other non-active match records.</p>
-                    </div>
-                </div>
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover align-middle admin-table">
+                    <table class="table table-hover align-middle admin-table">
                         <thead>
                             <tr>
                                 <th>Match</th>

@@ -61,7 +61,6 @@ class AdminMatches extends BaseController
         if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
-
         return view('admin/matches/create', $this->buildMatchFormViewData());
     }
 
@@ -669,17 +668,6 @@ class AdminMatches extends BaseController
         return $this->matchFinance->getMatchContributorIds($matchId);
     }
 
-
-    private function respondWithJson(array $payload, int $statusCode = 200): ResponseInterface
-    {
-        $payload['csrfToken'] = csrf_token();
-        $payload['csrfHash'] = csrf_hash();
-
-        return $this->response
-            ->setStatusCode($statusCode)
-            ->setJSON($payload);
-    }
-
     private function resolveReturnTarget(string $default): string
     {
         $returnTo = trim((string) $this->request->getPost('return_to'));
@@ -689,20 +677,6 @@ class AdminMatches extends BaseController
         }
 
         return $default;
-    }
-
-
-    private function getSideLabel(string $side, array $match): string
-    {
-        if ($side === 'team_a') {
-            return (string) $match['team_name'];
-        }
-
-        if ($side === 'team_b') {
-            return (string) $match['opponent_name'];
-        }
-
-        return ucwords(str_replace('_', ' ', $side));
     }
 
     private function buildMatchFormViewData(?array $match = null): array
@@ -840,17 +814,17 @@ class AdminMatches extends BaseController
             ->findAll();
 
         return view('admin/matches/scoreboard-view', [
-            'activeNav'        => 'matches',
-            'match'            => $match,
-            'matchNumber'      => $matchNumber,
-            'teamAPlayers'     => $teamAPlayers,
-            'teamBPlayers'     => $teamBPlayers,
+            'activeNav' => 'matches',
+            'match' => $match,
+            'matchNumber' => $matchNumber,
+            'teamAPlayers' => $teamAPlayers,
+            'teamBPlayers' => $teamBPlayers,
             'inns1BattingSide' => $inns1BattingSide,
             'batsmenByInnings' => $batsmenByInnings,
             'bowlersByInnings' => $bowlersByInnings,
-            'wickets'          => $wickets,
-            'extrasByInnings'  => $extrasByInnings,
-            'allPlayers'       => $allPlayers,
+            'wickets' => $wickets,
+            'extrasByInnings' => $extrasByInnings,
+            'allPlayers' => $allPlayers,
         ]);
     }
 
@@ -896,21 +870,21 @@ class AdminMatches extends BaseController
                 'fours' => ($data['fours'] ?? '') !== '' ? (int) $data['fours'] : null,
                 'sixes' => ($data['sixes'] ?? '') !== '' ? (int) $data['sixes'] : null,
                 'dismissal_mode' => $this->emptyToNull((string) ($data['dismissal_mode'] ?? '')),
-                'dismissal_by'   => ($data['dismissal_by'] ?? '') !== '' ? (int) $data['dismissal_by'] : null,
-                'fielder_id'     => ($data['fielder_id'] ?? '') !== '' ? (int) $data['fielder_id'] : null,
+                'dismissal_by' => ($data['dismissal_by'] ?? '') !== '' ? (int) $data['dismissal_by'] : null,
+                'fielder_id' => ($data['fielder_id'] ?? '') !== '' ? (int) $data['fielder_id'] : null,
             ]);
         }
 
-        $extrasData  = (array) ($this->request->getPost('extras') ?? []);
+        $extrasData = (array) ($this->request->getPost('extras') ?? []);
         $extrasModel = new \App\Models\MatchSummaryExtrasModel();
         $extrasModel->where('match_id', $matchId)->where('innings_number', $inningsNumber)->delete();
         $extrasModel->insert([
-            'match_id'       => $matchId,
+            'match_id' => $matchId,
             'innings_number' => $inningsNumber,
-            'byes'           => (int) ($extrasData['byes'] ?? 0),
-            'leg_byes'       => (int) ($extrasData['leg_byes'] ?? 0),
-            'wides'          => (int) ($extrasData['wides'] ?? 0),
-            'no_balls'       => (int) ($extrasData['no_balls'] ?? 0),
+            'byes' => (int) ($extrasData['byes'] ?? 0),
+            'leg_byes' => (int) ($extrasData['leg_byes'] ?? 0),
+            'wides' => (int) ($extrasData['wides'] ?? 0),
+            'no_balls' => (int) ($extrasData['no_balls'] ?? 0),
         ]);
 
         return redirect()->to('/admin/matches/' . $matchId . '/scoreboard')->with('success', 'Innings ' . $inningsNumber . ' batting saved.');
@@ -1061,7 +1035,7 @@ class AdminMatches extends BaseController
 
         $matchNumber = $this->matches->where('scheduled_at <', $match['scheduled_at'])->countAllResults() + 1;
 
-        $tossWinner   = (string) ($match['toss_winner'] ?? '');
+        $tossWinner = (string) ($match['toss_winner'] ?? '');
         $tossDecision = (string) ($match['toss_decision'] ?? '');
 
         if ($tossWinner === 'team_a' && $tossDecision === 'bat') {
@@ -1130,14 +1104,14 @@ class AdminMatches extends BaseController
         }
 
         return view('admin/matches/scoreboard-preview-view', [
-            'activeNav'        => 'matches',
-            'match'            => $match,
-            'matchNumber'      => $matchNumber,
+            'activeNav' => 'matches',
+            'match' => $match,
+            'matchNumber' => $matchNumber,
             'inns1BattingSide' => $inns1BattingSide,
             'battingByInnings' => $battingByInnings,
             'bowlingByInnings' => $bowlingByInnings,
             'wicketsByInnings' => $wicketsByInnings,
-            'extrasByInnings'  => $extrasByInnings,
+            'extrasByInnings' => $extrasByInnings,
         ]);
     }
 
@@ -1160,11 +1134,11 @@ class AdminMatches extends BaseController
                 continue;
             }
             $model->insert([
-                'match_id'           => $matchId,
-                'innings_number'     => $inningsNumber,
-                'player_id'          => $playerId,
+                'match_id' => $matchId,
+                'innings_number' => $inningsNumber,
+                'player_id' => $playerId,
                 'score_at_dismissal' => (int) ($row['score_at_dismissal'] ?? 0),
-                'over_at_dismissal'  => (float) ($row['over_at_dismissal'] ?? 0),
+                'over_at_dismissal' => (float) ($row['over_at_dismissal'] ?? 0),
             ]);
         }
 

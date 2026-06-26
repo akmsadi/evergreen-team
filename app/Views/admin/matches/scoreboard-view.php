@@ -21,7 +21,7 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div>
                 <h1 class="h2 fw-bold mb-2"><?= esc($match['team_name']) ?> vs <?= esc($match['opponent_name']) ?></h1>
-                <p class="text-secondary mb-0">Match number <?= $matchNumber ?></p>
+                <p class="text-secondary mb-0">Match #<?= $matchNumber ?></p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <a href="<?= site_url('/admin/matches/' . $match['id']) ?>" class="btn btn-light border">Back to Match</a>
@@ -88,7 +88,7 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                         <form action="<?= site_url('/admin/matches/' . $match['id'] . '/scoreboard/batting/' . $inns . '/save') ?>" method="post">
                             <?= csrf_field() ?>
                             <div class="table-responsive">
-                                <table class="table table-sm align-middle mb-3">
+                                <table class="table align-middle mb-3">
                                     <thead>
                                         <tr>
                                             <th style="width:32px"></th>
@@ -176,6 +176,25 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                                     </div>
                                 </div>
                             </div>
+                            <?php
+                            $batTotalRuns = 0;
+                            $batTotalWickets = 0;
+                            foreach ($existBat as $b) {
+                                $batTotalRuns += (int) ($b['runs'] ?? 0);
+                                $dm = $b['dismissal_mode'] ?? '';
+                                if ($dm !== '' && !in_array($dm, ['not_out', 'retired_hurt'], true)) {
+                                    $batTotalWickets++;
+                                }
+                            }
+                            $extrasSum = (int) ($exExtras['byes'] ?? 0) + (int) ($exExtras['leg_byes'] ?? 0) + (int) ($exExtras['wides'] ?? 0) + (int) ($exExtras['no_balls'] ?? 0);
+                            $batTotalRuns += $extrasSum;
+                            if ($existBat !== []):
+                                ?>
+                                <div class="alert alert-secondary py-2 px-3 mb-3 d-flex align-items-center gap-3">
+                                    <span class="fw-bold fs-5"><?= $batTotalRuns ?>/<?= $batTotalWickets ?></span>
+                                    <span class="text-secondary small">Extras: <?= $extrasSum ?></span>
+                                </div>
+                            <?php endif; ?>
                             <button type="submit" class="btn btn-sm btn-primary">Save Batting</button>
                         </form>
                     <?php endif; ?>
@@ -189,7 +208,7 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                         <form action="<?= site_url('/admin/matches/' . $match['id'] . '/scoreboard/bowling/' . $inns . '/save') ?>" method="post">
                             <?= csrf_field() ?>
                             <div class="table-responsive">
-                                <table class="table table-sm align-middle mb-3">
+                                <table class="table align-middle mb-3">
                                     <thead>
                                         <tr>
                                             <th style="width:32px"></th>
@@ -228,6 +247,26 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                                     </tbody>
                                 </table>
                             </div>
+                            <?php
+                            $bowlTotalWickets = 0;
+                            $bowlTotalRuns = 0;
+                            $bowlTotalBalls = 0;
+                            foreach ($existBowl as $bw) {
+                                $bowlTotalWickets += (int) ($bw['wickets'] ?? 0);
+                                $bowlTotalRuns += (int) ($bw['runs'] ?? 0);
+                                $oVal = (string) ($bw['overs'] ?? '0');
+                                [$oFull, $oBalls] = array_pad(explode('.', $oVal, 2), 2, '0');
+                                $bowlTotalBalls += (int) $oFull * 6 + (int) $oBalls;
+                            }
+                            $bowlOversDisplay = floor($bowlTotalBalls / 6) . '.' . ($bowlTotalBalls % 6);
+                            if ($existBowl !== []):
+                                ?>
+                                <div class="alert alert-secondary py-2 px-3 mb-3 d-flex align-items-center gap-3">
+                                    <span class="fw-bold"><?= $bowlTotalWickets ?> wkt<?= $bowlTotalWickets !== 1 ? 's' : '' ?></span>
+                                    <span class="text-secondary small"><?= $bowlTotalRuns ?> runs conceded</span>
+                                    <span class="text-secondary small"><?= $bowlOversDisplay ?> overs</span>
+                                </div>
+                            <?php endif; ?>
                             <button type="submit" class="btn btn-sm btn-primary">Save Bowling</button>
                         </form>
                     <?php endif; ?>
@@ -239,7 +278,7 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                 <form action="<?= site_url('/admin/matches/' . $match['id'] . '/scoreboard/wickets/' . $inns . '/save') ?>" method="post">
                     <?= csrf_field() ?>
                     <div class="table-responsive mb-2">
-                        <table class="table table-sm align-middle">
+                        <table class="table align-middle">
                             <thead>
                                 <tr>
                                     <th style="width:36px">#</th>
@@ -285,32 +324,32 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
 <script>
     /* ─ ─ Drag-and-drop sort ── */
     function updateSortOrders(tbody) {
-        tbod y.querySelectorAll('tr').forEach(function (tr, index) {
-        var input = tr.querySelector('.sort-order-input');
-        if (input) { input.value = index + 1; }
-    });
+        tbody.querySelectorAll('tr').forEach(function (tr, index) {
+            var input = tr.querySelector('.sort-order-input');
+            if (input) { input.value = index + 1; }
+        });
     }
 
     document.querySelectorAll('.sortable-batting, .sortable-bowling').forEach(function (tbody) {
-        Sort able.create(tbody, {
-        handle: '.drag-handle',
-        animation: 150,
-        onEnd: function () { updateSortOrders(tbody); },
-    });
+        Sortable.create(tbody, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function () { updateSortOrders(tbody); },
+        });
     });
 
     /* ─ ─ Fall of Wickets ── */
     function fowRenumber(tbody) {
-        tbod y.querySelectorAll('tr').forEach(function (tr, i) {
-        var cell = tr.querySelector('.fow-num');
-        if (cell) { cell.textContent = i + 1; }
-    });
+        tbody.querySelectorAll('tr').forEach(function (tr, i) {
+            var cell = tr.querySelector('.fow-num');
+            if (cell) { cell.textContent = i + 1; }
+        });
     }
 
-        func tion fowSyncSelects(tbody) {
+    function fowSyncSelects(tbody) {
         var selects = Array.from(tbody.querySelectorAll('.fow-player-select'));
         var selected = {};
-        sele cts.forEach(function (sel) { if (sel.value) { selected[sel.value] = true; } });
+        selects.forEach(function (sel) { if (sel.value) { selected[sel.value] = true; } });
         selects.forEach(function (sel) {
             sel.querySelectorAll('option').forEach(function (opt) {
                 if (opt.value === '') { return; }
@@ -319,14 +358,14 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
         });
     }
 
-        func tion fowBuildRow(tbody, index) {
+    function fowBuildRow(tbody, index) {
         var players = JSON.parse(tbody.dataset.players || '[]');
         var opts = '<option value="">Select player</option>' +
             players.map(function (p) {
                 return '<option value="' + p.id + '">' + String(p.name).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</option>';
             }).join('');
         var tr = document.createElement('tr');
-        tr.i nnerHTML =
+        tr.innerHTML =
             '<td class="fow-num"></td>' +
             '<td><select name="wickets[' + index + '][player_id]" class="form-select form-select-sm fow-player-select" required>' + opts + '</select></td>' +
             '<td><input type="number" name="wickets[' + index + '][score_at_dismissal]" class="form-control form-control-sm" value="0" min="0" required></td>' +
@@ -335,17 +374,17 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
         return tr;
     }
 
-        docu ment.querySelectorAll('[id^="fow-tbody-"]').forEach(function (tbody) {
+    document.querySelectorAll('[id^="fow-tbody-"]').forEach(function (tbody) {
         fowRenumber(tbody);
         fowSyncSelects(tbody);
 
-        tbody.ad dEventListener('change', function (e) {
+        tbody.addEventListener('change', function (e) {
             if (e.target.classList.contains('fow-player-select')) {
                 fowSyncSelects(tbody);
             }
         });
 
-        tbody.ad dEventListener('click', function (e) {
+        tbody.addEventListener('click', function (e) {
             if (e.target.classList.contains('fow-remove-row')) {
                 e.target.closest('tr').remove();
                 fowRenumber(tbody);

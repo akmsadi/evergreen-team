@@ -44,14 +44,14 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="team_name" class="form-label fw-semibold">Team A Name</label>
-                <input type="text" class="form-control<?= isset($errors['team_name']) ? ' is-invalid' : '' ?>" id="team_name" name="team_name" value="<?= esc(old('team_name', $match['team_name'] ?? 'Evergreen Green')) ?>" <?= $fieldLockAttr ?>>
+                <input type="text" class="form-control<?= isset($errors['team_name']) ? ' is-invalid' : '' ?>" id="team_name" name="team_name" value="<?= esc(old('team_name', $match['team_name'] ?? 'Challengers Red')) ?>" <?= $fieldLockAttr ?>>
                 <?php if (isset($errors['team_name'])): ?>
                     <div class="invalid-feedback"><?= esc($errors['team_name']) ?></div>
                 <?php endif; ?>
             </div>
             <div class="col-md-6">
                 <label for="opponent_name" class="form-label fw-semibold">Team B Name</label>
-                <input type="text" class="form-control<?= isset($errors['opponent_name']) ? ' is-invalid' : '' ?>" id="opponent_name" name="opponent_name" value="<?= esc(old('opponent_name', $match['opponent_name'] ?? 'Evergreen Gold')) ?>" <?= $fieldLockAttr ?>>
+                <input type="text" class="form-control<?= isset($errors['opponent_name']) ? ' is-invalid' : '' ?>" id="opponent_name" name="opponent_name" value="<?= esc(old('opponent_name', $match['opponent_name'] ?? 'Challengers Blue')) ?>" <?= $fieldLockAttr ?>>
                 <?php if (isset($errors['opponent_name'])): ?>
                     <div class="invalid-feedback"><?= esc($errors['opponent_name']) ?></div>
                 <?php endif; ?>
@@ -59,7 +59,7 @@
             <div class="col-md-4">
                 <label for="match_type" class="form-label fw-semibold">Match Type</label>
                 <select class="form-select<?= isset($errors['match_type']) ? ' is-invalid' : '' ?>" id="match_type" name="match_type" <?= $fieldLockAttr ?>>
-                    <?php foreach (['limited_overs', 'test', 't10', 'odi', 't20', 'friendly'] as $type): ?>
+                    <?php foreach (['t20', 'test', 't10', 'odi', 'friendly'] as $type): ?>
                         <option value="<?= esc($type) ?>" <?= old('match_type', $match['match_type'] ?? 'limited_overs') === $type ? 'selected' : '' ?>><?= esc(ucwords(str_replace('_', ' ', $type))) ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -129,7 +129,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input team-a-player" type="checkbox" id="team_a_player_<?= esc((string) $player['id']) ?>" name="team_a_player_ids[]" value="<?= esc((string) $player['id']) ?>" <?= in_array((int) $player['id'], $teamAPlayerIds, true) ? 'checked' : '' ?><?= $fieldLockAttr ?>>
                                         <label class="form-check-label" for="team_a_player_<?= esc((string) $player['id']) ?>">
-                                            <?= esc($player['name']) ?>
+                                            <?= esc($player['name']) ?><?php if (($player['status'] ?? '') === 'guest' && !empty($player['guest_of_player_id']) && isset($playersById[(int) $player['guest_of_player_id']])): ?> <span class="text-secondary small">(Guest - <?= esc($playersById[(int) $player['guest_of_player_id']]['name']) ?>)</span><?php endif; ?>
                                         </label>
                                     </div>
                                 </div>
@@ -147,7 +147,9 @@
                                 <?php if (!isset($playersById[$playerId])) {
                                     continue;
                                 } ?>
-                                <option value="<?= esc((string) $playerId) ?>" <?= old('team_a_captain_id', $teamACaptainId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($playersById[$playerId]['name']) ?></option>
+                                <?php $captainPlayer = $playersById[$playerId]; ?>
+                                <?php $captainLabel = $captainPlayer['name'] . (($captainPlayer['status'] ?? '') === 'guest' && !empty($captainPlayer['guest_of_player_id']) && isset($playersById[(int) $captainPlayer['guest_of_player_id']]) ? ' (Guest - ' . $playersById[(int) $captainPlayer['guest_of_player_id']]['name'] . ')' : ''); ?>
+                                <option value="<?= esc((string) $playerId) ?>" <?= old('team_a_captain_id', $teamACaptainId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($captainLabel) ?></option>
                             <?php endforeach; ?>
                         </select>
                         <?php if (isset($errors['team_a_captain_id'])): ?>
@@ -166,7 +168,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input team-b-player" type="checkbox" id="team_b_player_<?= esc((string) $player['id']) ?>" name="team_b_player_ids[]" value="<?= esc((string) $player['id']) ?>" <?= in_array((int) $player['id'], $teamBPlayerIds, true) ? 'checked' : '' ?><?= $fieldLockAttr ?>>
                                         <label class="form-check-label" for="team_b_player_<?= esc((string) $player['id']) ?>">
-                                            <?= esc($player['name']) ?>
+                                            <?= esc($player['name']) ?><?php if (($player['status'] ?? '') === 'guest' && !empty($player['guest_of_player_id']) && isset($playersById[(int) $player['guest_of_player_id']])): ?> <span class="text-secondary small">(Guest - <?= esc($playersById[(int) $player['guest_of_player_id']]['name']) ?>)</span><?php endif; ?>
                                         </label>
                                     </div>
                                 </div>
@@ -184,7 +186,9 @@
                                 <?php if (!isset($playersById[$playerId])) {
                                     continue;
                                 } ?>
-                                <option value="<?= esc((string) $playerId) ?>" <?= old('team_b_captain_id', $teamBCaptainId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($playersById[$playerId]['name']) ?></option>
+                                <?php $captainPlayer = $playersById[$playerId]; ?>
+                                <?php $captainLabel = $captainPlayer['name'] . (($captainPlayer['status'] ?? '') === 'guest' && !empty($captainPlayer['guest_of_player_id']) && isset($playersById[(int) $captainPlayer['guest_of_player_id']]) ? ' (Guest - ' . $playersById[(int) $captainPlayer['guest_of_player_id']]['name'] . ')' : ''); ?>
+                                <option value="<?= esc((string) $playerId) ?>" <?= old('team_b_captain_id', $teamBCaptainId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($captainLabel) ?></option>
                             <?php endforeach; ?>
                         </select>
                         <?php if (isset($errors['team_b_captain_id'])): ?>

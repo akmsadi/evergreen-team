@@ -119,7 +119,7 @@
                 <h2 class="report-hero__title fw-bold">Match Report</h2>
                 <p class="report-hero__copy mb-0">Innings summary, batting cards, bowling cards, and recent deliveries for this match.</p>
             </div>
-            <?php if (! empty($match['result_summary'])): ?>
+            <?php if (!empty($match['result_summary'])): ?>
                 <div class="report-hero__result"><?= esc($match['result_summary']) ?></div>
             <?php endif; ?>
         </div>
@@ -189,7 +189,7 @@
                             <div class="col-lg-5">
                                 <h4 class="h6 fw-bold mb-3">Batting Card</h4>
                                 <div class="table-responsive">
-                                    <table class="table table-sm align-middle mb-0">
+                                    <table class="table align-middle mb-0">
                                         <thead>
                                             <tr>
                                                 <th>Batter</th>
@@ -221,7 +221,7 @@
                                     <p class="text-secondary small mb-0">No bowling figures recorded.</p>
                                 <?php else: ?>
                                     <div class="table-responsive">
-                                        <table class="table table-sm align-middle mb-0">
+                                        <table class="table align-middle mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Bowler</th>
@@ -250,7 +250,7 @@
                                     <p class="text-secondary small mb-0">No deliveries logged yet.</p>
                                 <?php else: ?>
                                     <div class="table-responsive">
-                                        <table class="table table-sm align-middle mb-0">
+                                        <table class="table align-middle mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Ball</th>
@@ -268,11 +268,11 @@
                                                         </td>
                                                         <td>
                                                             <div><?= esc((string) ($ball['striker_name'] ?? '')) ?> scored <?= esc((string) ($ball['runs_bat'] ?? 0)) ?></div>
-                                                            <?php if (! empty($ball['extra_type'])): ?>
-                                                                <div class="small text-secondary">Extras: <?= esc((string) ($ball['extras'] ?? 0)) ?> <?= esc(str_replace('_', ' ', (string) $ball['extra_type'])) ?></div>
+                                                            <?php if (!empty($ball['extra_type'])): ?>
+                                                                <div class="small text-secondary">Extras: <?= esc((string) ($ball['extras'] ?? 0)) ?>                     <?= esc(str_replace('_', ' ', (string) $ball['extra_type'])) ?></div>
                                                             <?php endif; ?>
                                                             <?php if ((int) ($ball['is_wicket'] ?? 0) === 1): ?>
-                                                                <div class="small text-danger">Wicket: <?= esc(str_replace('_', ' ', (string) ($ball['wicket_type'] ?? 'out'))) ?><?= ! empty($ball['dismissed_name']) ? ' - ' . esc((string) $ball['dismissed_name']) : '' ?></div>
+                                                                <div class="small text-danger">Wicket: <?= esc(str_replace('_', ' ', (string) ($ball['wicket_type'] ?? 'out'))) ?><?= !empty($ball['dismissed_name']) ? ' - ' . esc((string) $ball['dismissed_name']) : '' ?></div>
                                                             <?php endif; ?>
                                                         </td>
                                                         <td><?= esc((string) ($ball['score_after_ball'] ?? '')) ?></td>
