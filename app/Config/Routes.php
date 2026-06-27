@@ -8,12 +8,14 @@ use App\Controllers\AdminMatches;
 use App\Controllers\AdminPlayers;
 use App\Controllers\AdminEvents;
 use App\Controllers\AdminTeams;
+use App\Controllers\Scoreboard;
 
 /** @var RouteCollection $routes */
 
 // Public routes
 $routes->get('/', [HomeController::class, 'index']);
 $routes->post('/join-us', [HomeController::class, 'joinUs']);
+$routes->get('/matches/(:segment)/scoreboard', [Scoreboard::class, 'view']);
 
 // Auth routes
 $routes->get('/admin/login', [AdminAuth::class, 'login']);

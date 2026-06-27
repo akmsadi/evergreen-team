@@ -49,6 +49,7 @@ $dismissalText = static function (array $row): string {
                 <?php endif; ?>
             </div>
             <div class="d-flex gap-2 flex-wrap">
+                <a href="<?= site_url('/matches/' . esc($publicHash) . '/scoreboard') ?>" class="btn btn-primary" target="_blank">Public Scorecard ↗</a>
                 <a href="<?= site_url('/admin/matches/' . $match['id'] . '/scoreboard') ?>" class="btn btn-light border">Edit Scoreboard</a>
                 <a href="<?= site_url('/admin/matches/' . $match['id']) ?>" class="btn btn-light border">Back to Match</a>
             </div>

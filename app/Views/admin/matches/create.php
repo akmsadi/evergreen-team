@@ -38,7 +38,48 @@
 
     <?php $errors = session()->getFlashdata('errors') ?? []; ?>
 
-    <form action="<?= esc($formAction) ?>" method="post">
+    <?php
+    $teamAPlayerIds = array_map('intval', (array) old('team_a_player_ids', $teamAPlayerIds ?? []));
+    $teamBPlayerIds = array_map('intval', (array) old('team_b_player_ids', $teamBPlayerIds ?? []));
+    $playersById = [];
+    $approvedPlayers = [];
+    $guestPlayers = [];
+    $externalPlayers = [];
+    foreach ($players as $p) {
+        $playersById[(int) $p['id']] = $p;
+        $status = $p['status'] ?? '';
+        if ($status === 'approved') {
+            $approvedPlayers[] = $p;
+        } elseif ($status === 'guest') {
+            $guestPlayers[] = $p;
+        } elseif ($status === 'external') {
+            $externalPlayers[] = $p;
+        }
+    }
+    $assignedIds = array_merge($teamAPlayerIds, $teamBPlayerIds);
+    $guestLabel = static function (array $p) use ($playersById): string {
+        if (($p['status'] ?? '') !== 'guest' || empty($p['guest_of_player_id']))
+            return '';
+        $host = $playersById[(int) $p['guest_of_player_id']] ?? null;
+        return $host ? ' (Guest - ' . esc($host['name']) . ')' : '';
+    };
+    $playerDataJson = [];
+    foreach ($players as $p) {
+        $guestOfName = '';
+        if (($p['status'] ?? '') === 'guest' && !empty($p['guest_of_player_id'])) {
+            $host = $playersById[(int) $p['guest_of_player_id']] ?? null;
+            $guestOfName = $host['name'] ?? '';
+        }
+        $playerDataJson[(string) $p['id']] = [
+            'id' => (string) $p['id'],
+            'name' => $p['name'],
+            'status' => $p['status'] ?? 'approved',
+            'guestOfName' => $guestOfName,
+        ];
+    }
+    ?>
+
+    <form action="<?= esc($formAction) ?>" method="post" id="match-form">
         <?= csrf_field() ?>
 
         <div class="row g-3">
@@ -111,92 +152,140 @@
                     <div class="invalid-feedback"><?= esc($errors['scheduled_at']) ?></div>
                 <?php endif; ?>
             </div>
-            <?php $teamAPlayerIds = array_map('intval', (array) old('team_a_player_ids', $teamAPlayerIds ?? [])); ?>
-            <?php $teamBPlayerIds = array_map('intval', (array) old('team_b_player_ids', $teamBPlayerIds ?? [])); ?>
-            <?php $teamASquadCount = count($teamAPlayerIds); ?>
-            <?php $teamBSquadCount = count($teamBPlayerIds); ?>
-            <?php $playersById = []; ?>
-            <?php foreach ($players as $player): ?>
-                <?php $playersById[(int) $player['id']] = $player; ?>
+
+            <!-- ── Player Pool ── -->
+            <div class="col-12">
+                <div class="d-flex align-items-baseline gap-2 mb-2">
+                    <label class="form-label fw-semibold mb-0">All Players</label>
+                    <?php if (empty($isMatchLocked)): ?>
+                        <span class="text-secondary small">Drag into a team squad below</span>
+                    <?php endif; ?>
+                </div>
+                <div class="row g-2">
+                    <?php
+                    $poolSections = [
+                        ['id' => 'pool-approved', 'label' => 'Approved', 'color' => 'text-success', 'players' => $approvedPlayers],
+                        ['id' => 'pool-guest', 'label' => 'Guest', 'color' => 'text-primary', 'players' => $guestPlayers],
+                        ['id' => 'pool-external', 'label' => 'External', 'color' => 'text-secondary', 'players' => $externalPlayers],
+                    ];
+                    ?>
+                    <?php foreach ($poolSections as $section): ?>
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-white h-100">
+                                <div class="fw-semibold small mb-2 px-1 <?= esc($section['color']) ?>">
+                                    <?= esc($section['label']) ?>
+                                    <span class="text-secondary fw-normal">(<?= count($section['players']) ?>)</span>
+                                </div>
+                                <div class="player-pool<?= $section['id'] === 'pool-approved' ? ' pool-two-col' : '' ?>" id="<?= esc($section['id']) ?>">
+                                    <?php foreach ($section['players'] as $p): ?>
+                                        <?php if (in_array((int) $p['id'], $assignedIds, true))
+                                            continue; ?>
+                                        <div class="player-card pool-card" <?= empty($isMatchLocked) ? 'draggable="true"' : '' ?> data-player-id="<?= esc((string) $p['id']) ?>">
+                                            <?= esc($p['name']) ?>
+                                            <?php if (!empty($guestLabel($p))): ?>
+                                                <span class="text-secondary ms-1" style="font-size:0.78em"><?= $guestLabel($p) ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                    <?php if (empty($section['players'])): ?>
+                                        <span class="text-secondary small px-1">None</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- ── Team Squads ── -->
+            <?php
+            $squadConfigs = [
+                [
+                    'squad_id' => 'squad-a',
+                    'label_id' => 'team_a_squad_label',
+                    'name_input_id' => 'team_name',
+                    'inputs_id' => 'team-a-inputs',
+                    'input_name' => 'team_a_player_ids[]',
+                    'captain_id' => 'team_a_captain_id',
+                    'captain_name' => 'team_a_captain_id',
+                    'captain_old' => old('team_a_captain_id', $teamACaptainId ?? ''),
+                    'player_ids' => $teamAPlayerIds,
+                    'error_key' => 'team_a_player_ids',
+                    'error_cap' => 'team_a_captain_id',
+                    'default_label' => 'Team A',
+                    'team_label' => old('team_name', $match['team_name'] ?? 'Team A'),
+                ],
+                [
+                    'squad_id' => 'squad-b',
+                    'label_id' => 'team_b_squad_label',
+                    'name_input_id' => 'opponent_name',
+                    'inputs_id' => 'team-b-inputs',
+                    'input_name' => 'team_b_player_ids[]',
+                    'captain_id' => 'team_b_captain_id',
+                    'captain_name' => 'team_b_captain_id',
+                    'captain_old' => old('team_b_captain_id', $teamBCaptainId ?? ''),
+                    'player_ids' => $teamBPlayerIds,
+                    'error_key' => 'team_b_player_ids',
+                    'error_cap' => 'team_b_captain_id',
+                    'default_label' => 'Team B',
+                    'team_label' => old('opponent_name', $match['opponent_name'] ?? 'Team B'),
+                ],
+            ];
+            ?>
+            <?php foreach ($squadConfigs as $sq): ?>
+                <div class="col-lg-6">
+                    <div class="team-panel h-100 border p-3 bg-light">
+                        <label class="form-label fw-semibold mb-2" id="<?= esc($sq['label_id']) ?>">
+                            <?= esc($sq['team_label']) ?> Squad (<?= count($sq['player_ids']) ?> players)
+                        </label>
+                        <?php if (isset($errors[$sq['error_key']])): ?>
+                            <div class="text-danger small mb-2"><?= esc($errors[$sq['error_key']]) ?></div>
+                        <?php endif; ?>
+                        <div class="squad-drop-zone mb-3" id="<?= esc($sq['squad_id']) ?>">
+                            <div class="squad-drop-hint text-secondary small text-center py-2<?= !empty($sq['player_ids']) ? ' d-none' : '' ?>">Drag players here</div>
+                            <?php foreach ($sq['player_ids'] as $pid): ?>
+                                <?php if (!isset($playersById[$pid]))
+                                    continue; ?>
+                                <?php $p = $playersById[$pid]; ?>
+                                <div class="player-card squad-card" <?= empty($isMatchLocked) ? 'draggable="true"' : '' ?> data-player-id="<?= esc((string) $pid) ?>">
+                                    <?php if (empty($isMatchLocked)): ?>
+                                        <span class="drag-handle me-1">&#8597;</span>
+                                    <?php endif; ?>
+                                    <?= esc($p['name']) ?>
+                                    <?php if (!empty($guestLabel($p))): ?>
+                                        <span class="text-secondary ms-1" style="font-size:0.78em"><?= $guestLabel($p) ?></span>
+                                    <?php endif; ?>
+                                    <?php if (empty($isMatchLocked)): ?>
+                                        <button type="button" class="remove-player" data-player-id="<?= esc((string) $pid) ?>" title="Remove">&#x2715;</button>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                            <div class="squad-inputs" id="<?= esc($sq['inputs_id']) ?>">
+                                <?php foreach ($sq['player_ids'] as $pid): ?>
+                                    <input type="hidden" name="<?= esc($sq['input_name']) ?>" value="<?= esc((string) $pid) ?>">
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="<?= esc($sq['captain_id']) ?>" class="form-label fw-semibold">Captain</label>
+                            <select class="form-select<?= isset($errors[$sq['error_cap']]) ? ' is-invalid' : '' ?>" id="<?= esc($sq['captain_id']) ?>" name="<?= esc($sq['captain_name']) ?>" <?= $fieldLockAttr ?>>
+                                <option value="">Select captain</option>
+                                <?php foreach ($sq['player_ids'] as $pid): ?>
+                                    <?php if (!isset($playersById[$pid]))
+                                        continue; ?>
+                                    <?php $cp = $playersById[$pid]; ?>
+                                    <?php $cl = esc($cp['name']) . $guestLabel($cp); ?>
+                                    <option value="<?= esc((string) $pid) ?>" <?= (string) $sq['captain_old'] === (string) $pid ? 'selected' : '' ?>><?= $cl ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?php if (isset($errors[$sq['error_cap']])): ?>
+                                <div class="invalid-feedback d-block"><?= esc($errors[$sq['error_cap']]) ?></div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
             <?php endforeach; ?>
-            <div class="col-lg-6">
-                <div class="team-panel h-100 border p-3 bg-light">
-                    <label class="form-label fw-semibold" id="team_a_squad_label">Team A Squad (<?= esc((string) $teamASquadCount) ?> checked)</label>
-                    <div class="panel squad-box p-3 mb-3">
-                        <div class="row g-2">
-                            <?php foreach ($players as $player): ?>
-                                <div class="col-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input team-a-player" type="checkbox" id="team_a_player_<?= esc((string) $player['id']) ?>" name="team_a_player_ids[]" value="<?= esc((string) $player['id']) ?>" <?= in_array((int) $player['id'], $teamAPlayerIds, true) ? 'checked' : '' ?><?= $fieldLockAttr ?>>
-                                        <label class="form-check-label" for="team_a_player_<?= esc((string) $player['id']) ?>">
-                                            <?= esc($player['name']) ?><?php if (($player['status'] ?? '') === 'guest' && !empty($player['guest_of_player_id']) && isset($playersById[(int) $player['guest_of_player_id']])): ?> <span class="text-secondary small">(Guest - <?= esc($playersById[(int) $player['guest_of_player_id']]['name']) ?>)</span><?php endif; ?>
-                                        </label>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <?php if (isset($errors['team_a_player_ids'])): ?>
-                        <div class="text-danger small mb-3"><?= esc($errors['team_a_player_ids']) ?></div>
-                    <?php endif; ?>
-                    <div class="mb-3">
-                        <label for="team_a_captain_id" class="form-label fw-semibold">Team A Captain</label>
-                        <select class="form-select<?= isset($errors['team_a_captain_id']) ? ' is-invalid' : '' ?>" id="team_a_captain_id" name="team_a_captain_id" <?= $fieldLockAttr ?>>
-                            <option value="">Select captain</option>
-                            <?php foreach ($teamAPlayerIds as $playerId): ?>
-                                <?php if (!isset($playersById[$playerId])) {
-                                    continue;
-                                } ?>
-                                <?php $captainPlayer = $playersById[$playerId]; ?>
-                                <?php $captainLabel = $captainPlayer['name'] . (($captainPlayer['status'] ?? '') === 'guest' && !empty($captainPlayer['guest_of_player_id']) && isset($playersById[(int) $captainPlayer['guest_of_player_id']]) ? ' (Guest - ' . $playersById[(int) $captainPlayer['guest_of_player_id']]['name'] . ')' : ''); ?>
-                                <option value="<?= esc((string) $playerId) ?>" <?= old('team_a_captain_id', $teamACaptainId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($captainLabel) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <?php if (isset($errors['team_a_captain_id'])): ?>
-                            <div class="invalid-feedback d-block"><?= esc($errors['team_a_captain_id']) ?></div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="team-panel h-100 border p-3 bg-light">
-                    <label class="form-label fw-semibold" id="team_b_squad_label">Team B Squad (<?= esc((string) $teamBSquadCount) ?> checked)</label>
-                    <div class="panel squad-box p-3 mb-3">
-                        <div class="row g-2">
-                            <?php foreach ($players as $player): ?>
-                                <div class="col-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input team-b-player" type="checkbox" id="team_b_player_<?= esc((string) $player['id']) ?>" name="team_b_player_ids[]" value="<?= esc((string) $player['id']) ?>" <?= in_array((int) $player['id'], $teamBPlayerIds, true) ? 'checked' : '' ?><?= $fieldLockAttr ?>>
-                                        <label class="form-check-label" for="team_b_player_<?= esc((string) $player['id']) ?>">
-                                            <?= esc($player['name']) ?><?php if (($player['status'] ?? '') === 'guest' && !empty($player['guest_of_player_id']) && isset($playersById[(int) $player['guest_of_player_id']])): ?> <span class="text-secondary small">(Guest - <?= esc($playersById[(int) $player['guest_of_player_id']]['name']) ?>)</span><?php endif; ?>
-                                        </label>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <?php if (isset($errors['team_b_player_ids'])): ?>
-                        <div class="text-danger small mb-3"><?= esc($errors['team_b_player_ids']) ?></div>
-                    <?php endif; ?>
-                    <div class="mb-3">
-                        <label for="team_b_captain_id" class="form-label fw-semibold">Team B Captain</label>
-                        <select class="form-select<?= isset($errors['team_b_captain_id']) ? ' is-invalid' : '' ?>" id="team_b_captain_id" name="team_b_captain_id" <?= $fieldLockAttr ?>>
-                            <option value="">Select captain</option>
-                            <?php foreach ($teamBPlayerIds as $playerId): ?>
-                                <?php if (!isset($playersById[$playerId])) {
-                                    continue;
-                                } ?>
-                                <?php $captainPlayer = $playersById[$playerId]; ?>
-                                <?php $captainLabel = $captainPlayer['name'] . (($captainPlayer['status'] ?? '') === 'guest' && !empty($captainPlayer['guest_of_player_id']) && isset($playersById[(int) $captainPlayer['guest_of_player_id']]) ? ' (Guest - ' . $playersById[(int) $captainPlayer['guest_of_player_id']]['name'] . ')' : ''); ?>
-                                <option value="<?= esc((string) $playerId) ?>" <?= old('team_b_captain_id', $teamBCaptainId ?? '') == $playerId ? 'selected' : '' ?>><?= esc($captainLabel) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <?php if (isset($errors['team_b_captain_id'])): ?>
-                            <div class="invalid-feedback d-block"><?= esc($errors['team_b_captain_id']) ?></div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
+
             <div class="col-12">
                 <label for="notes" class="form-label fw-semibold">Notes</label>
                 <textarea class="form-control" id="notes" name="notes" rows="4" <?= $fieldLockAttr ?>><?= esc(old('notes', $match['notes'] ?? '')) ?></textarea>
@@ -213,74 +302,297 @@
 </div>
 <?= $this->endSection() ?>
 
+<?= $this->section('styles') ?>
+<style>
+    .player-card {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 5px 8px;
+        margin-bottom: 5px;
+        font-size: 0.875rem;
+        user-select: none;
+    }
+
+    .player-card[draggable="true"] {
+        cursor: grab;
+    }
+
+    .player-card[draggable="true"]:active {
+        cursor: grabbing;
+    }
+
+    .player-card.dragging {
+        opacity: 0.3;
+    }
+
+    .drag-handle {
+        color: #adb5bd;
+        flex-shrink: 0;
+    }
+
+    .remove-player {
+        margin-left: auto;
+        flex-shrink: 0;
+        background: none;
+        border: none;
+        color: #adb5bd;
+        cursor: pointer;
+        padding: 0 2px;
+        font-size: 0.85rem;
+        line-height: 1;
+    }
+
+    .remove-player:hover {
+        color: #dc3545;
+    }
+
+    .squad-inputs {
+        display: none;
+    }
+
+    .squad-drop-zone {
+        min-height: 80px;
+        border: 2px dashed #dee2e6;
+        border-radius: 6px;
+        padding: 8px;
+        transition: border-color 0.15s, background-color 0.15s;
+    }
+
+    .squad-drop-zone.drag-over {
+        border-color: #0d6efd;
+        background-color: #eef3ff;
+    }
+
+    .player-pool {
+        min-height: 36px;
+        border-radius: 4px;
+        transition: background-color 0.15s, outline 0.15s;
+    }
+    .player-pool.pool-two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+        align-content: start;
+    }
+    .player-pool.pool-two-col .player-card {
+        margin-bottom: 0;
+    }
+
+    .player-pool.drag-over {
+        background-color: #f0fff4;
+        outline: 2px dashed #198754;
+        outline-offset: 2px;
+    }
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('scripts') ?>
 <script>
-    const isMatchLocked = <?= !empty($isMatchLocked) ? 'true' : 'false' ?>;
+    (function () {
+        const isMatchLocked = <?= !empty($isMatchLocked) ? 'true' : 'false' ?>;
+        const PLAYERS = <?= json_encode($playerDataJson, JSON_HEX_TAG | JSON_HEX_APOS) ?>;
 
-    const updateSquadLabel = (labelSelector, teamName, checkboxes) => {
-        const label = document.querySelector(labelSelector);
+        if (isMatchLocked) return;
 
-        if (!label) {
-            return;
-        }
+        const squadA = document.getElementById('squad-a');
+        const squadB = document.getElementById('squad-b');
+        const pools = {
+            approved: document.getElementById('pool-approved'),
+            guest: document.getElementById('pool-guest'),
+            external: document.getElementById('pool-external'),
+        };
 
-        const checkedCount = Array.from(checkboxes).filter((input) => input.checked).length;
-        label.textContent = `${teamName} Squad (${checkedCount} checked)`;
-    };
+        let dragId = null;
 
-    const syncTeamSelections = () => {
-        const teamACheckboxes = document.querySelectorAll('.team-a-player');
-        const teamBCheckboxes = document.querySelectorAll('.team-b-player');
-        const teamASelected = new Set(Array.from(teamACheckboxes).filter((input) => input.checked).map((input) => input.value));
-        const teamBSelected = new Set(Array.from(teamBCheckboxes).filter((input) => input.checked).map((input) => input.value));
+        const escHtml = (s) => String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
 
-        teamACheckboxes.forEach((input) => {
-            input.disabled = teamBSelected.has(input.value);
+        const playerPool = (id) => {
+            const status = PLAYERS[id]?.status || 'approved';
+            return pools[status] || pools.approved;
+        };
+
+        const makePoolCard = (id) => {
+            const p = PLAYERS[id];
+            if (!p) return null;
+            const el = document.createElement('div');
+            el.className = 'player-card pool-card';
+            el.draggable = true;
+            el.dataset.playerId = id;
+            let html = escHtml(p.name);
+            if (p.status === 'guest' && p.guestOfName) {
+                html += ` <span class="text-secondary ms-1" style="font-size:0.78em">(Guest - ${escHtml(p.guestOfName)})</span>`;
+            }
+            el.innerHTML = html;
+            attachDrag(el);
+            return el;
+        };
+
+        const makeSquadCard = (id) => {
+            const p = PLAYERS[id];
+            if (!p) return null;
+            const el = document.createElement('div');
+            el.className = 'player-card squad-card';
+            el.draggable = true;
+            el.dataset.playerId = id;
+            let html = '<span class="drag-handle me-1">&#8597;</span>' + escHtml(p.name);
+            if (p.status === 'guest' && p.guestOfName) {
+                html += ` <span class="text-secondary ms-1" style="font-size:0.78em">(Guest - ${escHtml(p.guestOfName)})</span>`;
+            }
+            html += `<button type="button" class="remove-player" data-player-id="${escHtml(id)}" title="Remove">&#x2715;</button>`;
+            el.innerHTML = html;
+            attachDrag(el);
+            el.querySelector('.remove-player').addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeFromSquads(id);
+                playerPool(id).appendChild(makePoolCard(id));
+                sync();
+            });
+            return el;
+        };
+
+        const removeFromSquads = (id) => {
+            [squadA, squadB].forEach(sq => {
+                sq.querySelectorAll(`.squad-card[data-player-id="${id}"]`).forEach(el => el.remove());
+            });
+        };
+
+        const removeFromPools = (id) => {
+            Object.values(pools).forEach(pool => {
+                pool.querySelectorAll(`.pool-card[data-player-id="${id}"]`).forEach(el => el.remove());
+            });
+        };
+
+        const assignToSquad = (id, squadEl) => {
+            if (squadEl.querySelector(`.squad-card[data-player-id="${id}"]`)) return;
+            removeFromSquads(id);
+            removeFromPools(id);
+            const inputContainer = squadEl.querySelector('.squad-inputs');
+            squadEl.insertBefore(makeSquadCard(id), inputContainer);
+            sync();
+        };
+
+        const syncInputs = (squadEl, name) => {
+            const container = squadEl.querySelector('.squad-inputs');
+            if (!container) return;
+            container.innerHTML = '';
+            squadEl.querySelectorAll('.squad-card').forEach(card => {
+                const inp = document.createElement('input');
+                inp.type = 'hidden';
+                inp.name = name;
+                inp.value = card.dataset.playerId;
+                container.appendChild(inp);
+            });
+        };
+
+        const syncCaptain = (squadEl, selectId) => {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            const prev = sel.value;
+            sel.innerHTML = '<option value="">Select captain</option>';
+            squadEl.querySelectorAll('.squad-card').forEach(card => {
+                const id = card.dataset.playerId;
+                const p = PLAYERS[id] || { name: id, status: '', guestOfName: '' };
+                let label = p.name;
+                if (p.status === 'guest' && p.guestOfName) label += ` (Guest - ${p.guestOfName})`;
+                sel.appendChild(new Option(label, id, false, id === prev));
+            });
+            if (!squadEl.querySelector(`.squad-card[data-player-id="${prev}"]`)) sel.value = '';
+        };
+
+        const syncLabel = (squadEl, labelId, nameInputId) => {
+            const label = document.getElementById(labelId);
+            if (!label) return;
+            const count = squadEl.querySelectorAll('.squad-card').length;
+            const name = document.getElementById(nameInputId)?.value || '';
+            label.textContent = `${name} Squad (${count} player${count !== 1 ? 's' : ''})`;
+        };
+
+        const syncHint = (squadEl) => {
+            const hint = squadEl.querySelector('.squad-drop-hint');
+            if (hint) hint.classList.toggle('d-none', squadEl.querySelectorAll('.squad-card').length > 0);
+        };
+
+        const sync = () => {
+            syncInputs(squadA, 'team_a_player_ids[]');
+            syncInputs(squadB, 'team_b_player_ids[]');
+            syncCaptain(squadA, 'team_a_captain_id');
+            syncCaptain(squadB, 'team_b_captain_id');
+            syncLabel(squadA, 'team_a_squad_label', 'team_name');
+            syncLabel(squadB, 'team_b_squad_label', 'opponent_name');
+            syncHint(squadA);
+            syncHint(squadB);
+        };
+
+        const attachDrag = (el) => {
+            el.addEventListener('dragstart', (e) => {
+                dragId = el.dataset.playerId;
+                el.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', dragId);
+            });
+            el.addEventListener('dragend', () => {
+                el.classList.remove('dragging');
+                document.querySelectorAll('.drag-over').forEach(z => z.classList.remove('drag-over'));
+            });
+        };
+
+        const makeDropZone = (el, onDrop) => {
+            el.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                el.classList.add('drag-over');
+            });
+            el.addEventListener('dragleave', (e) => {
+                if (!el.contains(e.relatedTarget)) el.classList.remove('drag-over');
+            });
+            el.addEventListener('drop', (e) => {
+                e.preventDefault();
+                el.classList.remove('drag-over');
+                if (dragId) onDrop(dragId);
+                dragId = null;
+            });
+        };
+
+        makeDropZone(squadA, (id) => assignToSquad(id, squadA));
+        makeDropZone(squadB, (id) => assignToSquad(id, squadB));
+
+        Object.entries(pools).forEach(([status, pool]) => {
+            makeDropZone(pool, (id) => {
+                if (playerPool(id) !== pool) return;
+                if (pool.querySelector(`.pool-card[data-player-id="${id}"]`)) return;
+                removeFromSquads(id);
+                removeFromPools(id);
+                pool.appendChild(makePoolCard(id));
+                sync();
+            });
         });
 
-        teamBCheckboxes.forEach((input) => {
-            input.disabled = teamASelected.has(input.value);
+        // Wire up server-rendered cards
+        document.querySelectorAll('.pool-card').forEach(el => attachDrag(el));
+        document.querySelectorAll('.squad-card').forEach(el => {
+            attachDrag(el);
+            el.querySelector('.remove-player')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = el.dataset.playerId;
+                removeFromSquads(id);
+                playerPool(id).appendChild(makePoolCard(id));
+                sync();
+            });
         });
 
-        updateSquadLabel('#team_a_squad_label', 'Team A', teamACheckboxes);
-        updateSquadLabel('#team_b_squad_label', 'Team B', teamBCheckboxes);
-        syncLeadershipOptions(teamACheckboxes, document.querySelector('#team_a_captain_id'), 'Select captain');
-        syncLeadershipOptions(teamBCheckboxes, document.querySelector('#team_b_captain_id'), 'Select captain');
-    };
+        // Keep squad labels live when team name fields change
+        document.getElementById('team_name')?.addEventListener('input', () => syncLabel(squadA, 'team_a_squad_label', 'team_name'));
+        document.getElementById('opponent_name')?.addEventListener('input', () => syncLabel(squadB, 'team_b_squad_label', 'opponent_name'));
 
-    const syncLeadershipOptions = (checkboxes, select, placeholder) => {
-        if (!select) {
-            return;
-        }
-
-        const selectedValue = select.value;
-        const selectedPlayers = Array.from(checkboxes)
-            .filter((input) => input.checked)
-            .map((input) => ({
-                id: input.value,
-                name: document.querySelector(`label[for="${input.id}"]`)?.textContent.trim() ?? '',
-            }));
-
-        select.innerHTML = '';
-        select.append(new Option(placeholder, ''));
-
-        selectedPlayers.forEach((player) => {
-            const option = new Option(player.name, player.id, false, player.id === selectedValue);
-            select.append(option);
-        });
-
-        if (!selectedPlayers.some((player) => player.id === selectedValue)) {
-            select.value = '';
-        }
-    };
-    if (isMatchLocked) {
-        syncTeamSelections();
-    } else {
-        document.querySelectorAll('.team-a-player, .team-b-player').forEach((input) => {
-            input.addEventListener('change', syncTeamSelections);
-        });
-
-        syncTeamSelections();
-    }
+        sync();
+    }());
 </script>
 <?= $this->endSection() ?>

@@ -32,7 +32,7 @@ class AdminMatches extends BaseController
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
-        helper(['form', 'url']);
+        helper(['form', 'url', 'scoreboard']);
         $this->auditLogger = new AuditLogger();
         $this->matchBalls = new MatchBallModel();
         $this->matches = new MatchModel();
@@ -1104,14 +1104,15 @@ class AdminMatches extends BaseController
         }
 
         return view('admin/matches/scoreboard-preview-view', [
-            'activeNav' => 'matches',
-            'match' => $match,
-            'matchNumber' => $matchNumber,
+            'activeNav'        => 'matches',
+            'match'            => $match,
+            'matchNumber'      => $matchNumber,
             'inns1BattingSide' => $inns1BattingSide,
             'battingByInnings' => $battingByInnings,
             'bowlingByInnings' => $bowlingByInnings,
             'wicketsByInnings' => $wicketsByInnings,
-            'extrasByInnings' => $extrasByInnings,
+            'extrasByInnings'  => $extrasByInnings,
+            'publicHash'       => scoreboard_encode($matchId),
         ]);
     }
 
