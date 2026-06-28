@@ -4,11 +4,10 @@
 
 <?= $this->section('content') ?>
 <?php $errors = session()->getFlashdata('errors') ?? []; ?>
-<div class="content-stack">
-    <div class="panel p-4 p-md-5 mb-4">
+<div class="content-card">
+    <div class="panel mb-8">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div>
-                <p class="text-uppercase text-success fw-bold small mb-2">Evergreen Team Admin</p>
                 <h1 class="h2 fw-bold mb-2"><?= esc($team['name']) ?></h1>
                 <p class="text-secondary mb-0">Update team details and manage roster.</p>
             </div>
@@ -23,7 +22,7 @@
     <?php endif; ?>
 
     <!-- Team Details -->
-    <div class="content-card p-4 mb-4">
+    <div class="panel mb-8">
         <h2 class="h5 mb-3">Team Details</h2>
         <form action="<?= site_url('/admin/teams/' . $team['id'] . '/update') ?>" method="post" enctype="multipart/form-data">
             <?= csrf_field() ?>

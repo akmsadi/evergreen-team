@@ -7,6 +7,7 @@ use App\Controllers\AdminVenues;
 use App\Controllers\AdminMatches;
 use App\Controllers\AdminPlayers;
 use App\Controllers\AdminEvents;
+use App\Controllers\AdminExpenses;
 use App\Controllers\AdminTeams;
 use App\Controllers\Scoreboard;
 
@@ -55,6 +56,12 @@ $routes->post('/admin/matches/(:num)/scoreboard/toss', [AdminMatches::class, 'sa
 $routes->post('/admin/matches/(:num)/scoreboard/batting/(:num)/save', [AdminMatches::class, 'saveBatting']);
 $routes->post('/admin/matches/(:num)/scoreboard/bowling/(:num)/save', [AdminMatches::class, 'saveBowling']);
 $routes->post('/admin/matches/(:num)/scoreboard/wickets/(:num)/save', [AdminMatches::class, 'saveFallOfWickets']);
+
+// General expense routes
+$routes->get('/admin/expenses', [AdminExpenses::class, 'index']);
+$routes->post('/admin/expenses', [AdminExpenses::class, 'store']);
+$routes->post('/admin/expenses/(:num)/update', [AdminExpenses::class, 'update']);
+$routes->post('/admin/expenses/(:num)/delete', [AdminExpenses::class, 'delete']);
 
 // Player routes
 $routes->get('/admin/players', [AdminPlayers::class, 'index']);

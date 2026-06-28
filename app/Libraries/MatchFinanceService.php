@@ -139,6 +139,52 @@ class MatchFinanceService
         return $this->attachExpenseContributors($expenses);
     }
 
+    public function getGeneralExpenses(): array
+    {
+        $expenses = $this->matchExpenses
+            ->where('match_id', null)
+            ->orderBy('id', 'DESC')
+            ->findAll();
+
+        return $this->attachExpenseContributors($expenses);
+    }
+
+    public function getGeneralExpenseRecord(int $expenseId): ?array
+    {
+        return $this->matchExpenses
+            ->where('id', $expenseId)
+            ->where('match_id', null)
+            ->first();
+    }
+
+    public function syncExpenseContributors(int $expenseId, array $playerIds): void
+    {
+        $playerIds = array_values(array_unique(array_map('intval', array_filter($playerIds))));
+        $db = db_connect();
+        $db->table('match_expense_contributors')->where('expense_id', $expenseId)->delete();
+        $now = date('Y-m-d H:i:s');
+        foreach ($playerIds as $playerId) {
+            $db->table('match_expense_contributors')->insert([
+                'expense_id'  => $expenseId,
+                'player_id'   => $playerId,
+                'created_at'  => $now,
+                'updated_at'  => $now,
+            ]);
+        }
+    }
+
+    public function getExpenseContributorIds(int $expenseId): array
+    {
+        $rows = db_connect()
+            ->table('match_expense_contributors')
+            ->select('player_id')
+            ->where('expense_id', $expenseId)
+            ->get()
+            ->getResultArray();
+
+        return array_map(static fn(array $row): int => (int) $row['player_id'], $rows);
+    }
+
     public function getParticipantDeposits(int $matchId): array
     {
         return $this->getDepositsByPlayerIds($this->getParticipantIds($matchId));
@@ -534,6 +580,28 @@ class MatchFinanceService
         }
         unset($match);
 
+        $matches = array_values(array_filter($matches, static fn(array $m): bool => $m['total_expense'] > 0));
+
+        // General (no-match) expenses
+        $generalExpenses = $this->attachExpenseContributors(
+            $this->matchExpenses->where('match_id', null)->findAll()
+        );
+        $generalTotal = 0.0;
+        $generalShareByPlayer = [];
+        foreach ($generalExpenses as $expense) {
+            $contributorIds = array_map(static fn(array $c): int => (int) $c['player_id'], $expense['contributors']);
+            $count = count($contributorIds);
+            if ($count === 0) {
+                continue;
+            }
+            $generalTotal += (float) $expense['amount'];
+            $share = round((float) $expense['amount'] / $count, 2);
+            foreach ($contributorIds as $pid) {
+                $generalShareByPlayer[$pid] = ($generalShareByPlayer[$pid] ?? 0.0) + $share;
+            }
+        }
+        $generalTotal = round($generalTotal, 2);
+
         $depositTotals = $this->calculateDepositTotalsForPlayers($this->getDepositsByPlayerIds($playerIds));
 
         $playerRows = [];
@@ -552,19 +620,25 @@ class MatchFinanceService
                 }
             }
 
+            $generalShare = round($generalShareByPlayer[$playerId] ?? 0.0, 2);
+            $totalOwed = round($totalOwed + $generalShare, 2);
             $deposited = round($depositTotals[$playerId] ?? 0.0, 2);
-            $totalOwed = round($totalOwed, 2);
 
             $playerRows[] = [
-                'player' => $player,
-                'deposited' => $deposited,
-                'owed' => $totalOwed,
-                'balance' => round($deposited - $totalOwed, 2),
-                'match_shares' => $matchShares,
+                'player'        => $player,
+                'deposited'     => $deposited,
+                'owed'          => $totalOwed,
+                'balance'       => round($deposited - $totalOwed, 2),
+                'match_shares'  => $matchShares,
+                'general_share' => $generalShare,
             ];
         }
 
-        return ['matches' => $matches, 'playerRows' => $playerRows];
+        return [
+            'matches'      => $matches,
+            'playerRows'   => $playerRows,
+            'generalTotal' => $generalTotal,
+        ];
     }
 
     public function buildPlayerOverview(array $players): array
@@ -772,29 +846,72 @@ class MatchFinanceService
             return [];
         }
 
-        $matchIds = array_values(array_unique(array_map(static fn(array $expense): int => (int) $expense['match_id'], $expenses)));
-        $contributors = $this->matchContributors
-            ->select('match_contributors.match_id, match_contributors.player_id, players.name')
-            ->join('players', 'players.id = match_contributors.player_id')
-            ->whereIn('match_contributors.match_id', $matchIds)
-            ->orderBy('players.name', 'ASC')
-            ->findAll();
+        $matchExpenses    = [];
+        $generalExpenses  = [];
 
-        $contributorsByMatch = [];
-        foreach ($contributors as $contributor) {
-            $matchId = (int) $contributor['match_id'];
-            $contributorsByMatch[$matchId][] = [
-                'player_id' => (int) $contributor['player_id'],
-                'name' => $contributor['name'],
-            ];
+        foreach ($expenses as $expense) {
+            if ($expense['match_id'] !== null && (int) $expense['match_id'] > 0) {
+                $matchExpenses[] = $expense;
+            } else {
+                $generalExpenses[] = $expense;
+            }
         }
 
-        foreach ($expenses as &$expense) {
-            $expense['contributors'] = $contributorsByMatch[(int) $expense['match_id']] ?? [];
-        }
-        unset($expense);
+        // Match-bound expenses: contributors come from match_contributors table
+        if ($matchExpenses !== []) {
+            $matchIds = array_values(array_unique(array_map(
+                static fn(array $e): int => (int) $e['match_id'], $matchExpenses
+            )));
+            $contributors = $this->matchContributors
+                ->select('match_contributors.match_id, match_contributors.player_id, players.name')
+                ->join('players', 'players.id = match_contributors.player_id')
+                ->whereIn('match_contributors.match_id', $matchIds)
+                ->orderBy('players.name', 'ASC')
+                ->findAll();
 
-        return $expenses;
+            $contributorsByMatch = [];
+            foreach ($contributors as $contributor) {
+                $contributorsByMatch[(int) $contributor['match_id']][] = [
+                    'player_id' => (int) $contributor['player_id'],
+                    'name'      => $contributor['name'],
+                ];
+            }
+
+            foreach ($matchExpenses as &$expense) {
+                $expense['contributors'] = $contributorsByMatch[(int) $expense['match_id']] ?? [];
+            }
+            unset($expense);
+        }
+
+        // General (no match) expenses: contributors come from match_expense_contributors table
+        if ($generalExpenses !== []) {
+            $expenseIds = array_values(array_unique(array_map(
+                static fn(array $e): int => (int) $e['id'], $generalExpenses
+            )));
+            $rows = db_connect()
+                ->table('match_expense_contributors mec')
+                ->select('mec.expense_id, mec.player_id, players.name')
+                ->join('players', 'players.id = mec.player_id')
+                ->whereIn('mec.expense_id', $expenseIds)
+                ->orderBy('players.name', 'ASC')
+                ->get()
+                ->getResultArray();
+
+            $contributorsByExpense = [];
+            foreach ($rows as $row) {
+                $contributorsByExpense[(int) $row['expense_id']][] = [
+                    'player_id' => (int) $row['player_id'],
+                    'name'      => $row['name'],
+                ];
+            }
+
+            foreach ($generalExpenses as &$expense) {
+                $expense['contributors'] = $contributorsByExpense[(int) $expense['id']] ?? [];
+            }
+            unset($expense);
+        }
+
+        return array_merge($matchExpenses, $generalExpenses);
     }
 
     private function calculateExpenseTotalsForPlayers(array $expenses, array $playerIds): array
@@ -828,22 +945,46 @@ class MatchFinanceService
             return [];
         }
 
+        // Match-bound expenses via match_contributors
         $linkedContributors = $this->matchContributors
             ->select('match_id')
             ->whereIn('player_id', $playerIds)
             ->findAll();
 
-        $matchIds = array_values(array_unique(array_map(static fn(array $row): int => (int) $row['match_id'], $linkedContributors)));
+        $matchIds = array_values(array_unique(array_map(
+            static fn(array $row): int => (int) $row['match_id'], $linkedContributors
+        )));
 
-        if ($matchIds === []) {
+        $matchExpenses = $matchIds !== []
+            ? $this->attachExpenseContributors($this->matchExpenses->whereIn('match_id', $matchIds)->findAll())
+            : [];
+
+        // General expenses via match_expense_contributors
+        $db = db_connect();
+        $linkedRows = $db->table('match_expense_contributors')
+            ->distinct()
+            ->select('expense_id')
+            ->whereIn('player_id', $playerIds)
+            ->get()
+            ->getResultArray();
+
+        $generalExpenseIds = array_values(array_unique(array_map(
+            static fn(array $row): int => (int) $row['expense_id'], $linkedRows
+        )));
+
+        $generalExpenses = $generalExpenseIds !== []
+            ? $this->attachExpenseContributors(
+                $this->matchExpenses->where('match_id', null)->whereIn('id', $generalExpenseIds)->findAll()
+            )
+            : [];
+
+        $allExpenses = array_merge($matchExpenses, $generalExpenses);
+
+        if ($allExpenses === []) {
             return [];
         }
 
-        $expenses = $this->attachExpenseContributors(
-            $this->matchExpenses->whereIn('match_id', $matchIds)->findAll()
-        );
-
-        return $this->calculateExpenseTotalsForPlayers($expenses, $playerIds);
+        return $this->calculateExpenseTotalsForPlayers($allExpenses, $playerIds);
     }
 
     private function calculateDepositTotalsForPlayers(array $deposits): array

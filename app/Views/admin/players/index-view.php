@@ -80,28 +80,28 @@
 
         <div class="row g-4 mb-4">
             <div class="col-md-3">
-                <div class="summary-card player-summary-card player-summary-card--players p-4 h-100">
+                <div class="summary-card p-4 h-100">
                     <div class="player-summary-card__label">Players</div>
                     <div class="player-summary-card__value"><?= esc((string) $playerCount) ?></div>
                     <div class="player-summary-card__note">All registered players in the club pool.</div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="summary-card player-summary-card player-summary-card--approved p-4 h-100">
+                <div class="summary-card p-4 h-100">
                     <div class="player-summary-card__label">Approved</div>
                     <div class="player-summary-card__value"><?= esc((string) $approvedCount) ?></div>
                     <div class="player-summary-card__note">Eligible for squads, deposits, and match selection.</div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="summary-card player-summary-card player-summary-card--pending p-4 h-100">
+                <div class="summary-card p-4 h-100">
                     <div class="player-summary-card__label">Guest</div>
                     <div class="player-summary-card__value"><?= count($guestPlayers) ?></div>
                     <div class="player-summary-card__note">Guests of Active players.</div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="summary-card player-summary-card player-summary-card--rejected p-4 h-100">
+                <div class="summary-card p-4 h-100">
                     <div class="player-summary-card__label">External</div>
                     <div class="player-summary-card__value"><?= count($externalPlayers) ?></div>
                     <div class="player-summary-card__note">External players from friendly match.</div>

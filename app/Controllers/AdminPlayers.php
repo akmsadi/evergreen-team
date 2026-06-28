@@ -65,9 +65,10 @@ class AdminPlayers extends BaseController
         $matrix = $this->matchFinance->buildFinanceMatrix($players);
 
         return view('admin/players/finance-overview-view', [
-            'username' => session()->get('admin_username'),
-            'matches' => $matrix['matches'],
-            'playerRows' => $matrix['playerRows'],
+            'username'     => session()->get('admin_username'),
+            'matches'      => $matrix['matches'],
+            'playerRows'   => $matrix['playerRows'],
+            'generalTotal' => $matrix['generalTotal'],
         ]);
     }
 

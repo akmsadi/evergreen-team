@@ -111,8 +111,8 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
 
     <?php if ($playerRows === []): ?>
         <p class="text-secondary">No approved players found.</p>
-    <?php elseif ($matches === []): ?>
-        <p class="text-secondary">No matches recorded yet.</p>
+    <?php elseif ($matches === [] && ($generalTotal ?? 0) <= 0): ?>
+        <p class="text-secondary">No matches or expenses recorded yet.</p>
     <?php else: ?>
         <div class="finance-table-wrap">
             <table class="finance-table">
@@ -129,6 +129,9 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
                                 <small class="fw-normal text-secondary"><?= esc($match['venue'] ?? $match['venue_name'] ?? '-') ?></small>
                             </th>
                         <?php endforeach; ?>
+                        <?php if (($generalTotal ?? 0) > 0): ?>
+                            <th class="match-header">General<br><small class="fw-normal text-secondary">Equipment &amp; misc</small></th>
+                        <?php endif; ?>
                     </tr>
                     <tr>
                         <?php foreach ($matches as $match): ?>
@@ -136,6 +139,9 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
                                 <?= $match['total_expense'] > 0 ? esc(number_format($match['total_expense'], 0)) : '-' ?>
                             </th>
                         <?php endforeach; ?>
+                        <?php if (($generalTotal ?? 0) > 0): ?>
+                            <th class="match-expense"><?= esc(number_format($generalTotal, 0)) ?></th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -159,6 +165,13 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
                                     <td class="cell-empty"></td>
                                 <?php endif; ?>
                             <?php endforeach; ?>
+                            <?php if (($generalTotal ?? 0) > 0): ?>
+                                <?php if (($row['general_share'] ?? 0) > 0): ?>
+                                    <td class="cell-share"><?= esc(number_format($row['general_share'], 0)) ?></td>
+                                <?php else: ?>
+                                    <td class="cell-empty"></td>
+                                <?php endif; ?>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -178,6 +191,9 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
                                 <?= $match['total_expense'] > 0 ? esc(number_format($match['total_expense'], 0)) : '' ?>
                             </td>
                         <?php endforeach; ?>
+                        <?php if (($generalTotal ?? 0) > 0): ?>
+                            <td class="text-end"><?= esc(number_format($generalTotal, 0)) ?></td>
+                        <?php endif; ?>
                     </tr>
                 </tfoot>
             </table>
