@@ -10,6 +10,7 @@ use App\Controllers\AdminEvents;
 use App\Controllers\AdminExpenses;
 use App\Controllers\AdminTeams;
 use App\Controllers\Scoreboard;
+use App\Controllers\Api\Matches as ApiMatches;
 
 /** @var RouteCollection $routes */
 
@@ -96,3 +97,9 @@ $routes->post('/admin/teams/(:num)/delete', [AdminTeams::class, 'delete']);
 $routes->post('/admin/teams/(:num)/members', [AdminTeams::class, 'storeMember']);
 $routes->post('/admin/teams/(:num)/members/(:num)/update', [AdminTeams::class, 'updateMember']);
 $routes->post('/admin/teams/(:num)/members/(:num)/delete', [AdminTeams::class, 'deleteMember']);
+
+// Handle CORS preflight for all API endpoints
+$routes->options('api/(:any)', static function () {
+    return service('response')->setStatusCode(204);
+});
+$routes->get('/api/matches', [ApiMatches::class, 'index'], ['filter' => 'apikey']);

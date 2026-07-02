@@ -17,37 +17,37 @@ $tossDecisionLabel = match ((string) ($match['toss_decision'] ?? '')) {
     <h2 class="h4 fw-bold mb-3">Match Details</h2>
     <div class="row g-3 mb-6">
         <div class="col-md-4 col-xl-2">
-            <div class="border rounded-3 h-100 p-3">
+            <div class="border rounded-3 h-100 p-3 bg-body-tertiary">
                 <div class="text-secondary small text-uppercase mb-1">Type</div>
                 <div class="fw-semibold"><?= esc(ucwords(str_replace('_', ' ', (string) ($match['match_type'] ?? '-')))) ?></div>
             </div>
         </div>
         <div class="col-md-4 col-xl-2">
-            <div class="border rounded-3 h-100 p-3">
+            <div class="border rounded-3 h-100 p-3 bg-body-tertiary">
                 <div class="text-secondary small text-uppercase mb-1">Overs</div>
                 <div class="fw-semibold"><?= esc((string) ($match['format_overs'] ?? '-')) ?></div>
             </div>
         </div>
         <div class="col-md-4 col-xl-2">
-            <div class="border rounded-3 h-100 p-3">
+            <div class="border rounded-3 h-100 p-3 bg-body-tertiary">
                 <div class="text-secondary small text-uppercase mb-1">Venue</div>
                 <div class="fw-semibold"><?= esc($match['venue'] ?: '-') ?></div>
             </div>
         </div>
         <div class="col-md-4 col-xl-2">
-            <div class="border rounded-3 h-100 p-3">
+            <div class="border rounded-3 h-100 p-3 bg-body-tertiary">
                 <div class="text-secondary small text-uppercase mb-1">Scheduled</div>
                 <div class="fw-semibold"><?= esc(getFormattedDate($match['scheduled_at'] ?? null, '-')) ?></div>
             </div>
         </div>
         <div class="col-md-4 col-xl-2">
-            <div class="border rounded-3 h-100 p-3">
+            <div class="border rounded-3 h-100 p-3 bg-body-tertiary">
                 <div class="text-secondary small text-uppercase mb-1">Toss Winner</div>
                 <div class="fw-semibold"><?= esc($tossWinnerLabel) ?></div>
             </div>
         </div>
         <div class="col-md-4 col-xl-2">
-            <div class="border rounded-3 h-100 p-3">
+            <div class="border rounded-3 h-100 p-3 bg-body-tertiary">
                 <div class="text-secondary small text-uppercase mb-1">Decision</div>
                 <div class="fw-semibold"><?= esc($tossDecisionLabel) ?></div>
             </div>
@@ -59,29 +59,22 @@ $tossDecisionLabel = match ((string) ($match['toss_decision'] ?? '')) {
         <?php foreach ($contributorGroups as $group): ?>
             <div class="col-md-6">
                 <div class="border rounded-3 h-100 p-3">
-                    <div class="fw-semibold mb-3"><?= esc($group['label']) ?></div>
-                    <div class="table-responsive">
-                        <table class="table align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Player</th>
-                                    <th>Tags</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($group['participants'] as $participant): ?>
-                                    <tr>
-                                        <td><?= esc($participant['name']) ?></td>
-                                        <td>
-                                            <?php if ((int) $participant['is_captain'] === 1): ?>
-                                                <span class="badge rounded-pill text-bg-dark">Captain</span>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="h5 mb-3"><?= esc($group['label']) ?></div>
+                    <ul class="list-group list-group-flush">
+                        <?php foreach ($group['participants'] as $participant): ?>
+                            <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+                                <span>
+                                    <?= esc($participant['name']) ?>
+                                    <?php if (($participant['status'] ?? '') === 'guest' && !empty($participant['guest_of_name'])): ?>
+                                        <span class="text-secondary small">(Guest - <?= esc($participant['guest_of_name']) ?>)</span>
+                                    <?php endif; ?>
+                                </span>
+                                <?php if ((int) $participant['is_captain'] === 1): ?>
+                                    <span class="badge rounded-pill text-bg-dark">Captain</span>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
                 </div>
             </div>
         <?php endforeach; ?>
@@ -105,19 +98,22 @@ $tossDecisionLabel = match ((string) ($match['toss_decision'] ?? '')) {
             <?php foreach ($contributorGroups as $group): ?>
                 <div class="col-md-6">
                     <div class="contributor-group h-100">
-                        <div class="fw-semibold mb-2"><?= esc($group['label']) ?></div>
-                        <div class="row g-2">
+                        <div class="h5 mb-2"><?= esc($group['label']) ?></div>
+                        <ul class="list-group list-group-flush">
                             <?php foreach ($group['participants'] as $participant): ?>
-                                <div class="col-12">
-                                    <div class="form-check border rounded-3 px-3 py-2">
+                                <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+                                    <div class="form-check mb-0">
                                         <input class="form-check-input" type="checkbox" id="match_contributor_<?= esc((string) $participant['player_id']) ?>" name="match_contributor_ids[]" value="<?= esc((string) $participant['player_id']) ?>" <?= in_array((int) $participant['player_id'], $selectedMatchContributorIds, true) ? 'checked' : '' ?>>
                                         <label class="form-check-label" for="match_contributor_<?= esc((string) $participant['player_id']) ?>">
                                             <?= esc($participant['name']) ?>
+                                            <?php if (($participant['status'] ?? '') === 'guest' && !empty($participant['guest_of_name'])): ?>
+                                                <span class="text-secondary small">(Guest - <?= esc($participant['guest_of_name']) ?>)</span>
+                                            <?php endif; ?>
                                         </label>
                                     </div>
-                                </div>
+                                </li>
                             <?php endforeach; ?>
-                        </div>
+                        </ul>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -169,7 +165,7 @@ $tossDecisionLabel = match ((string) ($match['toss_decision'] ?? '')) {
 <div class="card-surface mb-6">
     <h2 class="h4 fw-bold mb-3">Add Expense</h2>
     <?php if (($matchContributorIds ?? []) === []): ?>
-        <div class="alert alert-warning">Set match contributors before adding expenses.</div>
+        <div class="text-danger mb-3">Set match contributors before adding expenses.</div>
     <?php endif; ?>
     <form action="<?= site_url('/admin/matches/' . $match['id'] . '/expenses') ?>" method="post">
         <?= csrf_field() ?>
@@ -218,7 +214,7 @@ $tossDecisionLabel = match ((string) ($match['toss_decision'] ?? '')) {
                         <tr>
                             <td>
                                 <div class="fw-semibold"><?= esc($expense['title']) ?></div>
-                                <?php if (! empty($expense['notes'])): ?>
+                                <?php if (!empty($expense['notes'])): ?>
                                     <div class="text-secondary small"><?= esc($expense['notes']) ?></div>
                                 <?php endif; ?>
                             </td>

@@ -61,7 +61,7 @@ class AdminMatches extends BaseController
         if (!session()->get('is_admin')) {
             return redirect()->to('/admin/login');
         }
-        return view('admin/matches/create', $this->buildMatchFormViewData());
+        return view('admin/matches/create-view', $this->buildMatchFormViewData());
     }
 
     public function edit(int $matchId): ResponseInterface|string
@@ -76,7 +76,7 @@ class AdminMatches extends BaseController
             throw PageNotFoundException::forPageNotFound('Match not found.');
         }
 
-        return view('admin/matches/create', $this->buildMatchFormViewData($match));
+        return view('admin/matches/create-view', $this->buildMatchFormViewData($match));
     }
 
     public function store()
@@ -751,8 +751,9 @@ class AdminMatches extends BaseController
         $db = db_connect();
 
         $matchPlayerRows = $db->table('match_players mp')
-            ->select('mp.player_id, mp.side, mp.batting_position, p.name')
+            ->select('mp.player_id, mp.side, mp.batting_position, p.name, p.status, guest_of.name AS guest_of_name')
             ->join('players p', 'p.id = mp.player_id')
+            ->join('players guest_of', 'guest_of.id = p.guest_of_player_id', 'left')
             ->where('mp.match_id', $matchId)
             ->orderBy('mp.batting_position', 'ASC')
             ->orderBy('p.name', 'ASC')
@@ -1103,16 +1104,57 @@ class AdminMatches extends BaseController
             $extrasByInnings[(int) $row['innings_number']] = $row;
         }
 
+        $squadRows = $db->table('match_players mp')
+            ->select('mp.player_id, mp.side, p.name AS player_name')
+            ->join('players p', 'p.id = mp.player_id')
+            ->where('mp.match_id', $matchId)
+            ->orderBy('mp.batting_position', 'ASC')
+            ->get()->getResultArray();
+
+        $squadBySide = ['team_a' => [], 'team_b' => []];
+        foreach ($squadRows as $row) {
+            $side = $row['side'];
+            if (array_key_exists($side, $squadBySide)) {
+                $squadBySide[$side][] = [
+                    'player_id'   => (int) $row['player_id'],
+                    'player_name' => $row['player_name'],
+                ];
+            }
+        }
+
+        $inns1BowlingSide = $inns1BattingSide === 'team_a' ? 'team_b' : 'team_a';
+        $innsSides = [
+            1 => ['bowl' => $inns1BowlingSide],
+            2 => ['bowl' => $inns1BattingSide],
+        ];
+
+        $didNotBowlByInnings = [];
+        foreach ([1, 2] as $inns) {
+            $bowlSide  = $innsSides[$inns]['bowl'];
+            $bowledIds = array_map(
+                static fn($r) => (int) $r['player_id'],
+                array_filter(
+                    $bowlingByInnings[$inns] ?? [],
+                    static fn($r) => $r['overs'] !== null && (float) $r['overs'] > 0.0
+                )
+            );
+            $didNotBowlByInnings[$inns] = array_values(array_filter(
+                $squadBySide[$bowlSide],
+                static fn($p) => !in_array($p['player_id'], $bowledIds, true)
+            ));
+        }
+
         return view('admin/matches/scoreboard-preview-view', [
-            'activeNav'        => 'matches',
-            'match'            => $match,
-            'matchNumber'      => $matchNumber,
+            'activeNav' => 'matches',
+            'match' => $match,
+            'matchNumber' => $matchNumber,
             'inns1BattingSide' => $inns1BattingSide,
             'battingByInnings' => $battingByInnings,
             'bowlingByInnings' => $bowlingByInnings,
             'wicketsByInnings' => $wicketsByInnings,
-            'extrasByInnings'  => $extrasByInnings,
-            'publicHash'       => scoreboard_encode($matchId),
+            'extrasByInnings' => $extrasByInnings,
+            'didNotBowlByInnings' => $didNotBowlByInnings,
+            'publicHash' => scoreboard_encode($matchId),
         ]);
     }
 

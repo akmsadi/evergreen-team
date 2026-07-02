@@ -65,9 +65,9 @@ class AdminPlayers extends BaseController
         $matrix = $this->matchFinance->buildFinanceMatrix($players);
 
         return view('admin/players/finance-overview-view', [
-            'username'     => session()->get('admin_username'),
-            'matches'      => $matrix['matches'],
-            'playerRows'   => $matrix['playerRows'],
+            'username' => session()->get('admin_username'),
+            'matches' => $matrix['matches'],
+            'playerRows' => $matrix['playerRows'],
             'generalTotal' => $matrix['generalTotal'],
         ]);
     }
@@ -78,7 +78,7 @@ class AdminPlayers extends BaseController
             return redirect()->to('/admin/login');
         }
 
-        return view('admin/players/create', [
+        return view('admin/players/create-view', [
             'username' => session()->get('admin_username'),
             'approvedPlayers' => $this->approvedPlayers(),
         ]);
@@ -391,6 +391,7 @@ class AdminPlayers extends BaseController
             'playerOverview' => $this->matchFinance->buildPlayerOverview($players),
             'deposits' => $this->matchFinance->getAllDeposits(),
             'matchExpenseSummary' => $this->matchFinance->getMatchExpenseSummary(),
+            'generalExpenses' => $this->matchFinance->getGeneralExpenses(),
             'playerCount' => count($players),
             'approvedCount' => count(array_filter($players, static fn(array $player): bool => ($player['status'] ?? '') === 'approved')),
             'pendingCount' => count(array_filter($players, static fn(array $player): bool => ($player['status'] ?? '') === 'pending')),

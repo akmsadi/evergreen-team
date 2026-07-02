@@ -107,7 +107,7 @@
     </div>
 
     <div class="row mb-8">
-        <div class="col-lg-6">
+        <div class="col-lg-6 mb-5 mb-lg-0">
             <div class="panel">
                 <div class="recent-panel-header">
                     <div>
@@ -144,7 +144,7 @@
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="panel mb-8">
+            <div class="panel">
                 <div class="recent-panel-header">
                     <div>
                         <h2 class="h4 mb-2">Recent Players</h2>
@@ -183,7 +183,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-6 mb-5 mb-lg-0">
             <div class="panel">
                 <h2 class="h4 mb-2">Top 10 Batsmen</h2>
                 <p class="text-secondary mb-3">Ranked by total runs across recorded match balls.</p>
@@ -333,7 +333,6 @@
                         title: {
                             display: true,
                             text: 'Month',
-                            color: '#14532d',
                             font: { weight: 'bold' }
                         },
                         ticks: {
@@ -350,7 +349,6 @@
                         title: {
                             display: true,
                             text: 'Matches',
-                            color: '#14532d',
                             font: { weight: 'bold' }
                         },
                         grid: { color: '#d1d5db' },
@@ -403,14 +401,14 @@
                 },
                 scales: {
                     x: {
-                        title: { display: true, text: 'Match', color: '#14532d', font: { weight: 'bold' } },
+                        title: { display: true, text: 'Match', font: { weight: 'bold' } },
                         ticks: { color: '#374151', maxRotation: 45, minRotation: 45 },
                         grid: { display: false },
                         border: { display: false }
                     },
                     y: {
                         beginAtZero: true,
-                        title: { display: true, text: 'Expenses', color: '#14532d', font: { weight: 'bold' } },
+                        title: { display: true, text: 'Expenses', font: { weight: 'bold' } },
                         ticks: { color: '#374151' },
                         grid: { color: '#d1d5db' },
                         border: { display: false }

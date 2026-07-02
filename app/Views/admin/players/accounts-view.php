@@ -1,59 +1,5 @@
 <?= $this->extend('admin/template/default') ?>
 
-<?= $this->section('styles') ?>
-<style {csp-style-nonce}>
-    .account-summary-card {
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(15, 23, 42, 0.08);
-        border-radius: 1.25rem;
-        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
-    }
-
-    .account-summary-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.45), transparent 42%);
-        pointer-events: none;
-    }
-
-    .account-summary-card__label {
-        color: rgba(15, 23, 42, 0.72);
-        font-size: 0.78rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-    }
-
-    .account-summary-card__value {
-        color: #0f172a;
-        font-size: clamp(2rem, 4vw, 2.75rem);
-        font-weight: 700;
-        line-height: 1;
-        margin-top: 0.5rem;
-    }
-
-    .account-summary-card__note {
-        color: rgba(15, 23, 42, 0.72);
-        font-size: 0.9rem;
-        margin-top: 0.75rem;
-    }
-
-    .account-summary-card--deposited {
-        background: linear-gradient(145deg, #eefbf3 0%, #dff5e8 58%, #d3eddd 100%);
-    }
-
-    .account-summary-card--owed {
-        background: linear-gradient(145deg, #fff8e7 0%, #ffefc7 58%, #fde5a0 100%);
-    }
-
-    .account-summary-card--balance {
-        background: linear-gradient(145deg, #eff6ff 0%, #dbeafe 58%, #bfdbfe 100%);
-    }
-</style>
-<?= $this->endSection() ?>
-
 <?= $this->section('content') ?>
 <?php $depositErrors = session()->getFlashdata('deposit_errors') ?? []; ?>
 <?php $depositUpdateErrors = session()->getFlashdata('deposit_update_errors') ?? []; ?>
@@ -81,35 +27,26 @@
 
     <div class="row g-4 mb-4">
         <div class="col-md-4">
-            <div class="summary-card account-summary-card account-summary-card--owed p-4 h-100">
-                <div class="account-summary-card__label">Total Expenses</div>
-                <div class="account-summary-card__value"><?= esc(number_format($totalOwed, 2)) ?></div>
-                <div class="account-summary-card__note">Total expenses from matches.</div>
+            <div class="summary-card p-4 h-100">
+                <div class="summary-label">Total Expenses</div>
+                <div class="summary-value"><?= esc(number_format($totalOwed, 2)) ?></div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="summary-card account-summary-card account-summary-card--deposited p-4 h-100">
-                <div class="account-summary-card__label">Deposited</div>
-                <div class="account-summary-card__value"><?= esc(number_format($totalDeposited, 2)) ?></div>
-                <div class="account-summary-card__note">Total player deposits recorded.</div>
+            <div class="summary-card p-4 h-100">
+                <div class="summary-label">Deposited</div>
+                <div class="summary-value"><?= esc(number_format($totalDeposited, 2)) ?></div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="summary-card account-summary-card account-summary-card--balance p-4 h-100">
-                <div class="account-summary-card__label">Net Balance</div>
-                <div class="account-summary-card__value"><?= esc(number_format($totalBalance, 2)) ?></div>
-                <div class="account-summary-card__note">Positive means overpaid, negative means still outstanding.</div>
+            <div class="summary-card p-4 h-100">
+                <div class="summary-label">Net Balance</div>
+                <div class="summary-value"><?= esc(number_format($totalBalance, 2)) ?></div>
             </div>
         </div>
     </div>
 
     <div class="panel">
-        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-            <div>
-                <h2 class="h4 mb-1">Player Accounts</h2>
-                <p class="text-secondary mb-0">Review total recorded expenses for each player from the accounts overview.</p>
-            </div>
-        </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle admin-table">
                 <thead>
@@ -121,11 +58,11 @@
                         <th class="text-end">Deposited</th>
                         <th class="text-end">Owed</th>
                         <th class="text-end">Balance</th>
-                        <th>Payment Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($playerOverview as $entry): ?>
+                        <?php $bal = (float) $entry['balance']; ?>
                         <tr>
                             <td><?= esc($entry['player']['name']) ?></td>
                             <td><?= esc($entry['player']['phone']) ?></td>
@@ -146,26 +83,18 @@
                             <td><?= esc((string) $entry['match_count']) ?></td>
                             <td class="text-end"><?= esc(number_format((float) $entry['deposited'], 2)) ?></td>
                             <td class="text-end"><?= esc(number_format((float) $entry['owed'], 2)) ?></td>
-                            <td class="text-end"><?= esc(number_format((float) $entry['balance'], 2)) ?></td>
-                            <td>
-                                <?php if ($entry['status'] === 'overpaid'): ?>
-                                    <span class="badge-soft-success">Overpaid</span>
-                                <?php elseif ($entry['status'] === 'underpaid'): ?>
-                                    <span class="badge-soft-danger">Underpaid</span>
-                                <?php else: ?>
-                                    <span class="badge-soft-warning">Settled</span>
-                                <?php endif; ?>
+                            <td class="text-end <?= $bal > 0 ? 'text-success' : ($bal < 0 ? 'text-danger' : 'text-secondary') ?>">
+                                <?= esc(number_format($bal, 2)) ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="4" class="text-end">Total</th>
+                        <th colspan=" 4" class="text-end">Total</th>
                         <th class="text-end"><?= esc(number_format($totalDeposited, 2)) ?></th>
                         <th class="text-end"><?= esc(number_format($totalOwed, 2)) ?></th>
                         <th class="text-end"><?= esc(number_format($totalBalance, 2)) ?></th>
-                        <th></th>
                     </tr>
                 </tfoot>
             </table>
@@ -179,8 +108,8 @@
                 <p class="text-secondary mb-0">Review total recorded expenses for each match from the accounts overview.</p>
             </div>
         </div>
-        <?php if ($matchExpenseSummary === []): ?>
-            <p class="text-secondary mb-0">No match expenses recorded yet.</p>
+        <?php if ($matchExpenseSummary === [] && $generalExpenses === []): ?>
+            <p class="text-secondary mb-0">No expenses recorded yet.</p>
         <?php else: ?>
             <div class="table-responsive">
                 <table class="table table-hover align-middle admin-table">
@@ -226,6 +155,38 @@
                     </tfoot>
                 </table>
             </div>
+            <?php if ($generalExpenses !== []): ?>
+                <?php
+                $totalGeneralExpense = array_sum(array_map(static fn($e) => (float) ($e['amount'] ?? 0), $generalExpenses));
+                ?>
+                <h3 class="h6 fw-semibold mt-4 mb-2 text-secondary">General Expenses</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle admin-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($generalExpenses as $ge): ?>
+                                <tr>
+                                    <td><?= esc($ge['title'] ?? '—') ?></td>
+                                    <td><?= esc($ge['notes'] ?? '—') ?></td>
+                                    <td class="text-end"><?= esc(number_format((float) ($ge['amount'] ?? 0), 2)) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="2" class="text-end">Total</th>
+                                <th class="text-end"><?= esc(number_format($totalGeneralExpense, 2)) ?></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>

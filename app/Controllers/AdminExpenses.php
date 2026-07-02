@@ -22,8 +22,8 @@ class AdminExpenses extends BaseController
         parent::initController($request, $response, $logger);
         helper(['form', 'url']);
         $this->matchExpenses = new MatchExpenseModel();
-        $this->matchFinance  = new MatchFinanceService();
-        $this->players       = new PlayerModel();
+        $this->matchFinance = new MatchFinanceService();
+        $this->players = new PlayerModel();
     }
 
     public function index(): ResponseInterface|string
@@ -33,12 +33,12 @@ class AdminExpenses extends BaseController
         }
 
         return view('admin/expenses/index-view', [
-            'activeNav'          => 'expenses',
-            'expenses'           => $this->matchFinance->getGeneralExpenses(),
-            'players'            => $this->players->where('status !=', 'rejected')->orderBy('name', 'ASC')->findAll(),
-            'expenseErrors'      => session()->getFlashdata('expense_errors') ?? [],
+            'activeNav' => 'expenses',
+            'expenses' => $this->matchFinance->getGeneralExpenses(),
+            'players' => $this->players->where('status =', 'approved')->orderBy('name', 'ASC')->findAll(),
+            'expenseErrors' => session()->getFlashdata('expense_errors') ?? [],
             'expenseUpdateErrors' => session()->getFlashdata('expense_update_errors') ?? [],
-            'expenseEditId'      => (int) (session()->getFlashdata('expense_edit_id') ?? 0),
+            'expenseEditId' => (int) (session()->getFlashdata('expense_edit_id') ?? 0),
         ]);
     }
 
@@ -49,9 +49,9 @@ class AdminExpenses extends BaseController
         }
 
         $rules = [
-            'expense_title'  => 'required|min_length[2]',
+            'expense_title' => 'required|min_length[2]',
             'expense_amount' => 'required|decimal|greater_than[0]',
-            'expense_notes'  => 'permit_empty|string',
+            'expense_notes' => 'permit_empty|string',
         ];
 
         if (!$this->validate($rules)) {
@@ -72,9 +72,9 @@ class AdminExpenses extends BaseController
 
         $expenseId = $this->matchExpenses->insert([
             'match_id' => null,
-            'title'    => (string) $this->request->getPost('expense_title'),
-            'amount'   => $this->normalizeAmount((string) $this->request->getPost('expense_amount')),
-            'notes'    => $this->emptyToNull((string) $this->request->getPost('expense_notes')),
+            'title' => (string) $this->request->getPost('expense_title'),
+            'amount' => $this->normalizeAmount((string) $this->request->getPost('expense_amount')),
+            'notes' => $this->emptyToNull((string) $this->request->getPost('expense_notes')),
         ], true);
 
         $this->matchFinance->syncExpenseContributors((int) $expenseId, $contributorIds);
@@ -93,9 +93,9 @@ class AdminExpenses extends BaseController
         }
 
         $rules = [
-            'expense_title'  => 'required|min_length[2]',
+            'expense_title' => 'required|min_length[2]',
             'expense_amount' => 'required|decimal|greater_than[0]',
-            'expense_notes'  => 'permit_empty|string',
+            'expense_notes' => 'permit_empty|string',
         ];
 
         if (!$this->validate($rules)) {
@@ -117,9 +117,9 @@ class AdminExpenses extends BaseController
         }
 
         $this->matchExpenses->update($expenseId, [
-            'title'  => (string) $this->request->getPost('expense_title'),
+            'title' => (string) $this->request->getPost('expense_title'),
             'amount' => $this->normalizeAmount((string) $this->request->getPost('expense_amount')),
-            'notes'  => $this->emptyToNull((string) $this->request->getPost('expense_notes')),
+            'notes' => $this->emptyToNull((string) $this->request->getPost('expense_notes')),
         ]);
 
         $this->matchFinance->syncExpenseContributors($expenseId, $contributorIds);

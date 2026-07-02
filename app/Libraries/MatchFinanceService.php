@@ -57,8 +57,9 @@ class MatchFinanceService
     public function getParticipants(int $matchId): array
     {
         return $this->matchPlayers
-            ->select('match_players.player_id, match_players.side, match_players.playing_xi, match_players.is_captain, players.name')
+            ->select('match_players.player_id, match_players.side, match_players.playing_xi, match_players.is_captain, players.name, players.status, guest_of.name AS guest_of_name')
             ->join('players', 'players.id = match_players.player_id')
+            ->join('players AS guest_of', 'guest_of.id = players.guest_of_player_id', 'left')
             ->where('match_players.match_id', $matchId)
             ->orderBy('players.name', 'ASC')
             ->findAll();
@@ -165,10 +166,10 @@ class MatchFinanceService
         $now = date('Y-m-d H:i:s');
         foreach ($playerIds as $playerId) {
             $db->table('match_expense_contributors')->insert([
-                'expense_id'  => $expenseId,
-                'player_id'   => $playerId,
-                'created_at'  => $now,
-                'updated_at'  => $now,
+                'expense_id' => $expenseId,
+                'player_id' => $playerId,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
     }
@@ -277,7 +278,7 @@ class MatchFinanceService
         $rows = array_reverse($rows);
 
         return array_map(static function (array $row): array {
-            $label = $row['scheduled_at'] ? date('d M Y', strtotime($row['scheduled_at'])) : 'TBD';
+            $label = $row['scheduled_at'] ? date('d M', strtotime($row['scheduled_at'])) : 'TBD';
             return [
                 'label' => $label,
                 'amount' => round((float) $row['total_expense'], 2),
@@ -625,18 +626,18 @@ class MatchFinanceService
             $deposited = round($depositTotals[$playerId] ?? 0.0, 2);
 
             $playerRows[] = [
-                'player'        => $player,
-                'deposited'     => $deposited,
-                'owed'          => $totalOwed,
-                'balance'       => round($deposited - $totalOwed, 2),
-                'match_shares'  => $matchShares,
+                'player' => $player,
+                'deposited' => $deposited,
+                'owed' => $totalOwed,
+                'balance' => round($deposited - $totalOwed, 2),
+                'match_shares' => $matchShares,
                 'general_share' => $generalShare,
             ];
         }
 
         return [
-            'matches'      => $matches,
-            'playerRows'   => $playerRows,
+            'matches' => $matches,
+            'playerRows' => $playerRows,
             'generalTotal' => $generalTotal,
         ];
     }
@@ -846,8 +847,8 @@ class MatchFinanceService
             return [];
         }
 
-        $matchExpenses    = [];
-        $generalExpenses  = [];
+        $matchExpenses = [];
+        $generalExpenses = [];
 
         foreach ($expenses as $expense) {
             if ($expense['match_id'] !== null && (int) $expense['match_id'] > 0) {
@@ -860,7 +861,8 @@ class MatchFinanceService
         // Match-bound expenses: contributors come from match_contributors table
         if ($matchExpenses !== []) {
             $matchIds = array_values(array_unique(array_map(
-                static fn(array $e): int => (int) $e['match_id'], $matchExpenses
+                static fn(array $e): int => (int) $e['match_id'],
+                $matchExpenses
             )));
             $contributors = $this->matchContributors
                 ->select('match_contributors.match_id, match_contributors.player_id, players.name')
@@ -873,7 +875,7 @@ class MatchFinanceService
             foreach ($contributors as $contributor) {
                 $contributorsByMatch[(int) $contributor['match_id']][] = [
                     'player_id' => (int) $contributor['player_id'],
-                    'name'      => $contributor['name'],
+                    'name' => $contributor['name'],
                 ];
             }
 
@@ -886,7 +888,8 @@ class MatchFinanceService
         // General (no match) expenses: contributors come from match_expense_contributors table
         if ($generalExpenses !== []) {
             $expenseIds = array_values(array_unique(array_map(
-                static fn(array $e): int => (int) $e['id'], $generalExpenses
+                static fn(array $e): int => (int) $e['id'],
+                $generalExpenses
             )));
             $rows = db_connect()
                 ->table('match_expense_contributors mec')
@@ -901,7 +904,7 @@ class MatchFinanceService
             foreach ($rows as $row) {
                 $contributorsByExpense[(int) $row['expense_id']][] = [
                     'player_id' => (int) $row['player_id'],
-                    'name'      => $row['name'],
+                    'name' => $row['name'],
                 ];
             }
 
@@ -952,7 +955,8 @@ class MatchFinanceService
             ->findAll();
 
         $matchIds = array_values(array_unique(array_map(
-            static fn(array $row): int => (int) $row['match_id'], $linkedContributors
+            static fn(array $row): int => (int) $row['match_id'],
+            $linkedContributors
         )));
 
         $matchExpenses = $matchIds !== []
@@ -969,7 +973,8 @@ class MatchFinanceService
             ->getResultArray();
 
         $generalExpenseIds = array_values(array_unique(array_map(
-            static fn(array $row): int => (int) $row['expense_id'], $linkedRows
+            static fn(array $row): int => (int) $row['expense_id'],
+            $linkedRows
         )));
 
         $generalExpenses = $generalExpenseIds !== []

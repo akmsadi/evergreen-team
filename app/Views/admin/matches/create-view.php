@@ -12,7 +12,7 @@
         </div>
         <?php if (($match ?? null) !== null): ?>
             <div class="d-flex gap-2 flex-wrap">
-                <a href="<?= site_url('/admin/matches/' . $match['id']) ?>" class="btn btn-light border">Match Overview</a>
+                <a href="<?= site_url('/admin/matches/' . $match['id']) ?>" class="btn btn-primary">Match Overview</a>
             </div>
         <?php endif; ?>
     </div>
@@ -85,14 +85,14 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="team_name" class="form-label fw-semibold">Team A Name</label>
-                <input type="text" class="form-control<?= isset($errors['team_name']) ? ' is-invalid' : '' ?>" id="team_name" name="team_name" value="<?= esc(old('team_name', $match['team_name'] ?? 'Challengers Red')) ?>" <?= $fieldLockAttr ?>>
+                <input type="text" class="form-control<?= isset($errors['team_name']) ? ' is-invalid' : '' ?>" id="team_name" name="team_name" value="<?= esc(old('team_name', $match['team_name'] ?? 'Challenger Red')) ?>" <?= $fieldLockAttr ?>>
                 <?php if (isset($errors['team_name'])): ?>
                     <div class="invalid-feedback"><?= esc($errors['team_name']) ?></div>
                 <?php endif; ?>
             </div>
             <div class="col-md-6">
                 <label for="opponent_name" class="form-label fw-semibold">Team B Name</label>
-                <input type="text" class="form-control<?= isset($errors['opponent_name']) ? ' is-invalid' : '' ?>" id="opponent_name" name="opponent_name" value="<?= esc(old('opponent_name', $match['opponent_name'] ?? 'Challengers Blue')) ?>" <?= $fieldLockAttr ?>>
+                <input type="text" class="form-control<?= isset($errors['opponent_name']) ? ' is-invalid' : '' ?>" id="opponent_name" name="opponent_name" value="<?= esc(old('opponent_name', $match['opponent_name'] ?? 'Challenger Blue')) ?>" <?= $fieldLockAttr ?>>
                 <?php if (isset($errors['opponent_name'])): ?>
                     <div class="invalid-feedback"><?= esc($errors['opponent_name']) ?></div>
                 <?php endif; ?>
@@ -169,8 +169,8 @@
                         ['id' => 'pool-external', 'label' => 'External', 'color' => 'text-secondary', 'players' => $externalPlayers],
                     ];
                     ?>
-                    <?php foreach ($poolSections as $section): ?>
-                        <div class="col-md-4">
+                    <?php foreach ($poolSections as $key => $section): ?>
+                        <div class="col-md-<?= !$key ? 6 : 3 ?>">
                             <div class="border rounded p-2 bg-white h-100">
                                 <div class="fw-semibold small mb-2 px-1 <?= esc($section['color']) ?>">
                                     <?= esc($section['label']) ?>
@@ -180,8 +180,8 @@
                                     <?php foreach ($section['players'] as $p): ?>
                                         <?php if (in_array((int) $p['id'], $assignedIds, true))
                                             continue; ?>
-                                        <div class="player-card pool-card" <?= empty($isMatchLocked) ? 'draggable="true"' : '' ?> data-player-id="<?= esc((string) $p['id']) ?>">
-                                            <?= esc($p['name']) ?>
+                                        <div class="player-card pool-card bg-body-tertiary" <?= empty($isMatchLocked) ? 'draggable="true"' : '' ?> data-player-id="<?= esc((string) $p['id']) ?>">
+                                            ⠿ <?= esc($p['name']) ?>
                                             <?php if (!empty($guestLabel($p))): ?>
                                                 <span class="text-secondary ms-1" style="font-size:0.78em"><?= $guestLabel($p) ?></span>
                                             <?php endif; ?>
@@ -372,12 +372,14 @@
         border-radius: 4px;
         transition: background-color 0.15s, outline 0.15s;
     }
+
     .player-pool.pool-two-col {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 5px;
         align-content: start;
     }
+
     .player-pool.pool-two-col .player-card {
         margin-bottom: 0;
     }

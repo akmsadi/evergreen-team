@@ -5,7 +5,7 @@
     <div class="panel">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-6">
             <div>
-                <h1 class="h2 fw-bold mb-2">General Expenses</h1>
+                <h1 class="h2 mb-2">General Expenses</h1>
                 <p class="text-secondary mb-0">Record shared costs not tied to a specific match — equipment, accessories, and other club expenses.</p>
             </div>
         </div>
@@ -18,7 +18,6 @@
         <?php endif; ?>
 
         <div class="card-surface mb-6">
-            <h2 class="h4 fw-bold mb-3">Add Expense</h2>
             <form action="<?= site_url('/admin/expenses') ?>" method="post">
                 <?= csrf_field() ?>
                 <div class="row g-3">
@@ -53,12 +52,8 @@
                         <div class="row g-2" data-add-contributors>
                             <?php foreach ($players as $player): ?>
                                 <div class="col-md-4 col-lg-3">
-                                    <div class="form-check border rounded-3 px-3 py-2">
-                                        <input class="form-check-input" type="checkbox"
-                                            id="contributor_<?= esc((string) $player['id']) ?>"
-                                            name="contributor_ids[]"
-                                            value="<?= esc((string) $player['id']) ?>"
-                                            <?= in_array((int) $player['id'], $oldContributorIds, true) ? 'checked' : '' ?>>
+                                    <div class="form-check px-3 py-2">
+                                        <input class="form-check-input" type="checkbox" id="contributor_<?= esc((string) $player['id']) ?>" name="contributor_ids[]" value="<?= esc((string) $player['id']) ?>" <?= in_array((int) $player['id'], $oldContributorIds, true) ? 'checked' : '' ?>>
                                         <label class="form-check-label" for="contributor_<?= esc((string) $player['id']) ?>">
                                             <?= esc($player['name']) ?>
                                             <?php if (($player['status'] ?? '') === 'pending'): ?>
@@ -112,7 +107,8 @@
                                     </td>
                                     <td><?= esc(number_format((float) $expense['amount'], 2)) ?></td>
                                     <td>
-                                        <?= esc($expense['contributors'] === []
+                                        <?= esc(
+                                            $expense['contributors'] === []
                                             ? 'No contributors'
                                             : 'Shared across ' . count($expense['contributors']) . ' contributor' . (count($expense['contributors']) === 1 ? '' : 's')
                                         ) ?>
@@ -123,21 +119,13 @@
                                                     <?= csrf_field() ?>
                                                     <div class="row g-2">
                                                         <div class="col-12">
-                                                            <input type="text"
-                                                                class="form-control form-control-sm<?= $isEditing && isset($expenseUpdateErrors['expense_title']) ? ' is-invalid' : '' ?>"
-                                                                name="expense_title"
-                                                                value="<?= esc($isEditing ? old('expense_title', $expense['title']) : $expense['title']) ?>"
-                                                                placeholder="Expense title">
+                                                            <input type="text" class="form-control form-control-sm<?= $isEditing && isset($expenseUpdateErrors['expense_title']) ? ' is-invalid' : '' ?>" name="expense_title" value="<?= esc($isEditing ? old('expense_title', $expense['title']) : $expense['title']) ?>" placeholder="Expense title">
                                                             <?php if ($isEditing && isset($expenseUpdateErrors['expense_title'])): ?>
                                                                 <div class="invalid-feedback"><?= esc($expenseUpdateErrors['expense_title']) ?></div>
                                                             <?php endif; ?>
                                                         </div>
                                                         <div class="col-12">
-                                                            <input type="number" step="0.01" min="0.01"
-                                                                class="form-control form-control-sm<?= $isEditing && isset($expenseUpdateErrors['expense_amount']) ? ' is-invalid' : '' ?>"
-                                                                name="expense_amount"
-                                                                value="<?= esc($isEditing ? old('expense_amount', $expense['amount']) : $expense['amount']) ?>"
-                                                                placeholder="Amount">
+                                                            <input type="number" step="0.01" min="0.01" class="form-control form-control-sm<?= $isEditing && isset($expenseUpdateErrors['expense_amount']) ? ' is-invalid' : '' ?>" name="expense_amount" value="<?= esc($isEditing ? old('expense_amount', $expense['amount']) : $expense['amount']) ?>" placeholder="Amount">
                                                             <?php if ($isEditing && isset($expenseUpdateErrors['expense_amount'])): ?>
                                                                 <div class="invalid-feedback"><?= esc($expenseUpdateErrors['expense_amount']) ?></div>
                                                             <?php endif; ?>
@@ -154,11 +142,7 @@
                                                                 <?php foreach ($players as $player): ?>
                                                                     <div class="col-md-6">
                                                                         <div class="form-check border rounded-3 px-2 py-1">
-                                                                            <input class="form-check-input" type="checkbox"
-                                                                                id="edit_contributor_<?= esc((string) $expense['id']) ?>_<?= esc((string) $player['id']) ?>"
-                                                                                name="contributor_ids[]"
-                                                                                value="<?= esc((string) $player['id']) ?>"
-                                                                                <?= in_array((int) $player['id'], $editContributorIds, true) ? 'checked' : '' ?>>
+                                                                            <input class="form-check-input" type="checkbox" id="edit_contributor_<?= esc((string) $expense['id']) ?>_<?= esc((string) $player['id']) ?>" name="contributor_ids[]" value="<?= esc((string) $player['id']) ?>" <?= in_array((int) $player['id'], $editContributorIds, true) ? 'checked' : '' ?>>
                                                                             <label class="form-check-label small" for="edit_contributor_<?= esc((string) $expense['id']) ?>_<?= esc((string) $player['id']) ?>">
                                                                                 <?= esc($player['name']) ?>
                                                                                 <?php if (($player['status'] ?? '') === 'pending'): ?>
@@ -193,24 +177,24 @@
 </div>
 
 <script>
-(() => {
-    const addGrid = document.querySelector('[data-add-contributors]');
-    if (addGrid) {
-        const checkboxes = Array.from(addGrid.querySelectorAll('input[type="checkbox"]'));
-        const countEl = document.querySelector('[data-add-selected-count]');
+    (() => {
+        const addGrid = document.querySelector('[data-add-contributors]');
+        if (addGrid) {
+            const checkboxes = Array.from(addGrid.querySelectorAll('input[type="checkbox"]'));
+            const countEl = document.querySelector('[data-add-selected-count]');
 
-        const sync = () => {
-            if (countEl) countEl.textContent = checkboxes.filter(c => c.checked).length + ' selected';
-        };
+            const sync = () => {
+                if (countEl) countEl.textContent = checkboxes.filter(c => c.checked).length + ' selected';
+            };
 
-        sync();
-        checkboxes.forEach(c => c.addEventListener('change', sync));
-
-        document.querySelector('[data-check-all-add]')?.addEventListener('click', () => {
-            checkboxes.forEach(c => { c.checked = true; });
             sync();
-        });
-    }
-})();
+            checkboxes.forEach(c => c.addEventListener('change', sync));
+
+            document.querySelector('[data-check-all-add]')?.addEventListener('click', () => {
+                checkboxes.forEach(c => { c.checked = true; });
+                sync();
+            });
+        }
+    })();
 </script>
 <?= $this->endSection() ?>

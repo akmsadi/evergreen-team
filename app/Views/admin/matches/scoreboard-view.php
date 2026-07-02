@@ -27,7 +27,7 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                 <a href="<?= site_url('/admin/matches/' . $match['id']) ?>" class="btn btn-light border">Back to Match</a>
                 <form action="<?= site_url('/admin/matches/' . $match['id'] . '/complete') ?>" method="post" onsubmit="return confirm('Mark this match as completed? The scoreboard will become read-only.');">
                     <?= csrf_field() ?>
-                    <button type="submit" class="btn btn-success">Complete Match</button>
+                    <button type="submit" class="btn btn-primary">Complete Match</button>
                 </form>
             </div>
         </div>
@@ -38,7 +38,7 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
     <?php endif; ?>
 
     <div class="card mb-4">
-        <div class="card-header">Toss</div>
+        <div class="card-header bg-body-tertiary">Toss</div>
         <form action="<?= site_url('/admin/matches/' . $match['id'] . '/scoreboard/toss') ?>" method="post" class="card-body">
             <?= csrf_field() ?>
             <div class="row g-2 align-items-end">
@@ -75,7 +75,7 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
         $existBowl = $bowlersByInnings[$inns] ?? [];
         ?>
         <div class="card mb-4">
-            <div class="card-header">
+            <div class="card-header bg-body-tertiary">
                 Innings <?= $inns ?>
             </div>
             <div class="card-body">
@@ -119,7 +119,12 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                                             <tr>
                                                 <td class="drag-handle text-secondary" style="cursor:grab">⠿</td>
                                                 <td><?= $key + 1 ?></td>
-                                                <td class="fw-semibold"><?= esc($player['name']) ?></td>
+                                                <td class="fw-semibold">
+                                                    <?= esc($player['name']) ?>
+                                                    <?php if (($player['status'] ?? '') === 'guest' && !empty($player['guest_of_name'])): ?>
+                                                        <span class="text-secondary small">(Guest - <?= esc($player['guest_of_name']) ?>)</span>
+                                                    <?php endif; ?>
+                                                </td>
                                                 <input type="hidden" name="batsmen[<?= $pid ?>][sort_order]" class="sort-order-input" value="<?= esc((string) ($ex['sort_order'] ?? 0)) ?>">
                                                 <td><input type="number" name="batsmen[<?= $pid ?>][runs]" class="form-control form-control-sm" value="<?= esc((string) ($ex['runs'] ?? '')) ?>" min="0" placeholder="0"></td>
                                                 <td><input type="number" name="batsmen[<?= $pid ?>][balls]" class="form-control form-control-sm" value="<?= esc((string) ($ex['balls'] ?? '')) ?>" min="0" placeholder="0"></td>
@@ -137,7 +142,9 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                                                     <select name="batsmen[<?= $pid ?>][dismissal_by]" class="form-select form-select-sm">
                                                         <option value="">—</option>
                                                         <?php foreach ($bowlers as $bowler): ?>
-                                                            <option value="<?= esc((string) $bowler['player_id']) ?>" <?= (int) ($ex['dismissal_by'] ?? 0) === (int) $bowler['player_id'] ? 'selected' : '' ?>><?= esc($bowler['name']) ?></option>
+                                                            <option value="<?= esc((string) $bowler['player_id']) ?>" <?= (int) ($ex['dismissal_by'] ?? 0) === (int) $bowler['player_id'] ? 'selected' : '' ?>>
+                                                                <?= esc($bowler['name']) ?>                 <?= ($bowler['status'] ?? '') === 'guest' && !empty($bowler['guest_of_name']) ? ' (Guest - ' . esc($bowler['guest_of_name']) . ')' : '' ?>
+                                                            </option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </td>
@@ -145,7 +152,9 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                                                     <select name="batsmen[<?= $pid ?>][fielder_id]" class="form-select form-select-sm">
                                                         <option value="">—</option>
                                                         <?php foreach ($bowlers as $fielder): ?>
-                                                            <option value="<?= esc((string) $fielder['player_id']) ?>" <?= (int) ($ex['fielder_id'] ?? 0) === (int) $fielder['player_id'] ? 'selected' : '' ?>><?= esc($fielder['name']) ?></option>
+                                                            <option value="<?= esc((string) $fielder['player_id']) ?>" <?= (int) ($ex['fielder_id'] ?? 0) === (int) $fielder['player_id'] ? 'selected' : '' ?>>
+                                                                <?= esc($fielder['name']) ?>                 <?= ($fielder['status'] ?? '') === 'guest' && !empty($fielder['guest_of_name']) ? ' (Guest - ' . esc($fielder['guest_of_name']) . ')' : '' ?>
+                                                            </option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </td>
@@ -155,8 +164,8 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                                 </table>
                             </div>
                             <?php $exExtras = $extrasByInnings[$inns] ?? []; ?>
-                            <div class="border rounded p-3 mt-3 mb-3">
-                                <div class="fw-semibold small text-secondary mb-2">Extras</div>
+                            <div class="mt-3 mb-3">
+                                <div class="card-title mb-2">Extras</div>
                                 <div class="d-flex gap-3 flex-wrap">
                                     <div>
                                         <label class="form-label small mb-1">Byes</label>
@@ -195,7 +204,7 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                                     <span class="text-secondary small">Extras: <?= $extrasSum ?></span>
                                 </div>
                             <?php endif; ?>
-                            <button type="submit" class="btn btn-sm btn-primary">Save Batting</button>
+                            <button type="submit" class="btn btn-primary">Save Batting</button>
                         </form>
                     <?php endif; ?>
                 </div>
@@ -236,7 +245,12 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                                             <tr>
                                                 <td class="drag-handle text-secondary" style="cursor:grab">⠿</td>
                                                 <td><?= $key + 1 ?></td>
-                                                <td class="fw-semibold"><?= esc($player['name']) ?></td>
+                                                <td class="fw-semibold">
+                                                    <?= esc($player['name']) ?>
+                                                    <?php if (($player['status'] ?? '') === 'guest' && !empty($player['guest_of_name'])): ?>
+                                                        <span class="text-secondary small">(Guest - <?= esc($player['guest_of_name']) ?>)</span>
+                                                    <?php endif; ?>
+                                                </td>
                                                 <input type="hidden" name="bowlers[<?= $pid ?>][sort_order]" class="sort-order-input" value="<?= esc((string) ($ex['sort_order'] ?? 0)) ?>">
                                                 <td><input type="number" name="bowlers[<?= $pid ?>][overs]" class="form-control form-control-sm" value="<?= esc((string) ($ex['overs'] ?? '')) ?>" min="0" step="0.1" placeholder="0"></td>
                                                 <td><input type="number" name="bowlers[<?= $pid ?>][maidens]" class="form-control form-control-sm" value="<?= esc((string) ($ex['maidens'] ?? '')) ?>" min="0" placeholder="0"></td>
@@ -267,7 +281,7 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                                     <span class="text-secondary small"><?= $bowlOversDisplay ?> overs</span>
                                 </div>
                             <?php endif; ?>
-                            <button type="submit" class="btn btn-sm btn-primary">Save Bowling</button>
+                            <button type="submit" class="btn btn-primary">Save Bowling</button>
                         </form>
                     <?php endif; ?>
                 </div>
@@ -296,7 +310,9 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                                             <select name="wickets[<?= $i ?>][player_id]" class="form-select form-select-sm fow-player-select" required>
                                                 <option value="">Select player</option>
                                                 <?php foreach ($batters as $player): ?>
-                                                    <option value="<?= esc((string) $player['player_id']) ?>" <?= (int) $row['player_id'] === (int) $player['player_id'] ? 'selected' : '' ?>><?= esc($player['name']) ?></option>
+                                                    <option value="<?= esc((string) $player['player_id']) ?>" <?= (int) $row['player_id'] === (int) $player['player_id'] ? 'selected' : '' ?>>
+                                                        <?= esc($player['name']) ?>             <?= ($player['status'] ?? '') === 'guest' && !empty($player['guest_of_name']) ? ' (Guest - ' . esc($player['guest_of_name']) . ')' : '' ?>
+                                                    </option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </td>
@@ -309,8 +325,8 @@ $sidePlayers = static function (string $side) use ($teamAPlayers, $teamBPlayers)
                         </table>
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary fow-add-row" data-innings="<?= $inns ?>">+ Add Row</button>
-                        <button type="submit" class="btn btn-sm btn-primary">Save FOW</button>
+                        <button type="button" class="btn btn-outline-secondary fow-add-row" data-innings="<?= $inns ?>">+ Add Row</button>
+                        <button type="submit" class="btn btn-primary">Save FOW</button>
                     </div>
                 </form>
             </div>

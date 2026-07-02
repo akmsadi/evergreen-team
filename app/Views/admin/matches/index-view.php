@@ -34,7 +34,7 @@ $otherMatches = array_values(array_filter(
                 <div class="row">
                     <?php foreach ($activeMatches as $match): ?>
                         <div class="col-md-6">
-                            <div class="alert alert-<?= ($match['match_status'] ?? '') === 'scheduled' ? 'success' : 'warning' ?>">
+                            <div class="alert alert-warning">
                                 <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
                                     <div>
                                         <h2 class="h4 mb-1"><?= esc($match['team_name']) ?> vs <?= esc($match['opponent_name']) ?></h2>

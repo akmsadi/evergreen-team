@@ -1,65 +1,5 @@
 <?= $this->extend('admin/template/default') ?>
 
-<?= $this->section('admin_nav') ?>players<?= $this->endSection() ?>
-
-<?= $this->section('styles') ?>
-<style {csp-style-nonce}>
-    .player-summary-card {
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(15, 23, 42, 0.08);
-        border-radius: 1.25rem;
-        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
-    }
-
-    .player-summary-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.45), transparent 42%);
-        pointer-events: none;
-    }
-
-    .player-summary-card__label {
-        color: rgba(15, 23, 42, 0.72);
-        font-size: 0.78rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-    }
-
-    .player-summary-card__value {
-        color: #0f172a;
-        font-size: clamp(2rem, 4vw, 2.75rem);
-        font-weight: 700;
-        line-height: 1;
-        margin-top: 0.5rem;
-    }
-
-    .player-summary-card__note {
-        color: rgba(15, 23, 42, 0.72);
-        font-size: 0.9rem;
-        margin-top: 0.75rem;
-    }
-
-    .player-summary-card--players {
-        background: linear-gradient(145deg, #eefbf3 0%, #dff5e8 58%, #d3eddd 100%);
-    }
-
-    .player-summary-card--approved {
-        background: linear-gradient(145deg, #ecfdf3 0%, #d9fbe8 58%, #c7f4db 100%);
-    }
-
-    .player-summary-card--pending {
-        background: linear-gradient(145deg, #fff8e7 0%, #ffefc7 58%, #fde5a0 100%);
-    }
-
-    .player-summary-card--rejected {
-        background: linear-gradient(145deg, #fff1f2 0%, #ffe1e5 58%, #ffc9d2 100%);
-    }
-</style>
-<?= $this->endSection() ?>
-
 <?= $this->section('content') ?>
 <div class="content-card">
     <div class="panel mb-8">
@@ -81,30 +21,30 @@
         <div class="row g-4 mb-4">
             <div class="col-md-3">
                 <div class="summary-card p-4 h-100">
-                    <div class="player-summary-card__label">Players</div>
-                    <div class="player-summary-card__value"><?= esc((string) $playerCount) ?></div>
-                    <div class="player-summary-card__note">All registered players in the club pool.</div>
+                    <div class="summary-label">Players</div>
+                    <div class="summary-value"><?= esc((string) $playerCount) ?></div>
+                    <div class="summary-note">All players.</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="summary-card p-4 h-100">
-                    <div class="player-summary-card__label">Approved</div>
-                    <div class="player-summary-card__value"><?= esc((string) $approvedCount) ?></div>
-                    <div class="player-summary-card__note">Eligible for squads, deposits, and match selection.</div>
+                    <div class="summary-label">Approved</div>
+                    <div class="summary-value"><?= esc((string) $approvedCount) ?></div>
+                    <div class="summary-note">Active players.</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="summary-card p-4 h-100">
-                    <div class="player-summary-card__label">Guest</div>
-                    <div class="player-summary-card__value"><?= count($guestPlayers) ?></div>
-                    <div class="player-summary-card__note">Guests of Active players.</div>
+                    <div class="summary-label">Guest</div>
+                    <div class="summary-value"><?= esc((string) count($guestPlayers)) ?></div>
+                    <div class="summary-note">Guests of Active players.</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="summary-card p-4 h-100">
-                    <div class="player-summary-card__label">External</div>
-                    <div class="player-summary-card__value"><?= count($externalPlayers) ?></div>
-                    <div class="player-summary-card__note">External players from friendly match.</div>
+                    <div class="summary-label">External</div>
+                    <div class="summary-value"><?= esc((string) count($externalPlayers)) ?></div>
+                    <div class="summary-note">Friendly match.</div>
                 </div>
             </div>
         </div>

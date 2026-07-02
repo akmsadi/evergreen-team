@@ -69,19 +69,20 @@ a:hover {
 .summary-card {
     background-color: #E9ECEF;
     border-radius: 8px;
+    text-align: center;
 }
 
 .summary-label {
-    color: rgba(15, 23, 42, 0.72);
-    font-size: 0.78rem;
-    font-weight: 700;
     letter-spacing: 0.08em;
 }
 
 .summary-value {
-    color: #0f172a;
-    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-size: 20px;
     font-weight: 700;
     line-height: 1;
     margin-top: 0.5rem;
+}
+
+.summary-note {
+    margin-top: 0.75rem;
 }
