@@ -132,7 +132,9 @@ class AdminPlayers extends BaseController
             return $guestValidationError;
         }
 
-        $this->players->insert($this->playerPayload());
+        $payload = $this->playerPayload();
+        $payload['app_id'] = bin2hex(random_bytes(16));
+        $this->players->insert($payload);
 
         return redirect()->to('/admin/players/create')->with('success', 'Player added successfully.');
     }

@@ -15,6 +15,7 @@ class PlayerModel extends AuditableModel
         'address',
         'status',
         'guest_of_player_id',
+        'app_id',
     ];
 
     public function recentList(int $limit = 5): array

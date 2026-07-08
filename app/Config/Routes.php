@@ -10,7 +10,11 @@ use App\Controllers\AdminEvents;
 use App\Controllers\AdminExpenses;
 use App\Controllers\AdminTeams;
 use App\Controllers\Scoreboard;
+
+use App\Controllers\Api\Users as ApiUsers;
 use App\Controllers\Api\Matches as ApiMatches;
+use App\Controllers\Api\Players as ApiPlayers;
+use App\Controllers\Api\Venues as ApiVenues;
 
 /** @var RouteCollection $routes */
 
@@ -102,4 +106,8 @@ $routes->post('/admin/teams/(:num)/members/(:num)/delete', [AdminTeams::class, '
 $routes->options('api/(:any)', static function () {
     return service('response')->setStatusCode(204);
 });
+$routes->post('/api/login', [ApiUsers::class, 'login'], ['filter' => 'apikey']);
 $routes->get('/api/matches', [ApiMatches::class, 'index'], ['filter' => 'apikey']);
+$routes->get('/api/players', [ApiPlayers::class, 'index'], ['filter' => 'apikey']);
+$routes->post('/api/players', [ApiPlayers::class, 'saveList'], ['filter' => 'apikey']);
+$routes->get('/api/venues', [ApiVenues::class, 'index'], ['filter' => 'apikey']);
