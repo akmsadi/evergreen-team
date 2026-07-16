@@ -583,25 +583,31 @@ class MatchFinanceService
 
         $matches = array_values(array_filter($matches, static fn(array $m): bool => $m['total_expense'] > 0));
 
-        // General (no-match) expenses
-        $generalExpenses = $this->attachExpenseContributors(
+        // General (no-match) expenses, kept separate per expense
+        $generalExpensesRaw = $this->attachExpenseContributors(
             $this->matchExpenses->where('match_id', null)->findAll()
         );
-        $generalTotal = 0.0;
-        $generalShareByPlayer = [];
-        foreach ($generalExpenses as $expense) {
+        $generalExpenses = [];
+        $generalShareByExpensePlayer = [];
+        foreach ($generalExpensesRaw as $expense) {
             $contributorIds = array_map(static fn(array $c): int => (int) $c['player_id'], $expense['contributors']);
             $count = count($contributorIds);
             if ($count === 0) {
                 continue;
             }
-            $generalTotal += (float) $expense['amount'];
+            $expenseId = (int) $expense['id'];
             $share = round((float) $expense['amount'] / $count, 2);
             foreach ($contributorIds as $pid) {
-                $generalShareByPlayer[$pid] = ($generalShareByPlayer[$pid] ?? 0.0) + $share;
+                $generalShareByExpensePlayer[$expenseId][$pid] = $share;
             }
+            $generalExpenses[] = [
+                'id' => $expenseId,
+                'title' => $expense['title'],
+                'amount' => round((float) $expense['amount'], 2),
+                'contributor_count' => $count,
+            ];
         }
-        $generalTotal = round($generalTotal, 2);
+        $generalTotal = round(array_sum(array_column($generalExpenses, 'amount')), 2);
 
         $depositTotals = $this->calculateDepositTotalsForPlayers($this->getDepositsByPlayerIds($playerIds));
 
@@ -621,8 +627,18 @@ class MatchFinanceService
                 }
             }
 
-            $generalShare = round($generalShareByPlayer[$playerId] ?? 0.0, 2);
-            $totalOwed = round($totalOwed + $generalShare, 2);
+            $generalShares = [];
+            $generalShareTotal = 0.0;
+            foreach ($generalExpenses as $generalExpense) {
+                $geId = $generalExpense['id'];
+                $share = $generalShareByExpensePlayer[$geId][$playerId] ?? null;
+                if ($share !== null) {
+                    $generalShares[$geId] = $share;
+                    $generalShareTotal += $share;
+                }
+            }
+            $generalShareTotal = round($generalShareTotal, 2);
+            $totalOwed = round($totalOwed + $generalShareTotal, 2);
             $deposited = round($depositTotals[$playerId] ?? 0.0, 2);
 
             $playerRows[] = [
@@ -631,13 +647,14 @@ class MatchFinanceService
                 'owed' => $totalOwed,
                 'balance' => round($deposited - $totalOwed, 2),
                 'match_shares' => $matchShares,
-                'general_share' => $generalShare,
+                'general_shares' => $generalShares,
             ];
         }
 
         return [
             'matches' => $matches,
             'playerRows' => $playerRows,
+            'generalExpenses' => $generalExpenses,
             'generalTotal' => $generalTotal,
         ];
     }

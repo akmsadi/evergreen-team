@@ -68,6 +68,7 @@ class AdminPlayers extends BaseController
             'username' => session()->get('admin_username'),
             'matches' => $matrix['matches'],
             'playerRows' => $matrix['playerRows'],
+            'generalExpenses' => $matrix['generalExpenses'],
             'generalTotal' => $matrix['generalTotal'],
         ]);
     }

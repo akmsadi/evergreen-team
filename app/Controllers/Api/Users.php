@@ -49,7 +49,7 @@ class Users extends BaseController
                 ]);
         }
 
-        if (!password_verify($password, $user['password'])) {
+        if ($password !== $user['app_password']) {
             return $this->response
                 ->setStatusCode(401)
                 ->setJSON([
