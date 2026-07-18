@@ -40,7 +40,9 @@ $otherMatches = array_values(array_filter(
                                         <h2 class="h4 mb-1"><?= esc($match['team_name']) ?> vs <?= esc($match['opponent_name']) ?></h2>
                                         <div class="text-secondary small">
                                             <?= esc(ucwords(str_replace('_', ' ', $match['match_type']))) ?>
-                                            • <?= esc((string) $match['format_overs']) ?> overs
+                                            <?php if ($match['match_type'] !== 'football'): ?>
+                                                • <?= esc((string) $match['format_overs']) ?> overs
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <span class="status-pill"><?= esc($match['match_status']) ?></span>
@@ -86,7 +88,7 @@ $otherMatches = array_values(array_filter(
                             <?php foreach ($otherMatches as $match): ?>
                                 <tr>
                                     <td><?= esc($match['team_name']) ?> vs <?= esc($match['opponent_name']) ?></td>
-                                    <td><?= esc(ucwords(str_replace('_', ' ', $match['match_type']))) ?> · <?= esc((string) $match['format_overs']) ?> overs</td>
+                                    <td><?= esc(ucwords(str_replace('_', ' ', $match['match_type']))) ?><?= $match['match_type'] !== 'football' ? ' · ' . esc((string) $match['format_overs']) . ' overs' : '' ?></td>
                                     <td><?= esc($match['venue'] ?: 'TBD') ?></td>
                                     <td><?= esc(getFormattedDate($match['scheduled_at'] ?? null, 'Not set')) ?></td>
                                     <td><?= esc($match['match_status']) ?></td>

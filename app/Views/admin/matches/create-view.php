@@ -100,7 +100,7 @@
             <div class="col-md-4">
                 <label for="match_type" class="form-label fw-semibold">Match Type</label>
                 <select class="form-select<?= isset($errors['match_type']) ? ' is-invalid' : '' ?>" id="match_type" name="match_type" <?= $fieldLockAttr ?>>
-                    <?php foreach (['t20', 'test', 't10', 'odi', 'friendly'] as $type): ?>
+                    <?php foreach (['t20', 'test', 't10', 'odi', 'friendly', 'football'] as $type): ?>
                         <option value="<?= esc($type) ?>" <?= old('match_type', $match['match_type'] ?? 'limited_overs') === $type ? 'selected' : '' ?>><?= esc(ucwords(str_replace('_', ' ', $type))) ?></option>
                     <?php endforeach; ?>
                 </select>

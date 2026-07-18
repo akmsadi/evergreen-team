@@ -10,7 +10,9 @@
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <a href="<?= site_url('/admin/matches/' . $match['id'] . '/edit') ?>" class="btn btn-primary">Edit Match</a>
-                <a href="<?= site_url('/admin/matches/' . $match['id'] . '/scoreboard') ?>" class="btn btn-primary">Edit Scoreboard</a>
+                <?php if (($match['match_type'] ?? '') !== 'football'): ?>
+                    <a href="<?= site_url('/admin/matches/' . $match['id'] . '/scoreboard') ?>" class="btn btn-primary">Edit Scoreboard</a>
+                <?php endif; ?>
                 <form action="<?= site_url('/admin/matches/' . $match['id'] . '/clear-scoreboard') ?>" method="post" onsubmit="return confirm('Clear the match scoreboard? All innings and ball data will be deleted. You can then start a new scoreboard.');" class="d-inline d-none">
                     <?= csrf_field() ?>
                     <button type="submit" class="btn btn-outline-warning">Clear Scoreboard</button>

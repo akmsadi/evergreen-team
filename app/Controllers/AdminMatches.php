@@ -533,7 +533,7 @@ class AdminMatches extends BaseController
         $rules = [
             'team_name' => 'required|min_length[2]',
             'opponent_name' => 'required|min_length[2]',
-            'match_type' => 'required|in_list[limited_overs,test,t10,odi,t20,friendly]',
+            'match_type' => 'required|in_list[limited_overs,test,t10,odi,t20,friendly,football]',
             'format_overs' => 'required|integer|greater_than[0]',
             'venue_id' => 'permit_empty|integer|greater_than[0]',
             'scheduled_at' => 'permit_empty|valid_date[Y-m-d\TH:i]',
