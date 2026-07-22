@@ -21,6 +21,7 @@ use App\Controllers\Api\Venues as ApiVenues;
 // Public routes
 $routes->get('/', [HomeController::class, 'index']);
 $routes->post('/join-us', [HomeController::class, 'joinUs']);
+$routes->get('/team/(:segment)', [HomeController::class, 'team']);
 $routes->get('/matches/(:segment)/scoreboard', [Scoreboard::class, 'view']);
 
 // Auth routes

@@ -96,21 +96,34 @@ class AdminTeams extends BaseController
         }
 
         $validationError = $this->validateTeamPayload($teamId);
-
         if ($validationError !== null) {
             return $validationError;
         }
 
-        $data = ['name' => $this->normalizedName()];
+        $data = [
+            'name' => $this->normalizedName(),
+            'slug' => trim((string) $this->request->getPost('slug')),
+            'slogan' => trim((string) $this->request->getPost('slogan')),
+            'about' => trim((string) $this->request->getPost('about')),
+            'established' => (int) $this->request->getPost('established'),
+            'matches' => (int) $this->request->getPost('matches'),
+            'wins' => (int) $this->request->getPost('wins'),
+            'titles' => (int) $this->request->getPost('titles'),
+            'captain_id' => $this->request->getPost('captain_id'),
+            'vice_captain_id' => $this->request->getPost('vice_captain_id'),
+        ];
 
         $logo = $this->uploadLogo();
-
         if ($logo !== null) {
             $data['logo'] = $logo;
         }
 
-        $this->teams->update($teamId, $data);
+        $banner = $this->uploadBanner();
+        if ($banner !== null) {
+            $data['banner'] = $banner;
+        }
 
+        $this->teams->update($teamId, $data);
         return redirect()->to('/admin/teams/' . $teamId . '/edit')->with('success', 'Team updated successfully.');
     }
 
@@ -196,10 +209,27 @@ class AdminTeams extends BaseController
 
     private function validateTeamPayload(?int $teamId = null)
     {
-        $rules = [
-            'name' => 'required|min_length[2]|max_length[255]',
-            'logo' => 'permit_empty|uploaded[logo]|is_image[logo]|max_size[logo,2048]',
-        ];
+        if ($teamId) {
+            $rules = [
+                'name' => 'required|min_length[2]|max_length[255]',
+                'logo' => 'permit_empty|uploaded[logo]|is_image[logo]|max_size[logo,2048]',
+            ];
+        } else {
+            $rules = [
+                'name' => 'required|min_length[2]|max_length[255]',
+                'slug' => 'required|min_length[2]|max_length[255]',
+                'slogan' => 'required|min_length[2]|max_length[255]',
+                'about' => 'required|min_length[2]',
+                'established' => 'required|integer|greater_than[2000]|less_than_or_equal_to[' . date('Y') . ']',
+                'matches' => 'required|integer',
+                'wins' => 'required|integer',
+                'titles' => 'required|integer',
+                'logo' => 'permit_empty|uploaded[logo]|is_image[logo]|max_size[logo,2048]',
+                'banner' => 'permit_empty|uploaded[banner]|is_image[banner]|max_size[banner,2048]',
+                'captain_id' => 'permit_empty|integer',
+                'vice_captain_id' => 'permit_empty|integer',
+            ];
+        }
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
@@ -263,14 +293,22 @@ class AdminTeams extends BaseController
     private function uploadLogo(): ?string
     {
         $file = $this->request->getFile('logo');
-
         if ($file === null || !$file->isValid() || $file->hasMoved()) {
             return null;
         }
-
         $newName = $file->getRandomName();
         $file->move('assets/images/teams', $newName);
+        return $newName;
+    }
 
+    private function uploadBanner(): ?string
+    {
+        $file = $this->request->getFile('banner');
+        if ($file === null || !$file->isValid() || $file->hasMoved()) {
+            return null;
+        }
+        $newName = $file->getRandomName();
+        $file->move('assets/images/teams', $newName);
         return $newName;
     }
 

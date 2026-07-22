@@ -1014,13 +1014,103 @@ class AdminMatches extends BaseController
             return redirect()->to('/admin/login');
         }
 
-        if ($this->matches->find($matchId) === null) {
+        $match = $this->matches->find($matchId);
+        if ($match === null) {
             throw PageNotFoundException::forPageNotFound('Match not found.');
         }
 
-        $this->matches->update($matchId, ['match_status' => 'completed']);
+        $updateData = ['match_status' => 'completed'];
+
+        if (empty($match['result_summary'])) {
+            $autoResult = $this->calculateAutoResultSummary($matchId, $match);
+            if ($autoResult !== '') {
+                $updateData['result_summary'] = $autoResult;
+            }
+        }
+
+        $this->matches->update($matchId, $updateData);
 
         return redirect()->to('/admin/matches/' . $matchId . '/scoreboard/preview')->with('success', 'Match marked as completed.');
+    }
+
+    private function calculateAutoResultSummary(int $matchId, array $match): string
+    {
+        $tossWinner = (string) ($match['toss_winner'] ?? '');
+        $tossDecision = (string) ($match['toss_decision'] ?? '');
+
+        if ($tossWinner === 'team_b' && $tossDecision === 'bat') {
+            $inns1BattingSide = 'team_b';
+        } elseif ($tossWinner === 'team_b' && $tossDecision === 'bowl') {
+            $inns1BattingSide = 'team_a';
+        } elseif ($tossWinner === 'team_a' && $tossDecision === 'bowl') {
+            $inns1BattingSide = 'team_b';
+        } else {
+            $inns1BattingSide = 'team_a';
+        }
+
+        $battingSideByInnings = [1 => $inns1BattingSide, 2 => $inns1BattingSide === 'team_a' ? 'team_b' : 'team_a'];
+
+        $db = db_connect();
+
+        $runsByInnings = [1 => 0, 2 => 0];
+        $wicketsByInnings = [1 => 0, 2 => 0];
+
+        $battingRows = $db->table('match_summary_batsmen')
+            ->select('innings_number, runs, dismissal_mode')
+            ->where('match_id', $matchId)
+            ->get()->getResultArray();
+
+        foreach ($battingRows as $row) {
+            $inns = (int) $row['innings_number'];
+            if (!isset($runsByInnings[$inns])) {
+                continue;
+            }
+
+            $runsByInnings[$inns] += (int) $row['runs'];
+
+            $mode = $row['dismissal_mode'] ?? '';
+            if ($mode !== '' && !in_array($mode, ['not_out', 'retired_hurt'], true)) {
+                $wicketsByInnings[$inns]++;
+            }
+        }
+
+        $extrasRows = $db->table('match_summary_extras')
+            ->select('innings_number, byes, leg_byes, wides, no_balls')
+            ->where('match_id', $matchId)
+            ->get()->getResultArray();
+
+        foreach ($extrasRows as $row) {
+            $inns = (int) $row['innings_number'];
+            if (!isset($runsByInnings[$inns])) {
+                continue;
+            }
+
+            $runsByInnings[$inns] += (int) $row['byes'] + (int) $row['leg_byes'] + (int) $row['wides'] + (int) $row['no_balls'];
+        }
+
+        $s1Runs = $runsByInnings[1];
+        $s2Runs = $runsByInnings[2];
+        $s2Wickets = $wicketsByInnings[2];
+
+        if ($s1Runs === 0 && $s2Runs === 0) {
+            return '';
+        }
+
+        $teamName = static fn (string $side): string => $side === 'team_a' ? (string) $match['team_name'] : (string) $match['opponent_name'];
+
+        if ($s1Runs > $s2Runs) {
+            $margin = $s1Runs - $s2Runs;
+
+            return $teamName($battingSideByInnings[1]) . ' won by ' . $margin . ' ' . ($margin === 1 ? 'run' : 'runs');
+        }
+
+        if ($s2Runs > $s1Runs) {
+            $remaining = 10 - $s2Wickets;
+
+            return $teamName($battingSideByInnings[2]) . ' won by ' . $remaining . ' ' . ($remaining === 1 ? 'wicket' : 'wickets');
+        }
+
+        return 'Match tied — ' . $s1Runs . ' runs each';
     }
 
     public function scoreboardPreview(int $matchId): ResponseInterface|string

@@ -11,11 +11,11 @@ class CreateCiSessions extends Migration
         $this->forge->addField([
             'id' => ['type' => 'VARCHAR', 'constraint' => 128],
             'ip_address' => ['type' => 'VARCHAR', 'constraint' => 45],
-            'timestamp' => ['type' => 'INT', 'constraint' => 10],
-            'data' => ['type' => 'VARCHAR']
+            'timestamp' => ['type' => 'INT', 'constraint' => 10, 'unsigned' => true, 'default' => 0],
+            'data' => ['type' => 'BLOB'],
         ]);
-
-        // Review keys and foreign keys manually after generation.
+        $this->forge->addPrimaryKey('id');
+        $this->forge->addKey('timestamp', false, false, 'ci_sessions_timestamp');
         $this->forge->createTable('ci_sessions', true);
     }
 

@@ -11,6 +11,8 @@ use App\Models\MatchModel;
 use App\Models\EventModel;
 use App\Models\EventImageModel;
 use App\Models\TeamModel;
+use App\Models\TeamPlayerModel;
+use App\Models\TeamAchievementModel;
 
 class HomeController extends BaseController
 {
@@ -19,6 +21,8 @@ class HomeController extends BaseController
     private EventModel $events;
     private EventImageModel $eventImages;
     private TeamModel $teams;
+    private TeamPlayerModel $teamPlayers;
+    private TeamAchievementModel $teamAchievements;
 
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -29,6 +33,8 @@ class HomeController extends BaseController
         $this->events = new EventModel();
         $this->eventImages = new EventImageModel();
         $this->teams = new TeamModel();
+        $this->teamPlayers = new TeamPlayerModel();
+        $this->teamAchievements = new TeamAchievementModel();
     }
 
     public function index(): string
@@ -85,5 +91,13 @@ class HomeController extends BaseController
         $this->players->insert($playerData);
 
         return redirect()->to(site_url('/') . '#join')->with('join_success', 'Thank you for your submission! We have received your details and will let you know once your request has been approved.');
+    }
+
+    public function team($team_slug)
+    {
+        $team = $this->teams->withCaptainAndViceCaptainBySlug($team_slug);
+        $members = $this->teamPlayers->membersByTeam($team['id']);
+        $achievements = $this->teamAchievements->where('team_id', $team['id'])->findAll();
+        return view('team-view', ['team' => $team, 'members' => $members, 'achievements' => $achievements]);
     }
 }

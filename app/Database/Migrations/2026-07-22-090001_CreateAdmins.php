@@ -9,16 +9,16 @@ class CreateAdmins extends Migration
     public function up()
     {
         $this->forge->addField([
-            'id' => ['type' => 'INT', 'constraint' => 11],
+            'id' => ['type' => 'INT', 'constraint' => 11, 'auto_increment' => true],
             'username' => ['type' => 'VARCHAR', 'constraint' => 255],
             'email' => ['type' => 'VARCHAR', 'constraint' => 255],
             'password' => ['type' => 'VARCHAR', 'constraint' => 255],
-            'is_active' => ['type' => 'TINYINT', 'constraint' => 4],
+            'app_password' => ['type' => 'VARCHAR', 'constraint' => 255],
+            'is_active' => ['type' => 'TINYINT', 'constraint' => 4, 'default' => 1],
             'created_at' => ['type' => 'DATETIME', 'null' => true],
-            'updated_at' => ['type' => 'DATETIME', 'null' => true]
+            'updated_at' => ['type' => 'DATETIME', 'null' => true],
         ]);
-
-        // Review keys and foreign keys manually after generation.
+        $this->forge->addPrimaryKey('id');
         $this->forge->createTable('admins', true);
     }
 
