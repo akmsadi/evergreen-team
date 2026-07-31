@@ -57,24 +57,13 @@
         }
     }
     $assignedIds = array_merge($teamAPlayerIds, $teamBPlayerIds);
-    $guestLabel = static function (array $p) use ($playersById): string {
-        if (($p['status'] ?? '') !== 'guest' || empty($p['guest_of_player_id']))
-            return '';
-        $host = $playersById[(int) $p['guest_of_player_id']] ?? null;
-        return $host ? ' (Guest - ' . esc($host['name']) . ')' : '';
-    };
     $playerDataJson = [];
     foreach ($players as $p) {
-        $guestOfName = '';
-        if (($p['status'] ?? '') === 'guest' && !empty($p['guest_of_player_id'])) {
-            $host = $playersById[(int) $p['guest_of_player_id']] ?? null;
-            $guestOfName = $host['name'] ?? '';
-        }
         $playerDataJson[(string) $p['id']] = [
             'id' => (string) $p['id'],
             'name' => $p['name'],
             'status' => $p['status'] ?? 'approved',
-            'guestOfName' => $guestOfName,
+            'guestOfName' => $p['guest_of_name'] ?? '',
         ];
     }
     ?>
@@ -182,8 +171,8 @@
                                             continue; ?>
                                         <div class="player-card pool-card bg-body-tertiary" <?= empty($isMatchLocked) ? 'draggable="true"' : '' ?> data-player-id="<?= esc((string) $p['id']) ?>">
                                             ⠿ <?= esc($p['name']) ?>
-                                            <?php if (!empty($guestLabel($p))): ?>
-                                                <span class="text-secondary ms-1" style="font-size:0.78em"><?= $guestLabel($p) ?></span>
+                                            <?php if ($p['guest_of_name']): ?>
+                                                <span class="text-secondary ms-1" style="font-size:0.78em">(Guest . <?= $p['guest_of_name'] ?>)</span>
                                             <?php endif; ?>
                                         </div>
                                     <?php endforeach; ?>
@@ -252,8 +241,8 @@
                                         <span class="drag-handle me-1">&#8597;</span>
                                     <?php endif; ?>
                                     <?= esc($p['name']) ?>
-                                    <?php if (!empty($guestLabel($p))): ?>
-                                        <span class="text-secondary ms-1" style="font-size:0.78em"><?= $guestLabel($p) ?></span>
+                                    <?php if ($p['guest_of_name']): ?>
+                                        <span class="text-secondary ms-1" style="font-size:0.78em"><?= $p['guest_of_name'] ?></span>
                                     <?php endif; ?>
                                     <?php if (empty($isMatchLocked)): ?>
                                         <button type="button" class="remove-player" data-player-id="<?= esc((string) $pid) ?>" title="Remove">&#x2715;</button>
@@ -274,7 +263,12 @@
                                     <?php if (!isset($playersById[$pid]))
                                         continue; ?>
                                     <?php $cp = $playersById[$pid]; ?>
-                                    <?php $cl = esc($cp['name']) . $guestLabel($cp); ?>
+                                    <?php
+                                    $cl = esc($cp['name']);
+                                    if ($cp['guest_of_name'] ?? ''):
+                                        $cl .= ' <span class="text-secondary ms-1" style="font-size:0.78em">(Guest - ' . esc($cp['guest_of_name']) . ')</span>';
+                                    endif;
+                                    ?>
                                     <option value="<?= esc((string) $pid) ?>" <?= (string) $sq['captain_old'] === (string) $pid ? 'selected' : '' ?>><?= $cl ?></option>
                                 <?php endforeach; ?>
                             </select>
@@ -425,12 +419,12 @@
             const p = PLAYERS[id];
             if (!p) return null;
             const el = document.createElement('div');
-            el.className = 'player-card pool-card';
+            el.className = 'player-card pool-card bg-body-tertiary';
             el.draggable = true;
             el.dataset.playerId = id;
-            let html = escHtml(p.name);
+            let html = '⠿ ' + escHtml(p.name);
             if (p.status === 'guest' && p.guestOfName) {
-                html += ` <span class="text-secondary ms-1" style="font-size:0.78em">(Guest - ${escHtml(p.guestOfName)})</span>`;
+                html += `<span class="text-secondary ms-1" style="font-size:0.78em">(Guest - ${escHtml(p.guestOfName)})</span>`;
             }
             el.innerHTML = html;
             attachDrag(el);

@@ -24,4 +24,11 @@ class Matches extends BaseController
             'data' => $this->matches->orderedList(),
         ]);
     }
+
+    public function scheduled(): ResponseInterface
+    {
+        return $this->response->setJSON([
+            'data' => $this->matches->scheduledList(),
+        ]);
+    }
 }

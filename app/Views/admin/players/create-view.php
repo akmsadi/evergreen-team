@@ -28,7 +28,23 @@
             </div>
 
             <div class="mb-3">
-                <label for="email" class="form-label fw-semibold">Email (optional)</label>
+                <label for="organization" class="form-label fw-semibold">Organization</label>
+                <input type="text" class="form-control<?= isset($errors['organization']) ? ' is-invalid' : '' ?>" id="organization" name="organization" value="<?= esc(old('organization')) ?>">
+                <?php if (isset($errors['organization'])): ?>
+                    <div class="invalid-feedback"><?= esc($errors['organization']) ?></div>
+                <?php endif; ?>
+            </div>
+
+            <div class="mb-3">
+                <label for="nickname" class="form-label fw-semibold">Nickname</label>
+                <input type="text" class="form-control<?= isset($errors['nickname']) ? ' is-invalid' : '' ?>" id="nickname" name="nickname" value="<?= esc(old('nickname')) ?>">
+                <?php if (isset($errors['nickname'])): ?>
+                    <div class="invalid-feedback"><?= esc($errors['nickname']) ?></div>
+                <?php endif; ?>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">Email</label>
                 <input type="email" class="form-control<?= isset($errors['email']) ? ' is-invalid' : '' ?>" id="email" name="email" value="<?= esc(old('email')) ?>">
                 <?php if (isset($errors['email'])): ?>
                     <div class="invalid-feedback"><?= esc($errors['email']) ?></div>

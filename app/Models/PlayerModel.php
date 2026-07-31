@@ -10,6 +10,8 @@ class PlayerModel extends AuditableModel
     protected $useTimestamps = true;
     protected $allowedFields = [
         'name',
+        'organization',
+        'nickname',
         'email',
         'phone',
         'address',

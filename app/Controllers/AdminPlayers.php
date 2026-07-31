@@ -70,6 +70,7 @@ class AdminPlayers extends BaseController
             'playerRows' => $matrix['playerRows'],
             'generalExpenses' => $matrix['generalExpenses'],
             'generalTotal' => $matrix['generalTotal'],
+            'financeColumns' => $matrix['financeColumns'],
         ]);
     }
 
@@ -308,6 +309,8 @@ class AdminPlayers extends BaseController
     {
         return [
             'name' => 'required|min_length[2]',
+            'organization' => 'permit_empty|min_length[2]',
+            'nickname' => 'permit_empty|min_length[1]',
             'email' => 'permit_empty|valid_email',
             'phone' => 'required|min_length[7]',
             'address' => 'required|min_length[5]',
@@ -321,6 +324,8 @@ class AdminPlayers extends BaseController
 
         return [
             'name' => (string) $this->request->getPost('name'),
+            'organization' => (string) $this->request->getPost('organization'),
+            'nickname' => (string) $this->request->getPost('nickname'),
             'email' => (string) $this->request->getPost('email'),
             'phone' => (string) $this->request->getPost('phone'),
             'address' => (string) $this->request->getPost('address'),

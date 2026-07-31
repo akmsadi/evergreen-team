@@ -123,27 +123,16 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
                         <th rowspan="2" class="text-end">Total<br>Contribution</th>
                         <th rowspan="2" class="text-end">Total<br>Expenses</th>
                         <th rowspan="2" class="text-end">Balance</th>
-                        <?php foreach ($matches as $match): ?>
+                        <?php foreach (($financeColumns ?? []) as $column): ?>
                             <th class="match-header">
-                                <?= esc(getFormattedDate($match['scheduled_at'] ?? null, '-')) ?><br>
-                                <small class="fw-normal text-secondary"><?= esc($match['venue'] ?? $match['venue_name'] ?? '-') ?></small>
-                            </th>
-                        <?php endforeach; ?>
-                        <?php foreach (($generalExpenses ?? []) as $generalExpense): ?>
-                            <th class="match-header">
-                                <?= esc($generalExpense['title']) ?><br>
-                                <small class="fw-normal text-secondary">General</small>
+                                <?= esc($column['label']) ?><br>
+                                <small class="fw-normal text-secondary"><?= esc($column['sub_label']) ?></small>
                             </th>
                         <?php endforeach; ?>
                     </tr>
                     <tr>
-                        <?php foreach ($matches as $match): ?>
-                            <th class="match-expense">
-                                <?= $match['total_expense'] > 0 ? esc(number_format($match['total_expense'], 0)) : '-' ?>
-                            </th>
-                        <?php endforeach; ?>
-                        <?php foreach (($generalExpenses ?? []) as $generalExpense): ?>
-                            <th class="match-expense"><?= esc(number_format($generalExpense['amount'], 0)) ?></th>
+                        <?php foreach (($financeColumns ?? []) as $column): ?>
+                            <th class="match-expense"><?= esc($column['header_amount_display']) ?></th>
                         <?php endforeach; ?>
                     </tr>
                 </thead>
@@ -160,18 +149,10 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
                                     <?= esc(number_format($bal, 0)) ?>
                                 </span>
                             </td>
-                            <?php foreach ($matches as $match): ?>
-                                <?php $share = $row['match_shares'][(int) $match['id']] ?? null; ?>
+                            <?php foreach (($financeColumns ?? []) as $column): ?>
+                                <?php $share = $row['shares'][$column['key']] ?? null; ?>
                                 <?php if ($share !== null): ?>
                                     <td class="cell-share"><?= esc(number_format($share, 0)) ?></td>
-                                <?php else: ?>
-                                    <td class="cell-empty"></td>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                            <?php foreach (($generalExpenses ?? []) as $generalExpense): ?>
-                                <?php $generalShare = $row['general_shares'][$generalExpense['id']] ?? null; ?>
-                                <?php if ($generalShare !== null): ?>
-                                    <td class="cell-share"><?= esc(number_format($generalShare, 0)) ?></td>
                                 <?php else: ?>
                                     <td class="cell-empty"></td>
                                 <?php endif; ?>
@@ -190,13 +171,8 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
                                 <?= esc(number_format($totalBalance, 0)) ?>
                             </span>
                         </td>
-                        <?php foreach ($matches as $match): ?>
-                            <td class="text-end">
-                                <?= $match['total_expense'] > 0 ? esc(number_format($match['total_expense'], 0)) : '' ?>
-                            </td>
-                        <?php endforeach; ?>
-                        <?php foreach (($generalExpenses ?? []) as $generalExpense): ?>
-                            <td class="text-end"><?= esc(number_format($generalExpense['amount'], 0)) ?></td>
+                        <?php foreach (($financeColumns ?? []) as $column): ?>
+                            <td class="text-end"><?= esc($column['footer_amount_display']) ?></td>
                         <?php endforeach; ?>
                     </tr>
                 </tfoot>

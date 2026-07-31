@@ -13,6 +13,7 @@ class CreatePlayers extends Migration
             'app_id' => ['type' => 'CHAR', 'constraint' => 32, 'null' => true],
             'name' => ['type' => 'MEDIUMTEXT'],
             'organization' => ['type' => 'MEDIUMTEXT', 'null' => true],
+            'nickname' => ['type' => 'VARCHAR', 'constraint' => 255, 'default' => ''],
             'email' => ['type' => 'MEDIUMTEXT', 'null' => true],
             'phone' => ['type' => 'MEDIUMTEXT'],
             'address' => ['type' => 'MEDIUMTEXT'],

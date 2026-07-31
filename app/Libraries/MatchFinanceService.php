@@ -291,7 +291,7 @@ class MatchFinanceService
         $limit = max(1, $limit);
 
         $rows = $this->matchPlayers->db->table('match_summary_batsmen msb')
-            ->select("msb.player_id, players.name, SUM(COALESCE(msb.runs, 0)) AS runs, SUM(COALESCE(msb.balls, 0)) AS balls, SUM(COALESCE(msb.fours, 0)) AS fours, SUM(COALESCE(msb.sixes, 0)) AS sixes, COUNT(DISTINCT msb.match_id) AS matches_played, SUM(CASE WHEN msb.dismissal_mode IS NOT NULL AND msb.dismissal_mode NOT IN ('not_out', 'retired_hurt') THEN 1 ELSE 0 END) AS dismissals")
+            ->select("msb.player_id, players.name, SUM(COALESCE(msb.runs, 0)) AS runs, SUM(COALESCE(msb.balls, 0)) AS balls, SUM(COALESCE(msb.fours, 0)) AS fours, SUM(COALESCE(msb.sixes, 0)) AS sixes, COUNT(DISTINCT msb.match_id) AS matches_played, SUM(CASE WHEN msb.runs IS NOT NULL OR msb.balls IS NOT NULL OR msb.dismissal_mode IS NOT NULL THEN 1 ELSE 0 END) AS innings, SUM(CASE WHEN msb.dismissal_mode IS NOT NULL AND msb.dismissal_mode NOT IN ('not_out', 'retired_hurt') THEN 1 ELSE 0 END) AS dismissals")
             ->join('players', 'players.id = msb.player_id')
             ->join('matches', 'matches.id = msb.match_id')
             ->where('matches.match_status !=', 'archived')
@@ -315,6 +315,7 @@ class MatchFinanceService
                 'player_id' => (int) $row['player_id'],
                 'name' => (string) $row['name'],
                 'matches_played' => (int) ($row['matches_played'] ?? 0),
+                'innings' => (int) ($row['innings'] ?? 0),
                 'runs' => $runs,
                 'balls' => $balls,
                 'fours' => (int) ($row['fours'] ?? 0),
@@ -323,6 +324,13 @@ class MatchFinanceService
                 'average' => $dismissals > 0 ? round($runs / $dismissals, 2) : null,
             ];
         }
+
+        $matchCounts = $this->getMatchCountsForPlayers(array_column($leaderboard, 'player_id'));
+
+        foreach ($leaderboard as &$entry) {
+            $entry['matches_played'] = $matchCounts[$entry['player_id']] ?? 0;
+        }
+        unset($entry);
 
         usort($leaderboard, static function (array $left, array $right): int {
             $runsComparison = $right['runs'] <=> $left['runs'];
@@ -362,7 +370,6 @@ class MatchFinanceService
             ->getResultArray();
 
         $leaderboard = [];
-        $bowlerMatchIds = [];
 
         foreach ($rows as $row) {
             $playerId = (int) $row['player_id'];
@@ -372,28 +379,33 @@ class MatchFinanceService
                     'player_id' => $playerId,
                     'name' => (string) $row['name'],
                     'matches_played' => 0,
+                    'innings' => 0,
                     'balls' => 0,
                     'overs' => '0.0',
                     'runs' => 0,
                     'wickets' => 0,
                     'economy' => null,
                 ];
-                $bowlerMatchIds[$playerId] = [];
             }
-
-            $matchId = (int) $row['match_id'];
-            $bowlerMatchIds[$playerId][$matchId] = true;
 
             $overs = (float) ($row['overs'] ?? 0);
             $fullOvers = (int) $overs;
             $extraBalls = (int) round(($overs - $fullOvers) * 10);
-            $leaderboard[$playerId]['balls'] += $fullOvers * 6 + $extraBalls;
+            $ballsBowled = $fullOvers * 6 + $extraBalls;
+
+            if ($ballsBowled > 0) {
+                $leaderboard[$playerId]['innings']++;
+            }
+
+            $leaderboard[$playerId]['balls'] += $ballsBowled;
             $leaderboard[$playerId]['runs'] += (int) ($row['runs'] ?? 0);
             $leaderboard[$playerId]['wickets'] += (int) ($row['wickets'] ?? 0);
         }
 
+        $matchCounts = $this->getMatchCountsForPlayers(array_keys($leaderboard));
+
         foreach ($leaderboard as $pid => &$entry) {
-            $entry['matches_played'] = count($bowlerMatchIds[$pid] ?? []);
+            $entry['matches_played'] = $matchCounts[$pid] ?? 0;
         }
         unset($entry);
 
@@ -605,9 +617,38 @@ class MatchFinanceService
                 'title' => $expense['title'],
                 'amount' => round((float) $expense['amount'], 2),
                 'contributor_count' => $count,
+                'created_at' => $expense['created_at'] ?? null,
             ];
         }
         $generalTotal = round(array_sum(array_column($generalExpenses, 'amount')), 2);
+
+        $financeColumns = [];
+
+        foreach ($matches as $match) {
+            $financeColumns[] = [
+                'key' => 'match:' . $match['id'],
+                'date' => $match['scheduled_at'] ?? null,
+                'label' => getFormattedDate($match['scheduled_at'] ?? null, '-'),
+                'sub_label' => $match['venue'] ?? $match['venue_name'] ?? '-',
+                'header_amount_display' => $match['total_expense'] > 0 ? number_format($match['total_expense'], 0) : '-',
+                'footer_amount_display' => $match['total_expense'] > 0 ? number_format($match['total_expense'], 0) : '',
+            ];
+        }
+
+        foreach ($generalExpenses as $generalExpense) {
+            $financeColumns[] = [
+                'key' => 'general:' . $generalExpense['id'],
+                'date' => $generalExpense['created_at'],
+                'label' => $generalExpense['title'],
+                'sub_label' => 'General',
+                'header_amount_display' => number_format($generalExpense['amount'], 0),
+                'footer_amount_display' => number_format($generalExpense['amount'], 0),
+            ];
+        }
+
+        usort($financeColumns, static function (array $left, array $right): int {
+            return ($left['date'] !== null ? strtotime($left['date']) : 0) <=> ($right['date'] !== null ? strtotime($right['date']) : 0);
+        });
 
         $depositTotals = $this->calculateDepositTotalsForPlayers($this->getDepositsByPlayerIds($playerIds));
 
@@ -641,13 +682,20 @@ class MatchFinanceService
             $totalOwed = round($totalOwed + $generalShareTotal, 2);
             $deposited = round($depositTotals[$playerId] ?? 0.0, 2);
 
+            $shares = [];
+            foreach ($matchShares as $mId => $share) {
+                $shares['match:' . $mId] = $share;
+            }
+            foreach ($generalShares as $geId => $share) {
+                $shares['general:' . $geId] = $share;
+            }
+
             $playerRows[] = [
                 'player' => $player,
                 'deposited' => $deposited,
                 'owed' => $totalOwed,
                 'balance' => round($deposited - $totalOwed, 2),
-                'match_shares' => $matchShares,
-                'general_shares' => $generalShares,
+                'shares' => $shares,
             ];
         }
 
@@ -656,6 +704,7 @@ class MatchFinanceService
             'playerRows' => $playerRows,
             'generalExpenses' => $generalExpenses,
             'generalTotal' => $generalTotal,
+            'financeColumns' => $financeColumns,
         ];
     }
 
@@ -692,13 +741,20 @@ class MatchFinanceService
 
     public function getPlayerMatchBreakdown(int $playerId): array
     {
+        $scorecardMatchIds = $this->getPlayerScorecardMatchIds($playerId);
+
+        if ($scorecardMatchIds === []) {
+            return [];
+        }
+
         $matches = $this->matchPlayers
             ->select('match_players.match_id, match_players.side, match_players.role, match_players.batting_position, match_players.playing_xi, match_players.is_captain, matches.team_name, matches.opponent_name, COALESCE(venues.name, matches.venue) AS venue, matches.scheduled_at, matches.match_status')
             ->join('matches', 'matches.id = match_players.match_id')
             ->join('venues', 'venues.id = matches.venue_id', 'left')
             ->where('match_players.player_id', $playerId)
-            ->orderBy('matches.scheduled_at', 'DESC')
-            ->orderBy('matches.id', 'DESC')
+            ->whereIn('match_players.match_id', $scorecardMatchIds)
+            ->orderBy('matches.scheduled_at', 'ASC')
+            ->orderBy('matches.id', 'ASC')
             ->findAll();
 
         if ($matches === []) {
@@ -763,6 +819,11 @@ class MatchFinanceService
             $stats[$matchId]['bat_balls'] += (int) ($row['balls'] ?? 0);
             $stats[$matchId]['fours'] += (int) ($row['fours'] ?? 0);
             $stats[$matchId]['sixes'] += (int) ($row['sixes'] ?? 0);
+
+            if ($row['runs'] !== null || $row['balls'] !== null || $row['dismissal_mode'] !== null) {
+                $stats[$matchId]['batted'] = true;
+            }
+
             $dm = $row['dismissal_mode'] ?? '';
             if ($dm !== '' && !in_array($dm, ['not_out', 'retired_hurt'], true)) {
                 $stats[$matchId]['dismissed'] = true;
@@ -784,7 +845,13 @@ class MatchFinanceService
             $overs = (float) ($row['overs'] ?? 0);
             $fullOvers = (int) $overs;
             $extraBalls = (int) round(($overs - $fullOvers) * 10);
-            $stats[$matchId]['bowl_balls'] += $fullOvers * 6 + $extraBalls;
+            $ballsBowled = $fullOvers * 6 + $extraBalls;
+
+            if ($ballsBowled > 0) {
+                $stats[$matchId]['bowled'] = true;
+            }
+
+            $stats[$matchId]['bowl_balls'] += $ballsBowled;
             $stats[$matchId]['bowl_runs'] += (int) ($row['runs'] ?? 0);
             $stats[$matchId]['bowl_wickets'] += (int) ($row['wickets'] ?? 0);
         }
@@ -831,6 +898,7 @@ class MatchFinanceService
             'bat_balls' => 0,
             'fours' => 0,
             'sixes' => 0,
+            'batted' => false,
             'dismissed' => false,
             'dismissal_type' => null,
             'strike_rate' => null,
@@ -838,6 +906,7 @@ class MatchFinanceService
             'bowling_overs' => '0.0',
             'bowl_runs' => 0,
             'bowl_wickets' => 0,
+            'bowled' => false,
             'economy' => null,
             'catches' => 0,
             'run_outs' => 0,
@@ -1027,17 +1096,59 @@ class MatchFinanceService
             return [];
         }
 
-        $rows = $this->matchPlayers
-            ->select('player_id, COUNT(DISTINCT match_id) AS match_count')
+        $db = $this->matchPlayers->db;
+
+        $batRows = $db->table('match_summary_batsmen')
+            ->distinct()
+            ->select('player_id, match_id')
             ->whereIn('player_id', $playerIds)
-            ->groupBy('player_id')
-            ->findAll();
+            ->get()
+            ->getResultArray();
+
+        $bowlRows = $db->table('match_summary_bowlers')
+            ->distinct()
+            ->select('player_id, match_id')
+            ->whereIn('player_id', $playerIds)
+            ->get()
+            ->getResultArray();
+
+        $matchIdsByPlayer = [];
+        foreach (array_merge($batRows, $bowlRows) as $row) {
+            $playerId = (int) $row['player_id'];
+            $matchIdsByPlayer[$playerId][(int) $row['match_id']] = true;
+        }
 
         $counts = [];
-        foreach ($rows as $row) {
-            $counts[(int) $row['player_id']] = (int) $row['match_count'];
+        foreach ($matchIdsByPlayer as $playerId => $matchIds) {
+            $counts[$playerId] = count($matchIds);
         }
 
         return $counts;
+    }
+
+    private function getPlayerScorecardMatchIds(int $playerId): array
+    {
+        $db = $this->matchPlayers->db;
+
+        $batMatchIds = $db->table('match_summary_batsmen')
+            ->distinct()
+            ->select('match_id')
+            ->where('player_id', $playerId)
+            ->get()
+            ->getResultArray();
+
+        $bowlMatchIds = $db->table('match_summary_bowlers')
+            ->distinct()
+            ->select('match_id')
+            ->where('player_id', $playerId)
+            ->get()
+            ->getResultArray();
+
+        $matchIds = [];
+        foreach (array_merge($batMatchIds, $bowlMatchIds) as $row) {
+            $matchIds[(int) $row['match_id']] = true;
+        }
+
+        return array_keys($matchIds);
     }
 }

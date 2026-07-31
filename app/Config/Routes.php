@@ -109,6 +109,7 @@ $routes->options('api/(:any)', static function () {
 });
 $routes->post('/api/login', [ApiUsers::class, 'login'], ['filter' => 'apikey']);
 $routes->get('/api/matches', [ApiMatches::class, 'index'], ['filter' => 'apikey']);
+$routes->get('/api/matches/scheduled', [ApiMatches::class, 'scheduled'], ['filter' => 'apikey']);
 $routes->get('/api/players', [ApiPlayers::class, 'index'], ['filter' => 'apikey']);
 $routes->post('/api/players', [ApiPlayers::class, 'saveList'], ['filter' => 'apikey']);
 $routes->get('/api/venues', [ApiVenues::class, 'index'], ['filter' => 'apikey']);

@@ -28,10 +28,23 @@ class MatchModel extends AuditableModel
 
     public function orderedList(): array
     {
-        return $this->selectWithVenue()
-            ->orderBy('scheduled_at', 'DESC')
-            ->orderBy('id', 'DESC')
-            ->findAll();
+        return $this->attachRosters(
+            $this->selectWithVenue()
+                ->orderBy('scheduled_at', 'DESC')
+                ->orderBy('id', 'DESC')
+                ->findAll()
+        );
+    }
+
+    public function scheduledList(): array
+    {
+        return $this->attachRosters(
+            $this->selectWithVenue()
+                ->where('match_status', 'scheduled')
+                ->orderBy('scheduled_at', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->findAll()
+        );
     }
 
     public function recentList(int $limit = 5): array
@@ -99,5 +112,42 @@ class MatchModel extends AuditableModel
     {
         return $this->select('matches.*, COALESCE(venues.name, matches.venue) AS venue')
             ->join('venues', 'venues.id = matches.venue_id', 'left');
+    }
+
+    private function attachRosters(array $matches): array
+    {
+        if ($matches === []) {
+            return $matches;
+        }
+
+        $matchIds = array_column($matches, 'id');
+
+        $rosterRows = $this->db->table('match_players')
+            ->select('match_players.match_id, match_players.side, match_players.is_captain, players.app_id AS player_id')
+            ->join('players', 'players.id = match_players.player_id')
+            ->whereIn('match_players.match_id', $matchIds)
+            ->get()
+            ->getResultArray();
+
+        $rosterByMatch = [];
+
+        foreach ($rosterRows as $row) {
+            if (!in_array($row['side'], ['team_a', 'team_b'], true)) {
+                continue;
+            }
+
+            $rosterByMatch[$row['match_id']][$row['side']][] = [
+                'player_id' => $row['player_id'],
+                'is_captain' => (bool) $row['is_captain'],
+            ];
+        }
+
+        foreach ($matches as &$match) {
+            $match['team_a_players'] = $rosterByMatch[$match['id']]['team_a'] ?? [];
+            $match['team_b_players'] = $rosterByMatch[$match['id']]['team_b'] ?? [];
+        }
+        unset($match);
+
+        return $matches;
     }
 }

@@ -62,6 +62,139 @@
             height: 100%;
         }
     }
+
+    .leaderboard-panel {
+        /* border-radius: 14px; */
+        padding: 1.0rem;
+        color: #f8fafc;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        height: 100%;
+    }
+
+    .leaderboard-panel--batting {
+        background: linear-gradient(160deg, #081a35 0%, #0f2a52 55%, #163e70 100%);
+    }
+
+    .leaderboard-panel--bowling {
+        background: linear-gradient(160deg, #041d0d 0%, #0a3618 55%, #114a22 100%);
+    }
+
+    .leaderboard-head {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .leaderboard-title {
+        font-size: 1.5rem;
+        font-weight: 800 !important;
+        letter-spacing: 0.03em;
+        color: #fff;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+    }
+
+    .leaderboard-subtitle {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #ffd447;
+        margin-bottom: 0;
+    }
+
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 0.35rem;
+        color: #e5edf7;
+        font-size: 0.8rem;
+        margin-bottom: 0;
+    }
+
+    .leaderboard-table thead th {
+        background: rgba(255, 255, 255, 0.14);
+        color: #dbe4f0;
+        text-transform: uppercase;
+        font-size: 0.66rem;
+        letter-spacing: 0.05em;
+        font-weight: 700 !important;
+        padding: 0.55rem 0.6rem;
+        border: none;
+        white-space: nowrap;
+    }
+
+    .leaderboard-table thead th:first-child {
+        border-radius: 6px 0 0 6px;
+    }
+
+    .leaderboard-table thead th:last-child {
+        border-radius: 0 6px 6px 0;
+    }
+
+    .leaderboard-table tbody tr {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .leaderboard-table tbody tr:nth-child(even) {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .leaderboard-table td {
+        padding: 0.5rem 0.6rem;
+        vertical-align: middle;
+        border: none;
+        white-space: nowrap;
+    }
+
+    .leaderboard-table td:first-child {
+        border-radius: 6px 0 0 6px;
+    }
+
+    .leaderboard-table td:last-child {
+        border-radius: 0 6px 6px 0;
+    }
+
+    .leaderboard-table td a {
+        color: #fff;
+        font-weight: 600 !important;
+        text-decoration: none;
+    }
+
+    .leaderboard-table td a:hover {
+        text-decoration: underline;
+    }
+
+    .rank-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.6rem;
+        height: 1.6rem;
+        border-radius: 5px;
+        font-weight: 700 !important;
+        font-size: 0.75rem;
+        color: #fff;
+    }
+
+    .leaderboard-panel--batting .rank-chip {
+        background: #1c6fd1;
+    }
+
+    .leaderboard-panel--bowling .rank-chip {
+        background: #2f9e46;
+    }
+
+    .leaderboard-stat {
+        font-weight: 800 !important;
+        font-size: 0.95rem;
+        color: #ffd447;
+    }
+
+    .leaderboard-empty {
+        color: #dbe4f0;
+        margin-bottom: 0;
+        text-align: center;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -182,19 +315,22 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row g-0">
         <div class="col-lg-6 mb-5 mb-lg-0">
-            <div class="panel">
-                <h2 class="h4 mb-2">Top 10 Batsmen</h2>
-                <p class="text-secondary mb-3">Ranked by total runs across recorded match balls.</p>
+            <div class="leaderboard-panel leaderboard-panel--batting">
+                <div class="leaderboard-head">
+                    <h2 class="leaderboard-title">Top 10 Batsmen</h2>
+                    <p class="leaderboard-subtitle">Ranked by total runs across recorded match balls</p>
+                </div>
                 <?php if ($topBatsmen !== []): ?>
                     <div class="table-responsive">
-                        <table class="table table-hover dashboard-table">
+                        <table class="leaderboard-table">
                             <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Name</th>
                                     <th>Mat</th>
+                                    <th>Inn</th>
                                     <th>Runs</th>
                                     <th>Balls</th>
                                     <th>4s</th>
@@ -206,10 +342,11 @@
                             <tbody>
                                 <?php foreach ($topBatsmen as $index => $batsman): ?>
                                     <tr>
-                                        <td><?= esc((string) ($index + 1)) ?></td>
+                                        <td><span class="rank-chip"><?= esc((string) ($index + 1)) ?></span></td>
                                         <td><a target="_blank" href="<?= site_url('admin/players/' . $batsman['player_id'] . '/edit') ?>"><?= esc($batsman['name']) ?></a></td>
                                         <td><?= esc((string) $batsman['matches_played']) ?></td>
-                                        <td><?= esc((string) $batsman['runs']) ?></td>
+                                        <td><?= esc((string) $batsman['innings']) ?></td>
+                                        <td><span class="leaderboard-stat"><?= esc((string) $batsman['runs']) ?></span></td>
                                         <td><?= esc((string) $batsman['balls']) ?></td>
                                         <td><?= esc((string) $batsman['fours']) ?></td>
                                         <td><?= esc((string) $batsman['sixes']) ?></td>
@@ -221,22 +358,25 @@
                         </table>
                     </div>
                 <?php else: ?>
-                    <p class="text-secondary mb-0">No batting data available yet.</p>
+                    <p class="leaderboard-empty">No batting data available yet.</p>
                 <?php endif; ?>
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="panel">
-                <h2 class="h4 mb-2">Top 10 Bowlers</h2>
-                <p class="text-secondary mb-3">Ranked by wickets, then economy rate.</p>
+            <div class="leaderboard-panel leaderboard-panel--bowling">
+                <div class="leaderboard-head">
+                    <h2 class="leaderboard-title">Top 10 Bowlers</h2>
+                    <p class="leaderboard-subtitle">Ranked by wickets, then economy rate</p>
+                </div>
                 <?php if ($topBowlers !== []): ?>
                     <div class="table-responsive">
-                        <table class="table table-hover dashboard-table">
+                        <table class="leaderboard-table">
                             <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Name</th>
                                     <th>Matches</th>
+                                    <th>Inn</th>
                                     <th>Wickets</th>
                                     <th>Overs</th>
                                     <th>Runs</th>
@@ -246,10 +386,11 @@
                             <tbody>
                                 <?php foreach ($topBowlers as $index => $bowler): ?>
                                     <tr>
-                                        <td><?= esc((string) ($index + 1)) ?></td>
+                                        <td><span class="rank-chip"><?= esc((string) ($index + 1)) ?></span></td>
                                         <td><a target="_blank" href="<?= site_url('admin/players/' . $bowler['player_id'] . '/edit') ?>"><?= esc($bowler['name']) ?></a></td>
                                         <td><?= esc((string) $bowler['matches_played']) ?></td>
-                                        <td><?= esc((string) $bowler['wickets']) ?></td>
+                                        <td><?= esc((string) $bowler['innings']) ?></td>
+                                        <td><span class="leaderboard-stat"><?= esc((string) $bowler['wickets']) ?></span></td>
                                         <td><?= esc($bowler['overs']) ?></td>
                                         <td><?= esc((string) $bowler['runs']) ?></td>
                                         <td><?= $bowler['economy'] !== null ? esc(number_format((float) $bowler['economy'], 2)) : '-' ?></td>
@@ -259,7 +400,7 @@
                         </table>
                     </div>
                 <?php else: ?>
-                    <p class="text-secondary mb-0">No bowling data available yet.</p>
+                    <p class="leaderboard-empty">No bowling data available yet.</p>
                 <?php endif; ?>
             </div>
         </div>

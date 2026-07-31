@@ -708,12 +708,16 @@ class AdminMatches extends BaseController
             }
         }
 
+        $db = db_connect();
+        $all_players = $db->table('players p')
+            ->select('p.*, guest_of.name AS guest_of_name')
+            ->join('players guest_of', 'guest_of.id = p.guest_of_player_id', 'left')
+            ->orderBy('p.name', 'ASC')
+            ->get()->getResultArray();
+
         return [
             'username' => session()->get('admin_username'),
-            'players' => $this->players
-                ->where('status !=', 'rejected')
-                ->orderBy('name', 'ASC')
-                ->findAll(),
+            'players' => $all_players,
             'venues' => $this->venues->orderedList(),
             'match' => $match,
             'isMatchLocked' => $match !== null && (($match['match_status'] ?? '') === 'completed'),
@@ -1096,7 +1100,7 @@ class AdminMatches extends BaseController
             return '';
         }
 
-        $teamName = static fn (string $side): string => $side === 'team_a' ? (string) $match['team_name'] : (string) $match['opponent_name'];
+        $teamName = static fn(string $side): string => $side === 'team_a' ? (string) $match['team_name'] : (string) $match['opponent_name'];
 
         if ($s1Runs > $s2Runs) {
             $margin = $s1Runs - $s2Runs;
@@ -1206,7 +1210,7 @@ class AdminMatches extends BaseController
             $side = $row['side'];
             if (array_key_exists($side, $squadBySide)) {
                 $squadBySide[$side][] = [
-                    'player_id'   => (int) $row['player_id'],
+                    'player_id' => (int) $row['player_id'],
                     'player_name' => $row['player_name'],
                 ];
             }
@@ -1220,7 +1224,7 @@ class AdminMatches extends BaseController
 
         $didNotBowlByInnings = [];
         foreach ([1, 2] as $inns) {
-            $bowlSide  = $innsSides[$inns]['bowl'];
+            $bowlSide = $innsSides[$inns]['bowl'];
             $bowledIds = array_map(
                 static fn($r) => (int) $r['player_id'],
                 array_filter(

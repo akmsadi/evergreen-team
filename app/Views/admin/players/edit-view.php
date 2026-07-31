@@ -66,7 +66,7 @@
                 <?php endif; ?>
             </div>
             <div class="col-md-6">
-                <label for="email" class="form-label fw-semibold">Email (optional)</label>
+                <label for="email" class="form-label fw-semibold">Email</label>
                 <input type="email" class="form-control<?= isset($errors['email']) ? ' is-invalid' : '' ?>" id="email" name="email" value="<?= esc(old('email', $player['email'])) ?>">
                 <?php if (isset($errors['email'])): ?>
                     <div class="invalid-feedback"><?= esc($errors['email']) ?></div>
@@ -77,6 +77,13 @@
                 <input type="text" class="form-control<?= isset($errors['phone']) ? ' is-invalid' : '' ?>" id="phone" name="phone" value="<?= esc(old('phone', $player['phone'])) ?>">
                 <?php if (isset($errors['phone'])): ?>
                     <div class="invalid-feedback"><?= esc($errors['phone']) ?></div>
+                <?php endif; ?>
+            </div>
+            <div class="col-md-6">
+                <label for="nickname" class="form-label fw-semibold">Nickname</label>
+                <input type="text" class="form-control<?= isset($errors['nickname']) ? ' is-invalid' : '' ?>" id="nickname" name="nickname" value="<?= esc(old('nickname', $player['nickname'])) ?>">
+                <?php if (isset($errors['nickname'])): ?>
+                    <div class="invalid-feedback"><?= esc($errors['nickname']) ?></div>
                 <?php endif; ?>
             </div>
             <div class="col-md-6">
@@ -104,7 +111,14 @@
                     <div class="invalid-feedback"><?= esc($errors['guest_of_player_id']) ?></div>
                 <?php endif; ?>
             </div>
-            <div class="col-12">
+            <div class="col-md-6">
+                <label for="organization" class="form-label fw-semibold">Organization</label>
+                <input type="text" class="form-control<?= isset($errors['organization']) ? ' is-invalid' : '' ?>" id="organization" name="organization" value="<?= esc(old('organization', $player['organization'])) ?>">
+                <?php if (isset($errors['organization'])): ?>
+                    <div class="invalid-feedback"><?= esc($errors['organization']) ?></div>
+                <?php endif; ?>
+            </div>
+            <div class="col-6">
                 <label for="address" class="form-label fw-semibold">Address</label>
                 <textarea class="form-control<?= isset($errors['address']) ? ' is-invalid' : '' ?>" id="address" name="address" rows="3"><?= esc(old('address', $player['address'])) ?></textarea>
                 <?php if (isset($errors['address'])): ?>
@@ -116,13 +130,14 @@
                 <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
         </form>
-
-        <div class="mt-3 pt-3 border-top d-flex justify-content-start">
-            <form action="<?= site_url('/admin/players/' . $player['id'] . '/delete') ?>" method="post" onsubmit="return confirm('Delete this player? This will remove linked player finance records and squad entries.');">
-                <?= csrf_field() ?>
-                <button type="submit" class="btn btn-outline-danger">Delete Player</button>
-            </form>
-        </div>
+        <?php if ($player['status'] !== 'approved'): ?>
+            <div class="mt-3 pt-3 border-top d-flex justify-content-start">
+                <form action="<?= site_url('/admin/players/' . $player['id'] . '/delete') ?>" method="post" onsubmit="return confirm('Delete this player? This will remove linked player finance records and squad entries.');">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-outline-danger">Delete Player</button>
+                </form>
+            </div>
+        <?php endif; ?>
     </div>
 
     <div class="content-card p-4">
@@ -139,6 +154,7 @@
                 <table class="table align-middle mb-0">
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>Match</th>
                             <th>Scheduled</th>
                             <th>Role</th>
@@ -149,9 +165,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($matchBreakdown as $match): ?>
+                        <?php foreach ($matchBreakdown as $index => $match): ?>
                             <?php $scoreboard = $match['scoreboard']; ?>
                             <tr>
+                                <td><?= esc((string) ($index + 1)) ?></td>
                                 <td>
                                     <div class="fw-semibold"><?= esc($match['team_name']) ?> vs <?= esc($match['opponent_name']) ?></div>
                                     <div class="text-secondary small"><?= esc($match['venue'] ?: 'Venue not set') ?></div>
@@ -179,9 +196,17 @@
                                 </td>
                                 <td>
                                     <div class="small">
-                                        <div><span class="fw-semibold">Bat:</span> <?= esc((string) $scoreboard['bat_runs']) ?><?= $scoreboard['dismissed'] ? '' : '*' ?> (<?= esc((string) $scoreboard['bat_balls']) ?>)</div>
-                                        <div class="text-secondary">4s <?= esc((string) $scoreboard['fours']) ?> · 6s <?= esc((string) $scoreboard['sixes']) ?><?php if ($scoreboard['strike_rate'] !== null): ?> · SR <?= esc(number_format((float) $scoreboard['strike_rate'], 2)) ?><?php endif; ?></div>
-                                        <div class="mt-2"><span class="fw-semibold">Bowl:</span> <?= esc((string) $scoreboard['bowl_wickets']) ?>/<?= esc((string) $scoreboard['bowl_runs']) ?> in <?= esc($scoreboard['bowling_overs']) ?> ov<?php if ($scoreboard['economy'] !== null): ?> · Eco <?= esc(number_format((float) $scoreboard['economy'], 2)) ?><?php endif; ?></div>
+                                        <?php if ($scoreboard['batted']): ?>
+                                            <div><span class="fw-semibold">Bat:</span> <?= esc((string) $scoreboard['bat_runs']) ?><?= $scoreboard['dismissed'] ? '' : '*' ?> (<?= esc((string) $scoreboard['bat_balls']) ?>)</div>
+                                            <div class="text-secondary">4s <?= esc((string) $scoreboard['fours']) ?> · 6s <?= esc((string) $scoreboard['sixes']) ?><?php if ($scoreboard['strike_rate'] !== null): ?> · SR <?= esc(number_format((float) $scoreboard['strike_rate'], 2)) ?><?php endif; ?></div>
+                                        <?php else: ?>
+                                            <div class="text-secondary">Did not bat</div>
+                                        <?php endif; ?>
+                                        <?php if ($scoreboard['bowled']): ?>
+                                            <div class="mt-2"><span class="fw-semibold">Bowl:</span> <?= esc((string) $scoreboard['bowl_wickets']) ?>/<?= esc((string) $scoreboard['bowl_runs']) ?> in <?= esc($scoreboard['bowling_overs']) ?> ov<?php if ($scoreboard['economy'] !== null): ?> · Eco <?= esc(number_format((float) $scoreboard['economy'], 2)) ?><?php endif; ?></div>
+                                        <?php else: ?>
+                                            <div class="text-secondary mt-2">Did not bowl</div>
+                                        <?php endif; ?>
                                         <?php if ($scoreboard['catches'] > 0 || $scoreboard['run_outs'] > 0 || $scoreboard['stumpings'] > 0): ?>
                                             <div class="text-secondary mt-2">Field: Catches <?= esc((string) $scoreboard['catches']) ?> · Run outs <?= esc((string) $scoreboard['run_outs']) ?> · Stumpings <?= esc((string) $scoreboard['stumpings']) ?></div>
                                         <?php endif; ?>
