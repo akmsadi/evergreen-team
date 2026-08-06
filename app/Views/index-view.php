@@ -197,12 +197,12 @@
                     <div class="swiper mySwiper">
                         <div class="swiper-wrapper">
                             <?php foreach ($players as $player): ?>
-                                <div class="swiper-slide" style="background-image: url('<?= base_url('assets/images/empty-male.png') ?>');">
+                                <a class="swiper-slide text-decoration-none" href="<?= site_url('/players/' . (int) $player['id']) ?>" style="background-image: url('<?= base_url('assets/images/empty-male.png') ?>');">
                                     <div class="card-content">
                                         <p>Player</p>
-                                        <h3><?= $player['name'] ?></h3>
+                                        <h3><?= esc($player['name']) ?></h3>
                                     </div>
-                                </div>
+                                </a>
                             <?php endforeach; ?>
                         </div>
                         <!-- Navigation Arrows -->

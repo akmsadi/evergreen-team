@@ -338,6 +338,17 @@
                 font-size: 0.9em;
             }
 
+            .player-link {
+                color: inherit;
+                text-decoration: none;
+                border-bottom: 1px dashed transparent;
+            }
+
+            .player-link:hover {
+                color: var(--cg);
+                border-bottom-color: var(--cg);
+            }
+
             .td-runs {
                 font-weight: 800;
                 font-size: 1rem;
@@ -486,6 +497,16 @@
     <body>
 
         <?php
+        /* ── Player profile link helper ── */
+        $playerLink = static function ($playerId, string $name): string {
+            $name = esc($name !== '' ? $name : '—');
+            $playerId = (int) $playerId;
+            if ($playerId <= 0) {
+                return $name;
+            }
+            return '<a class="player-link" href="' . esc(site_url('players/' . $playerId)) . '">' . $name . '</a>';
+        };
+
         /* ── Derived side variables ── */
         $inns1BowlingSide = $inns1BattingSide === 'team_a' ? 'team_b' : 'team_a';
         $inns2BattingSide = $inns1BowlingSide;
@@ -763,6 +784,7 @@
                         if ($s['overs']) {
                             $scoreStr .= ' (' . $s['overs'] . ' ov)';
                         }
+
                         ?>
                         <div class="tab-pane fade <?= $i === 0 ? 'show active' : '' ?>" id="pane-inns<?= $inns ?>" role="tabpanel" aria-labelledby="tab-inns<?= $inns ?>" tabindex="0">
 
@@ -802,7 +824,7 @@
                                                     <tr>
                                                         <td class="td-seq"><?= $idx + 1 ?></td>
                                                         <td class="td-name">
-                                                            <?= esc($row['player_name'] ?? '—') ?>
+                                                            <?= $playerLink($row['player_id'] ?? null, (string) ($row['player_name'] ?? '')) ?>
                                                             <?php if ($isNotOut): ?><span class="not-out-star">*</span><?php endif; ?>
                                                         </td>
                                                         <td class="td-runs"><?= $row['runs'] !== null ? esc((string) $row['runs']) : '—' ?></td>
@@ -852,7 +874,7 @@
                                         <?php foreach ($fowRows as $k => $fw): ?>
                                             <span class="fow-chip">
                                                 <?= $k + 1 ?>-<?= esc((string) $fw['score_at_dismissal']) ?>
-                                                <span style="opacity:.65"> (<?= esc($fw['player_name'] ?? '?') ?>, <?= esc((string) $fw['over_at_dismissal']) ?> ov)</span>
+                                                <span style="opacity:.65"> (<?= $playerLink($fw['player_id'] ?? null, (string) ($fw['player_name'] ?? '?')) ?>, <?= esc((string) $fw['over_at_dismissal']) ?> ov)</span>
                                             </span>
                                         <?php endforeach; ?>
                                     </div>
@@ -878,7 +900,7 @@
                                                 <?php foreach ($bowlRows as $idx => $row): ?>
                                                     <tr>
                                                         <td class="td-seq"><?= $idx + 1 ?></td>
-                                                        <td class="td-name"><?= esc($row['player_name'] ?? '—') ?></td>
+                                                        <td class="td-name"><?= $playerLink($row['player_id'] ?? null, (string) ($row['player_name'] ?? '')) ?></td>
                                                         <td class="td-balls"><?= $row['overs'] !== null ? esc((string) $row['overs']) : '—' ?></td>
                                                         <td class="td-balls"><?= $row['maidens'] !== null ? esc((string) $row['maidens']) : '—' ?></td>
                                                         <td class="td-balls"><?= $row['runs'] !== null ? esc((string) $row['runs']) : '—' ?></td>
@@ -895,7 +917,7 @@
                                         <div class="dnb-row">
                                             <span class="dnb-label">Did not bowl:</span>
                                             <?php foreach ($didNotBowl as $k => $p): ?>
-                                                <span class="dnb-name"><?= esc($p['player_name']) ?><?= $k < count($didNotBowl) - 1 ? ',' : '' ?></span>
+                                                <span class="dnb-name"><?= $playerLink($p['player_id'] ?? null, (string) $p['player_name']) ?><?= $k < count($didNotBowl) - 1 ? ',' : '' ?></span>
                                             <?php endforeach; ?>
                                         </div>
                                     <?php endif; ?>

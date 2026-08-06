@@ -120,6 +120,7 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
                     <tr>
                         <th class="col-sticky col-sn" rowspan="2">#</th>
                         <th class="col-sticky col-name" rowspan="2">Player Name</th>
+                        <th rowspan="2">Organization</th>
                         <th rowspan="2" class="text-end">Total<br>Contribution</th>
                         <th rowspan="2" class="text-end">Total<br>Expenses</th>
                         <th rowspan="2" class="text-end">Balance</th>
@@ -141,6 +142,7 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
                         <tr>
                             <td class="col-sticky col-sn text-center text-secondary"><?= esc((string) ($i + 1)) ?></td>
                             <td class="col-sticky col-name fw-semibold"><?= esc($row['player']['name']) ?></td>
+                            <td><?= esc($row['player']['organization'] ?? '') ?></td>
                             <td class="text-end"><?= esc(number_format($row['deposited'], 0)) ?></td>
                             <td class="text-end"><?= esc(number_format($row['owed'], 0)) ?></td>
                             <td class="text-end">
@@ -164,6 +166,7 @@ $totalBalance = round($totalDeposited - $totalOwed, 2);
                     <tr>
                         <td class="col-sticky col-sn"></td>
                         <td class="col-sticky col-name text-end">Total</td>
+                        <td></td>
                         <td class="text-end"><?= esc(number_format($totalDeposited, 0)) ?></td>
                         <td class="text-end"><?= esc(number_format($totalOwed, 0)) ?></td>
                         <td class="text-end">

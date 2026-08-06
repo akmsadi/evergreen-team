@@ -107,7 +107,7 @@
         border-collapse: separate;
         border-spacing: 0 0.35rem;
         color: #e5edf7;
-        font-size: 0.8rem;
+        font-size: 1.1rem;
         margin-bottom: 0;
     }
 
@@ -115,7 +115,7 @@
         background: rgba(255, 255, 255, 0.14);
         color: #dbe4f0;
         text-transform: uppercase;
-        font-size: 0.66rem;
+        font-size: 0.88rem;
         letter-spacing: 0.05em;
         font-weight: 700 !important;
         padding: 0.55rem 0.6rem;
@@ -168,11 +168,11 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 1.6rem;
-        height: 1.6rem;
+        width: 1.9rem;
+        height: 1.9rem;
         border-radius: 5px;
         font-weight: 700 !important;
-        font-size: 0.75rem;
+        font-size: 1rem;
         color: #fff;
     }
 
@@ -186,7 +186,7 @@
 
     .leaderboard-stat {
         font-weight: 800 !important;
-        font-size: 0.95rem;
+        font-size: 1.3rem;
         color: #ffd447;
     }
 
@@ -335,6 +335,7 @@
                                     <th>Balls</th>
                                     <th>4s</th>
                                     <th>6s</th>
+                                    <th>R (B)</th>
                                     <th>SR</th>
                                     <th>Avg</th>
                                 </tr>
@@ -350,6 +351,7 @@
                                         <td><?= esc((string) $batsman['balls']) ?></td>
                                         <td><?= esc((string) $batsman['fours']) ?></td>
                                         <td><?= esc((string) $batsman['sixes']) ?></td>
+                                        <td><?= $batsman['best_score'] !== null ? esc($batsman['best_score']) : '-' ?></td>
                                         <td><?= $batsman['strike_rate'] !== null ? esc(number_format((float) $batsman['strike_rate'], 2)) : '-' ?></td>
                                         <td><?= $batsman['average'] !== null ? esc(number_format((float) $batsman['average'], 2)) : '-' ?></td>
                                     </tr>
@@ -380,6 +382,7 @@
                                     <th>Wickets</th>
                                     <th>Overs</th>
                                     <th>Runs</th>
+                                    <th>W / R</th>
                                     <th>Economy</th>
                                 </tr>
                             </thead>
@@ -393,6 +396,7 @@
                                         <td><span class="leaderboard-stat"><?= esc((string) $bowler['wickets']) ?></span></td>
                                         <td><?= esc($bowler['overs']) ?></td>
                                         <td><?= esc((string) $bowler['runs']) ?></td>
+                                        <td><?= $bowler['best_bowling'] !== null ? esc($bowler['best_bowling']) : '-' ?></td>
                                         <td><?= $bowler['economy'] !== null ? esc(number_format((float) $bowler['economy'], 2)) : '-' ?></td>
                                     </tr>
                                 <?php endforeach; ?>

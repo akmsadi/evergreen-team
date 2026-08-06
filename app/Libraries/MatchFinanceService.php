@@ -291,44 +291,80 @@ class MatchFinanceService
         $limit = max(1, $limit);
 
         $rows = $this->matchPlayers->db->table('match_summary_batsmen msb')
-            ->select("msb.player_id, players.name, SUM(COALESCE(msb.runs, 0)) AS runs, SUM(COALESCE(msb.balls, 0)) AS balls, SUM(COALESCE(msb.fours, 0)) AS fours, SUM(COALESCE(msb.sixes, 0)) AS sixes, COUNT(DISTINCT msb.match_id) AS matches_played, SUM(CASE WHEN msb.runs IS NOT NULL OR msb.balls IS NOT NULL OR msb.dismissal_mode IS NOT NULL THEN 1 ELSE 0 END) AS innings, SUM(CASE WHEN msb.dismissal_mode IS NOT NULL AND msb.dismissal_mode NOT IN ('not_out', 'retired_hurt') THEN 1 ELSE 0 END) AS dismissals")
+            ->select('msb.player_id, players.name, msb.runs, msb.balls, msb.fours, msb.sixes, msb.dismissal_mode')
             ->join('players', 'players.id = msb.player_id')
             ->join('matches', 'matches.id = msb.match_id')
             ->where('matches.match_status !=', 'archived')
-            ->groupBy('msb.player_id, players.name')
             ->get()
             ->getResultArray();
 
         $leaderboard = [];
 
         foreach ($rows as $row) {
-            $runs = (int) ($row['runs'] ?? 0);
-            $balls = (int) ($row['balls'] ?? 0);
+            $playerId = (int) $row['player_id'];
 
-            if ($balls <= 0 && $runs <= 0) {
-                continue;
+            if (!isset($leaderboard[$playerId])) {
+                $leaderboard[$playerId] = [
+                    'player_id' => $playerId,
+                    'name' => (string) $row['name'],
+                    'matches_played' => 0,
+                    'innings' => 0,
+                    'runs' => 0,
+                    'balls' => 0,
+                    'fours' => 0,
+                    'sixes' => 0,
+                    'dismissals' => 0,
+                    'best_score' => null,
+                    'best_score_runs' => null,
+                    'best_score_balls' => null,
+                    'best_score_not_out' => null,
+                ];
             }
 
-            $dismissals = (int) ($row['dismissals'] ?? 0);
+            $hasInningsData = $row['runs'] !== null || $row['balls'] !== null || $row['dismissal_mode'] !== null;
+            $inningsRuns = (int) ($row['runs'] ?? 0);
+            $inningsBalls = (int) ($row['balls'] ?? 0);
 
-            $leaderboard[] = [
-                'player_id' => (int) $row['player_id'],
-                'name' => (string) $row['name'],
-                'matches_played' => (int) ($row['matches_played'] ?? 0),
-                'innings' => (int) ($row['innings'] ?? 0),
-                'runs' => $runs,
-                'balls' => $balls,
-                'fours' => (int) ($row['fours'] ?? 0),
-                'sixes' => (int) ($row['sixes'] ?? 0),
-                'strike_rate' => $balls > 0 ? round(($runs / $balls) * 100, 2) : null,
-                'average' => $dismissals > 0 ? round($runs / $dismissals, 2) : null,
-            ];
+            if ($hasInningsData) {
+                $leaderboard[$playerId]['innings']++;
+            }
+
+            $leaderboard[$playerId]['runs'] += $inningsRuns;
+            $leaderboard[$playerId]['balls'] += $inningsBalls;
+            $leaderboard[$playerId]['fours'] += (int) ($row['fours'] ?? 0);
+            $leaderboard[$playerId]['sixes'] += (int) ($row['sixes'] ?? 0);
+
+            if ($row['dismissal_mode'] !== null && !in_array($row['dismissal_mode'], ['not_out', 'retired_hurt'], true)) {
+                $leaderboard[$playerId]['dismissals']++;
+            }
+
+            if ($hasInningsData) {
+                $bestRuns = $leaderboard[$playerId]['best_score_runs'];
+                $bestBalls = $leaderboard[$playerId]['best_score_balls'];
+
+                $isBetter = $bestRuns === null
+                    || $inningsRuns > $bestRuns
+                    || ($inningsRuns === $bestRuns && $inningsBalls < $bestBalls);
+
+                if ($isBetter) {
+                    $notOut = in_array($row['dismissal_mode'], ['not_out', 'retired_hurt'], true);
+                    $leaderboard[$playerId]['best_score_runs'] = $inningsRuns;
+                    $leaderboard[$playerId]['best_score_balls'] = $inningsBalls;
+                    $leaderboard[$playerId]['best_score_not_out'] = $notOut;
+                    $leaderboard[$playerId]['best_score'] = $inningsRuns . ($notOut ? '*' : '') . ' (' . $inningsBalls . ')';
+                }
+            }
         }
+
+        $leaderboard = array_values(array_filter($leaderboard, static fn(array $entry): bool => $entry['balls'] > 0 || $entry['runs'] > 0));
 
         $matchCounts = $this->getMatchCountsForPlayers(array_column($leaderboard, 'player_id'));
 
         foreach ($leaderboard as &$entry) {
             $entry['matches_played'] = $matchCounts[$entry['player_id']] ?? 0;
+            $entry['strike_rate'] = $entry['balls'] > 0 ? round(($entry['runs'] / $entry['balls']) * 100, 2) : null;
+            $entry['average'] = $entry['dismissals'] > 0 ? round($entry['runs'] / $entry['dismissals'], 2) : null;
+            unset($entry['dismissals'], $entry['best_score_runs'], $entry['best_score_balls'], $entry['best_score_not_out']);
         }
         unset($entry);
 
@@ -385,6 +421,9 @@ class MatchFinanceService
                     'runs' => 0,
                     'wickets' => 0,
                     'economy' => null,
+                    'best_bowling' => null,
+                    'best_bowling_wickets' => null,
+                    'best_bowling_runs' => null,
                 ];
             }
 
@@ -400,6 +439,23 @@ class MatchFinanceService
             $leaderboard[$playerId]['balls'] += $ballsBowled;
             $leaderboard[$playerId]['runs'] += (int) ($row['runs'] ?? 0);
             $leaderboard[$playerId]['wickets'] += (int) ($row['wickets'] ?? 0);
+
+            if ($ballsBowled > 0) {
+                $inningsWickets = (int) ($row['wickets'] ?? 0);
+                $inningsRuns = (int) ($row['runs'] ?? 0);
+                $bestWickets = $leaderboard[$playerId]['best_bowling_wickets'];
+                $bestRuns = $leaderboard[$playerId]['best_bowling_runs'];
+
+                $isBetter = $bestWickets === null
+                    || $inningsWickets > $bestWickets
+                    || ($inningsWickets === $bestWickets && $inningsRuns < $bestRuns);
+
+                if ($isBetter) {
+                    $leaderboard[$playerId]['best_bowling_wickets'] = $inningsWickets;
+                    $leaderboard[$playerId]['best_bowling_runs'] = $inningsRuns;
+                    $leaderboard[$playerId]['best_bowling'] = $inningsWickets . '/' . $inningsRuns;
+                }
+            }
         }
 
         $matchCounts = $this->getMatchCountsForPlayers(array_keys($leaderboard));
@@ -418,6 +474,11 @@ class MatchFinanceService
         unset($entry);
 
         $leaderboard = array_values(array_filter($leaderboard, static fn(array $entry): bool => $entry['balls'] > 0));
+
+        foreach ($leaderboard as &$entry) {
+            unset($entry['best_bowling_wickets'], $entry['best_bowling_runs']);
+        }
+        unset($entry);
 
         usort($leaderboard, static function (array $left, array $right): int {
             $wicketsComparison = $right['wickets'] <=> $left['wickets'];

@@ -2,6 +2,7 @@
 
 use CodeIgniter\Router\RouteCollection;
 use App\Controllers\HomeController;
+use App\Controllers\PublicPlayers;
 use App\Controllers\AdminAuth;
 use App\Controllers\AdminVenues;
 use App\Controllers\AdminMatches;
@@ -22,6 +23,7 @@ use App\Controllers\Api\Venues as ApiVenues;
 $routes->get('/', [HomeController::class, 'index']);
 $routes->post('/join-us', [HomeController::class, 'joinUs']);
 $routes->get('/team/(:segment)', [HomeController::class, 'team']);
+$routes->get('/players/(:num)', [PublicPlayers::class, 'profile']);
 $routes->get('/matches/(:segment)/scoreboard', [Scoreboard::class, 'view']);
 
 // Auth routes
