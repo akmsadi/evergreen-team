@@ -274,7 +274,7 @@
             if ($matchId <= 0) {
                 return $matchName;
             }
-            return '<a class="scoreboard-link" href="' . esc(site_url('matches/' . scoreboard_encode($matchId) . '/scoreboard')) . '" target="_blank">' . $matchName . '</a>';
+            return '<a class="scoreboard-link" href="' . esc(site_url('matches/' . scoreboard_encode($matchId) . '/scoreboard')) . '">' . $matchName . '</a>';
         };
 
         $dismissalLabel = static function (array $row): string {

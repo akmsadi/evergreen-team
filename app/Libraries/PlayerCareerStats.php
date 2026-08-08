@@ -14,9 +14,12 @@ class PlayerCareerStats
         $battingFours = array_sum(array_map(static fn(array $row): int => (int) ($row['fours'] ?? 0), $battingRows));
         $battingSixes = array_sum(array_map(static fn(array $row): int => (int) ($row['sixes'] ?? 0), $battingRows));
         $isNotOutMode = static fn(string $mode): bool => in_array($mode, ['', 'not_out', 'retired_hurt'], true);
+        $hasInningsData = static fn(array $row): bool => $row['runs'] !== null || $row['balls'] !== null || ($row['dismissal_mode'] ?? null) !== null;
+        $battingInningsRows = array_values(array_filter($battingRows, $hasInningsData));
+        $battingInnings = count($battingInningsRows);
         $notOuts = 0;
-        $dismissals = array_filter(array_map(static fn(array $row): ?string => $isNotOutMode((string) ($row['dismissal_mode'] ?? '')) ? null : (string) $row['dismissal_mode'], $battingRows));
-        foreach ($battingRows as $row) {
+        $dismissals = array_filter(array_map(static fn(array $row): ?string => $isNotOutMode((string) ($row['dismissal_mode'] ?? '')) ? null : (string) $row['dismissal_mode'], $battingInningsRows));
+        foreach ($battingInningsRows as $row) {
             if ($isNotOutMode((string) ($row['dismissal_mode'] ?? ''))) {
                 $notOuts++;
             }
@@ -33,11 +36,16 @@ class PlayerCareerStats
         $wickets = array_sum(array_map(static fn(array $row): int => (int) ($row['wickets'] ?? 0), $bowlingRows));
         $bowlingRuns = array_sum(array_map(static fn(array $row): int => (int) ($row['runs'] ?? 0), $bowlingRows));
         $ballsBowled = 0;
+        $bowlingInnings = 0;
         foreach ($bowlingRows as $row) {
             $rowOvers = (float) ($row['overs'] ?? 0.0);
             $fullOvers = (int) $rowOvers;
             $extraBalls = (int) round(($rowOvers - $fullOvers) * 10);
-            $ballsBowled += $fullOvers * 6 + $extraBalls;
+            $rowBalls = $fullOvers * 6 + $extraBalls;
+            $ballsBowled += $rowBalls;
+            if ($rowBalls > 0) {
+                $bowlingInnings++;
+            }
         }
         $overs = intdiv($ballsBowled, 6) . '.' . ($ballsBowled % 6);
         $bowlingAverage = $wickets > 0 ? round($bowlingRuns / $wickets, 2) : 0.0;
@@ -137,7 +145,7 @@ class PlayerCareerStats
             'matches_played' => $matchesPlayed,
             'matches_contributed' => $matchesContributed,
             'batting' => [
-                'innings' => count($battingRows),
+                'innings' => $battingInnings,
                 'runs' => $battingRuns,
                 'balls' => $battingBalls,
                 'fours' => $battingFours,
@@ -150,7 +158,7 @@ class PlayerCareerStats
                 'dismissal_breakdown' => array_count_values($dismissals),
             ],
             'bowling' => [
-                'innings' => count($bowlingRows),
+                'innings' => $bowlingInnings,
                 'overs' => $overs,
                 'maidens' => array_sum(array_map(static fn(array $row): int => (int) ($row['maidens'] ?? 0), $bowlingRows)),
                 'runs' => $bowlingRuns,
