@@ -29,15 +29,19 @@ class PublicPlayers extends BaseController
 
         $db = db_connect();
         $battingRows = $db->table('match_summary_batsmen msb')
-            ->select('msb.runs, msb.balls, msb.fours, msb.sixes, msb.dismissal_mode, msb.match_id')
+            ->select('msb.runs, msb.balls, msb.fours, msb.sixes, msb.dismissal_mode, msb.match_id, CONCAT(m.team_name, " vs ", m.opponent_name) AS match_name, COALESCE(v.name, m.venue, "TBD") AS venue_name, m.scheduled_at AS match_date')
+            ->join('matches m', 'm.id = msb.match_id')
+            ->join('venues v', 'v.id = m.venue_id', 'left')
             ->where('msb.player_id', $playerId)
-            ->orderBy('msb.match_id', 'ASC')
+            ->orderBy('m.scheduled_at', 'ASC')
             ->get()->getResultArray();
 
         $bowlingRows = $db->table('match_summary_bowlers msbow')
-            ->select('msbow.overs, msbow.maidens, msbow.runs, msbow.wickets, msbow.match_id')
+            ->select('msbow.overs, msbow.maidens, msbow.runs, msbow.wickets, msbow.match_id, CONCAT(m.team_name, " vs ", m.opponent_name) AS match_name, COALESCE(v.name, m.venue, "TBD") AS venue_name, m.scheduled_at AS match_date')
+            ->join('matches m', 'm.id = msbow.match_id')
+            ->join('venues v', 'v.id = m.venue_id', 'left')
             ->where('msbow.player_id', $playerId)
-            ->orderBy('msbow.match_id', 'ASC')
+            ->orderBy('m.scheduled_at', 'ASC')
             ->get()->getResultArray();
 
         $matchPlayerRows = $db->table('match_players mp')
@@ -58,21 +62,23 @@ class PublicPlayers extends BaseController
             ->get()->getResultArray();
 
         $battingDetailRows = $db->table('match_summary_batsmen msb')
-            ->select('msb.match_id, msb.runs, msb.balls, msb.fours, msb.sixes, msb.dismissal_mode, msb.dismissal_by, msb.fielder_id, CONCAT(m.team_name, " vs ", m.opponent_name) AS match_name, m.scheduled_at AS match_date, p.name AS player_name, p2.name AS dismissal_by_name, p3.name AS fielder_name')
+            ->select('msb.match_id, msb.runs, msb.balls, msb.fours, msb.sixes, msb.dismissal_mode, msb.dismissal_by, msb.fielder_id, CONCAT(m.team_name, " vs ", m.opponent_name) AS match_name, COALESCE(v.name, m.venue, "TBD") AS venue_name, m.scheduled_at AS match_date, p.name AS player_name, p2.name AS dismissal_by_name, p3.name AS fielder_name')
             ->join('matches m', 'm.id = msb.match_id')
+            ->join('venues v', 'v.id = m.venue_id', 'left')
             ->join('players p', 'p.id = msb.player_id')
             ->join('players p2', 'p2.id = msb.dismissal_by', 'left')
             ->join('players p3', 'p3.id = msb.fielder_id', 'left')
             ->where('msb.player_id', $playerId)
-            ->orderBy('msb.match_id', 'ASC')
+            ->orderBy('m.scheduled_at', 'ASC')
             ->get()->getResultArray();
 
         $bowlingDetailRows = $db->table('match_summary_bowlers msb')
-            ->select('msb.match_id, msb.overs, msb.maidens, msb.runs, msb.wickets, CONCAT(m.team_name, " vs ", m.opponent_name) AS match_name, m.scheduled_at AS match_date, p.name AS player_name')
+            ->select('msb.match_id, msb.overs, msb.maidens, msb.runs, msb.wickets, CONCAT(m.team_name, " vs ", m.opponent_name) AS match_name, COALESCE(v.name, m.venue, "TBD") AS venue_name, m.scheduled_at AS match_date, p.name AS player_name')
             ->join('matches m', 'm.id = msb.match_id')
+            ->join('venues v', 'v.id = m.venue_id', 'left')
             ->join('players p', 'p.id = msb.player_id')
             ->where('msb.player_id', $playerId)
-            ->orderBy('msb.match_id', 'ASC')
+            ->orderBy('m.scheduled_at', 'ASC')
             ->get()->getResultArray();
 
         $fieldingRows = $db->table('match_summary_batsmen msb')

@@ -490,6 +490,8 @@
                                     <thead>
                                         <tr>
                                             <th>Match</th>
+                                            <th>Venue</th>
+                                            <th>Date</th>
                                             <th class="td-num">Runs</th>
                                             <th class="td-num">Balls</th>
                                             <th class="td-num">4s</th>
@@ -501,6 +503,8 @@
                                         <?php foreach ($battingRows as $row): ?>
                                             <tr>
                                                 <td class="td-name"><?= $scoreboardLink($row['match_id'] ?? null, (string) ($row['match_name'] ?? '')) ?></td>
+                                                <td><?= esc((string) ($row['venue_name'] ?? 'TBD')) ?></td>
+                                                <td><?= esc($formatDate($row['match_date'] ?? null)) ?></td>
                                                 <td class="td-num"><?= esc((string) ($row['runs'] ?? 0)) ?></td>
                                                 <td class="td-num"><?= esc((string) ($row['balls'] ?? 0)) ?></td>
                                                 <td class="td-num"><?= esc((string) ($row['fours'] ?? 0)) ?></td>
@@ -525,6 +529,8 @@
                                     <thead>
                                         <tr>
                                             <th>Match</th>
+                                            <th>Venue</th>
+                                            <th>Date</th>
                                             <th class="td-num">Overs</th>
                                             <th class="td-num">Maidens</th>
                                             <th class="td-num">Runs</th>
@@ -536,6 +542,8 @@
                                         <?php foreach ($bowlingRows as $row): ?>
                                             <tr>
                                                 <td class="td-name"><?= $scoreboardLink($row['match_id'] ?? null, (string) ($row['match_name'] ?? '')) ?></td>
+                                                <td><?= esc((string) ($row['venue_name'] ?? 'TBD')) ?></td>
+                                                <td><?= esc($formatDate($row['match_date'] ?? null)) ?></td>
                                                 <td class="td-num"><?= esc((string) ($row['overs'] ?? 0)) ?></td>
                                                 <td class="td-num"><?= esc((string) ($row['maidens'] ?? 0)) ?></td>
                                                 <td class="td-num"><?= esc((string) ($row['runs'] ?? 0)) ?></td>
