@@ -25,6 +25,7 @@
                     <tr>
                         <th>Logo</th>
                         <th>Name</th>
+                        <th>Type</th>
                         <th>Members</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -40,6 +41,13 @@
                                 <?php endif; ?>
                             </td>
                             <td><?= esc($team['name']) ?></td>
+                            <td>
+                                <?php if ($team['is_external']): ?>
+                                    <span class="badge bg-warning">External</span>
+                                <?php else: ?>
+                                    <span class="badge bg-success">Home</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?= esc((string) $team['member_count']) ?></td>
                             <td class="text-end">
                                 <div class="d-inline-flex gap-2">

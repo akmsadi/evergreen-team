@@ -57,6 +57,15 @@
                     <div class="invalid-feedback"><?= esc($errors['about']) ?></div>
                 <?php endif; ?>
             </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="is_external" name="is_external" value="1" <?= old('is_external', $team['is_external']) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="is_external">
+                        <strong>External Team</strong>
+                        <span class="text-secondary d-block small">Check this if this team is not part of your home teams (e.g., opposing teams)</span>
+                    </label>
+                </div>
+            </div>
             <div class="row g-3 mb-3">
                 <div class="col-lg-3 mb-3 mb-lg-0">
                     <label for="established" class="form-label fw-semibold">Established</label>

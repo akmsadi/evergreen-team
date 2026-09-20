@@ -28,6 +28,15 @@
                     <div class="invalid-feedback"><?= esc($errors['name']) ?></div>
                 <?php endif; ?>
             </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="is_external" name="is_external" value="1" <?= old('is_external') ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="is_external">
+                        <strong>External Team</strong>
+                        <span class="text-secondary d-block small">Check this if this team is not part of your home teams (e.g., opposing teams)</span>
+                    </label>
+                </div>
+            </div>
             <div class="mb-4">
                 <label for="logo" class="form-label fw-semibold">Logo <span class="text-secondary fw-normal">(optional, max 2 MB)</span></label>
                 <input type="file" class="form-control<?= isset($errors['logo']) ? ' is-invalid' : '' ?>" id="logo" name="logo" accept="image/*">

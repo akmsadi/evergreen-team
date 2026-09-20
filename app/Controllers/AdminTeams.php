@@ -79,7 +79,16 @@ class AdminTeams extends BaseController
 
         $this->teams->insert([
             'name' => $this->normalizedName(),
+            'slug' => $this->generateSlug($this->normalizedName()),
+            'slogan' => '',
+            'about' => '',
+            'banner' => 'default.jpg',
+            'established' => (int) date('Y'),
+            'matches' => 0,
+            'wins' => 0,
+            'titles' => 0,
             'logo' => $this->uploadLogo(),
+            'is_external' => (bool) $this->request->getPost('is_external'),
         ]);
 
         return redirect()->to('/admin/teams')->with('success', 'Team created successfully.');
@@ -111,6 +120,7 @@ class AdminTeams extends BaseController
             'titles' => (int) $this->request->getPost('titles'),
             'captain_id' => $this->request->getPost('captain_id'),
             'vice_captain_id' => $this->request->getPost('vice_captain_id'),
+            'is_external' => (bool) $this->request->getPost('is_external'),
         ];
 
         $logo = $this->uploadLogo();
@@ -217,17 +227,7 @@ class AdminTeams extends BaseController
         } else {
             $rules = [
                 'name' => 'required|min_length[2]|max_length[255]',
-                'slug' => 'required|min_length[2]|max_length[255]',
-                'slogan' => 'required|min_length[2]|max_length[255]',
-                'about' => 'required|min_length[2]',
-                'established' => 'required|integer|greater_than[2000]|less_than_or_equal_to[' . date('Y') . ']',
-                'matches' => 'required|integer',
-                'wins' => 'required|integer',
-                'titles' => 'required|integer',
                 'logo' => 'permit_empty|uploaded[logo]|is_image[logo]|max_size[logo,2048]',
-                'banner' => 'permit_empty|uploaded[banner]|is_image[banner]|max_size[banner,2048]',
-                'captain_id' => 'permit_empty|integer',
-                'vice_captain_id' => 'permit_empty|integer',
             ];
         }
 
@@ -320,5 +320,13 @@ class AdminTeams extends BaseController
             ->orderBy('name', 'ASC')
             ->get()
             ->getResultArray();
+    }
+
+    private function generateSlug(string $name): string
+    {
+        $slug = strtolower(trim($name));
+        $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
+        $slug = trim($slug, '-');
+        return $slug;
     }
 }

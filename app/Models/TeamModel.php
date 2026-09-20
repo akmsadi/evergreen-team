@@ -21,6 +21,7 @@ class TeamModel extends AuditableModel
         'captain_id',
         'vice_captain_id',
         'logo',
+        'is_external',
     ];
 
     public function withMemberCount(): array
@@ -32,6 +33,28 @@ class TeamModel extends AuditableModel
             ->orderBy('teams.name', 'ASC')
             ->get()
             ->getResultArray();
+    }
+
+    public function withMemberCountByType(bool $isExternal = false): array
+    {
+        return $this->db->table('teams')
+            ->select('teams.*, COUNT(team_players.id) AS member_count')
+            ->join('team_players', 'team_players.team_id = teams.id', 'left')
+            ->where('teams.is_external', $isExternal)
+            ->groupBy('teams.id')
+            ->orderBy('teams.name', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
+    public function homeTeams(): array
+    {
+        return $this->where('is_external', false)->orderBy('name', 'ASC')->findAll();
+    }
+
+    public function externalTeams(): array
+    {
+        return $this->where('is_external', true)->orderBy('name', 'ASC')->findAll();
     }
 
     public function withCaptainAndViceCaptainBySlug($team_slug): array
