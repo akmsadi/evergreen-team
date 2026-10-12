@@ -507,6 +507,159 @@ class MatchFinanceService
         return array_slice($leaderboard, 0, $limit);
     }
 
+    /**
+     * Career and single-innings records across all non-archived matches.
+     *
+     * @return list<array{title: string, unit: string, note: string, rows: list<array{player_id: int|null, name: string, value: string, detail: string}>}>
+     */
+    public function getRecords(int $limit = 5): array
+    {
+        $db = $this->matchPlayers->db;
+        $matchLabel = 'CONCAT(m.team_name, " vs ", m.opponent_name) AS match_name, COALESCE(v.name, m.venue, "TBD") AS venue_name, m.scheduled_at AS match_date';
+
+        $batting = $db->table('match_summary_batsmen msb')
+            ->select('msb.player_id, p.name, msb.runs, msb.balls, msb.fours, msb.sixes, msb.dismissal_mode, msb.fielder_id, ' . $matchLabel)
+            ->join('players p', 'p.id = msb.player_id')
+            ->join('matches m', 'm.id = msb.match_id')
+            ->join('venues v', 'v.id = m.venue_id', 'left')
+            ->where('m.match_status !=', 'archived')
+            ->where('p.guest_of_player_id IS NULL', null, false)
+            ->where('p.status', 'approved')
+            ->get()->getResultArray();
+
+        $bowling = $db->table('match_summary_bowlers msbow')
+            ->select('msbow.player_id, p.name, msbow.overs, msbow.maidens, msbow.runs, msbow.wickets, ' . $matchLabel)
+            ->join('players p', 'p.id = msbow.player_id')
+            ->join('matches m', 'm.id = msbow.match_id')
+            ->join('venues v', 'v.id = m.venue_id', 'left')
+            ->where('m.match_status !=', 'archived')
+            ->where('p.guest_of_player_id IS NULL', null, false)
+            ->where('p.status', 'approved')
+            ->get()->getResultArray();
+
+        $catchRows = $db->table('match_summary_batsmen msb')
+            ->select('msb.fielder_id AS player_id, p.name, COUNT(*) AS catches', false)
+            ->join('players p', 'p.id = msb.fielder_id')
+            ->join('matches m', 'm.id = msb.match_id')
+            ->where('m.match_status !=', 'archived')
+            ->where('p.guest_of_player_id IS NULL', null, false)
+            ->where('p.status', 'approved')
+            ->where('msb.dismissal_mode', 'caught')
+            ->groupBy('msb.fielder_id, p.name')
+            ->get()->getResultArray();
+
+        $ballsFromOvers = static function ($overs): int {
+            $overs = (float) $overs;
+            $full = (int) $overs;
+
+            return $full * 6 + (int) round(($overs - $full) * 10);
+        };
+        $isOut = static fn(?string $mode): bool => $mode !== null && $mode !== '' && !in_array($mode, ['not_out', 'retired_hurt'], true);
+        $matchDetail = static fn(array $row): string => trim((string) $row['match_name'] . ($row['match_date'] ? ' · ' . date('d M Y', strtotime((string) $row['match_date'])) : ''));
+
+        // Career aggregates.
+        $bat = [];
+        $battingInnings = [];
+        foreach ($batting as $row) {
+            if ($row['runs'] === null && $row['balls'] === null && $row['dismissal_mode'] === null) {
+                continue;
+            }
+
+            $pid = (int) $row['player_id'];
+            $bat[$pid] ??= ['name' => $row['name'], 'runs' => 0, 'balls' => 0, 'fours' => 0, 'sixes' => 0, 'outs' => 0, 'ducks' => 0, 'innings' => 0];
+            $bat[$pid]['runs'] += (int) $row['runs'];
+            $bat[$pid]['balls'] += (int) $row['balls'];
+            $bat[$pid]['fours'] += (int) $row['fours'];
+            $bat[$pid]['sixes'] += (int) $row['sixes'];
+            $bat[$pid]['innings']++;
+
+            $out = $isOut($row['dismissal_mode']);
+            $bat[$pid]['outs'] += $out ? 1 : 0;
+            $bat[$pid]['ducks'] += ($out && (int) $row['runs'] === 0) ? 1 : 0;
+            $battingInnings[] = $row;
+        }
+
+        $bowl = [];
+        $bowlingInnings = [];
+        $byGround = [];
+        foreach ($bowling as $row) {
+            $b = $ballsFromOvers($row['overs']);
+            if ($b <= 0) {
+                continue;
+            }
+
+            $pid = (int) $row['player_id'];
+            $bowl[$pid] ??= ['name' => $row['name'], 'balls' => 0, 'runs' => 0, 'wickets' => 0, 'maidens' => 0];
+            $bowl[$pid]['balls'] += $b;
+            $bowl[$pid]['runs'] += (int) $row['runs'];
+            $bowl[$pid]['wickets'] += (int) $row['wickets'];
+            $bowl[$pid]['maidens'] += (int) $row['maidens'];
+
+            $ground = (string) $row['venue_name'];
+            $byGround[$pid . '|' . $ground] ??= ['player_id' => $pid, 'name' => $row['name'], 'ground' => $ground, 'wickets' => 0];
+            $byGround[$pid . '|' . $ground]['wickets'] += (int) $row['wickets'];
+
+            $row['ball_count'] = $b;
+            $bowlingInnings[] = $row;
+        }
+
+        $fmt = static fn(float $n): string => number_format($n, 2);
+        $rank = function (array $items, callable $valueOf, bool $desc, callable $render, string $title, string $unit, string $note = '') use ($limit): array {
+            usort($items, static fn(array $a, array $b): int => $desc ? $valueOf($b) <=> $valueOf($a) : $valueOf($a) <=> $valueOf($b));
+            $rows = [];
+            foreach (array_slice($items, 0, $limit) as $item) {
+                $rows[] = $render($item);
+            }
+
+            return ['title' => $title, 'unit' => $unit, 'note' => $note, 'rows' => $rows];
+        };
+        $row = static fn($pid, $name, $value, string $detail = ''): array => ['player_id' => $pid !== null ? (int) $pid : null, 'name' => (string) $name, 'value' => (string) $value, 'detail' => $detail];
+
+        $batList = array_map(static fn($pid, $b) => $b + ['player_id' => $pid], array_keys($bat), $bat);
+        $bowlList = array_map(static fn($pid, $b) => $b + ['player_id' => $pid], array_keys($bowl), $bowl);
+        $economy = static fn(array $b): float => $b['runs'] / ($b['balls'] / 6);
+        $bowlAvg = static fn(array $b): float => $b['runs'] / $b['wickets'];
+
+        $inningsBat = static fn(array $r): string => $r['runs'] . ($r['dismissal_mode'] === 'not_out' ? '*' : '') . ' (' . $r['balls'] . ')';
+
+        $withAvg = array_values(array_filter($batList, static fn($b) => $b['outs'] > 0));
+        $withSr = array_values(array_filter($batList, static fn($b) => $b['balls'] >= 30));
+        $quickInnings = array_values(array_filter($battingInnings, static fn($r) => (int) $r['balls'] >= 10));
+        $noDucks = array_values(array_filter($batList, static fn($b) => $b['ducks'] === 0));
+        $hasDucks = array_values(array_filter($batList, static fn($b) => $b['ducks'] > 0));
+        $withWickets = array_values(array_filter($bowlList, static fn($b) => $b['wickets'] > 0));
+        $withEco = array_values(array_filter($bowlList, static fn($b) => $b['balls'] >= 12));
+        $ecoInnings = array_values(array_filter($bowlingInnings, static fn($r) => $r['ball_count'] >= 6));
+
+        $inningsEco = static fn(array $r): float => (int) $r['runs'] / ($r['ball_count'] / 6);
+
+        return [
+            $rank($battingInnings, static fn($r) => (int) $r['runs'], true, fn($r) => $row($r['player_id'], $r['name'], $inningsBat($r), $matchDetail($r)), 'Most runs in an innings', 'Runs (balls)'),
+            $rank($withAvg, static fn($b) => $b['runs'] / $b['outs'], true, fn($b) => $row($b['player_id'], $b['name'], $fmt($b['runs'] / $b['outs']), $b['runs'] . ' runs, ' . $b['outs'] . ' dismissals'), 'Highest career batting average', 'Avg', 'Needs at least one dismissal'),
+            $rank($withSr, static fn($b) => $b['runs'] / $b['balls'], true, fn($b) => $row($b['player_id'], $b['name'], $fmt($b['runs'] / $b['balls'] * 100), $b['runs'] . ' runs off ' . $b['balls'] . ' balls'), 'Highest career strike rate', 'SR', 'Minimum 30 balls faced'),
+            $rank($quickInnings, static fn($r) => (int) $r['runs'] / (int) $r['balls'], true, fn($r) => $row($r['player_id'], $r['name'], $fmt((int) $r['runs'] / (int) $r['balls'] * 100), $inningsBat($r) . ' · ' . $matchDetail($r)), 'Highest strike rate in an innings', 'SR', 'Minimum 10 balls faced'),
+            $rank($noDucks, static fn($b) => $b['innings'], true, fn($b) => $row($b['player_id'], $b['name'], $b['innings'], 'innings without a duck'), 'No ducks in career', 'Innings', 'Batters who have never been out for 0, most innings first'),
+            $rank($hasDucks, static fn($b) => $b['ducks'], true, fn($b) => $row($b['player_id'], $b['name'], $b['ducks'], 'in ' . $b['innings'] . ' innings'), 'Most ducks in career', 'Ducks'),
+            $rank($batList, static fn($b) => $b['sixes'], true, fn($b) => $row($b['player_id'], $b['name'], $b['sixes'], 'in ' . $b['innings'] . ' innings'), 'Most sixes in career', '6s'),
+            $rank($batList, static fn($b) => $b['fours'], true, fn($b) => $row($b['player_id'], $b['name'], $b['fours'], 'in ' . $b['innings'] . ' innings'), 'Most fours in career', '4s'),
+            $rank($battingInnings, static fn($r) => (int) $r['sixes'], true, fn($r) => $row($r['player_id'], $r['name'], (int) $r['sixes'], $inningsBat($r) . ' · ' . $matchDetail($r)), 'Most sixes in an innings', '6s'),
+            $rank($battingInnings, static fn($r) => (int) $r['fours'], true, fn($r) => $row($r['player_id'], $r['name'], (int) $r['fours'], $inningsBat($r) . ' · ' . $matchDetail($r)), 'Most fours in an innings', '4s'),
+            $rank($bowlList, static fn($b) => $b['wickets'], true, fn($b) => $row($b['player_id'], $b['name'], $b['wickets'], $this->formatOvers($b['balls']) . ' overs, ' . $b['runs'] . ' runs'), 'Most wickets in career', 'Wkts'),
+            $rank($bowlingInnings, static fn($r) => (int) $r['wickets'] * 100000 - (int) $r['runs'], true, fn($r) => $row($r['player_id'], $r['name'], (int) $r['wickets'] . '/' . (int) $r['runs'], $matchDetail($r)), 'Best figures in an innings', 'W/R'),
+            $rank(array_values($byGround), static fn($g) => $g['wickets'], true, fn($g) => $row($g['player_id'], $g['name'], $g['wickets'], $g['ground']), 'Most wickets on a single ground', 'Wkts'),
+            $rank($withWickets, $bowlAvg, false, fn($b) => $row($b['player_id'], $b['name'], $fmt($bowlAvg($b)), $b['runs'] . ' runs, ' . $b['wickets'] . ' wickets'), 'Best career bowling average', 'Avg', 'Needs at least one wicket'),
+            $rank($withEco, $economy, false, fn($b) => $row($b['player_id'], $b['name'], $fmt($economy($b)), $this->formatOvers($b['balls']) . ' overs'), 'Best career economy rate', 'Econ', 'Minimum 2 overs bowled'),
+            $rank($withWickets, $bowlAvg, true, fn($b) => $row($b['player_id'], $b['name'], $fmt($bowlAvg($b)), $b['runs'] . ' runs, ' . $b['wickets'] . ' wickets'), 'Worst career bowling average', 'Avg', 'Needs at least one wicket'),
+            $rank($withEco, $economy, true, fn($b) => $row($b['player_id'], $b['name'], $fmt($economy($b)), $this->formatOvers($b['balls']) . ' overs'), 'Worst career economy rate', 'Econ', 'Minimum 2 overs bowled'),
+            $rank($ecoInnings, $inningsEco, true, fn($r) => $row($r['player_id'], $r['name'], $fmt($inningsEco($r)), (int) $r['runs'] . ' runs in ' . $this->formatOvers($r['ball_count']) . ' ov · ' . $matchDetail($r)), 'Worst economy rate in an innings', 'Econ', 'Minimum 1 over bowled'),
+            $rank($bowlList, static fn($b) => $b['balls'], true, fn($b) => $row($b['player_id'], $b['name'], $b['balls'], $this->formatOvers($b['balls']) . ' overs'), 'Most balls bowled in career', 'Balls'),
+            $rank($bowlList, static fn($b) => $b['runs'], true, fn($b) => $row($b['player_id'], $b['name'], $b['runs'], $this->formatOvers($b['balls']) . ' overs'), 'Most runs conceded in career', 'Runs'),
+            $rank($bowlingInnings, static fn($r) => (int) $r['runs'], true, fn($r) => $row($r['player_id'], $r['name'], (int) $r['runs'], (int) $r['wickets'] . ' wkts · ' . $matchDetail($r)), 'Most runs conceded in an innings', 'Runs'),
+            $rank($bowlList, static fn($b) => $b['maidens'], true, fn($b) => $row($b['player_id'], $b['name'], $b['maidens'], $this->formatOvers($b['balls']) . ' overs'), 'Most maidens in career', 'Maidens'),
+            $rank($catchRows, static fn($c) => (int) $c['catches'], true, fn($c) => $row($c['player_id'], $c['name'], (int) $c['catches']), 'Most catches in career', 'Catches'),
+        ];
+    }
+
     public function getPlayerDeposits(int $playerId): array
     {
         return $this->matchPlayerDeposits

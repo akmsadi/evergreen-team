@@ -94,6 +94,7 @@ class AdminAuth extends BaseController
             'recentPlayers' => $this->players->recentList(5),
             'topBatsmen' => $this->matchFinance->getTopBatsmen(10),
             'topBowlers' => $this->matchFinance->getTopBowlers(10),
+            'records' => $this->matchFinance->getRecords(1),
             'matchExpenseChart' => $this->matchFinance->getMatchExpenseChartData(10),
         ]);
     }

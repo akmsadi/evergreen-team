@@ -190,6 +190,11 @@
         color: #ffd447;
     }
 
+    .leaderboard-table .leaderboard-muted {
+        color: #b6c4d8;
+        font-size: 0.9rem;
+    }
+
     .leaderboard-empty {
         color: #dbe4f0;
         margin-bottom: 0;
@@ -407,6 +412,47 @@
                     <p class="leaderboard-empty">No bowling data available yet.</p>
                 <?php endif; ?>
             </div>
+        </div>
+    </div>
+    <div class="leaderboard-panel leaderboard-panel--batting mt-4">
+        <div class="leaderboard-head">
+            <h2 class="leaderboard-title">Records</h2>
+            <p class="leaderboard-subtitle">Best across all recorded matches</p>
+        </div>
+        <div class="table-responsive">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Record</th>
+                        <th>Name</th>
+                        <th>Value</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($records as $index => $record): ?>
+                        <?php $entry = $record['rows'][0] ?? null; ?>
+                        <tr>
+                            <td><span class="rank-chip"><?= esc((string) ($index + 1)) ?></span></td>
+                            <td><?= esc($record['title']) ?></td>
+                            <?php if ($entry !== null): ?>
+                                <td>
+                                    <?php if ($entry['player_id'] !== null): ?>
+                                        <a target="_blank" href="<?= site_url('admin/players/' . $entry['player_id'] . '/edit') ?>"><?= esc($entry['name']) ?></a>
+                                    <?php else: ?>
+                                        <?= esc($entry['name']) ?>
+                                    <?php endif; ?>
+                                </td>
+                                <td><span class="leaderboard-stat"><?= esc($entry['value']) ?></span> <small class="leaderboard-muted"><?= esc($record['unit']) ?></small></td>
+                                <td class="leaderboard-muted"><?= esc($entry['detail']) ?></td>
+                            <?php else: ?>
+                                <td colspan="3" class="leaderboard-muted">No data yet</td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

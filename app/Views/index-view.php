@@ -43,7 +43,7 @@
             <div class="swiper hero-slider">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide">
-                        <img class="w-100" src="<?= base_url('assets/images/slider/slider-image-1.jpg') ?>" alt="EverGreen Cricket Team">
+                        <img class="w-100" src="<?= base_url('assets/images/slider/slider-image-4.png') ?>" alt="EverGreen Cricket Team">
                         <div class="slide-content">
                             <h2>EVERGREEN TEAM</h2>
                             <p>PASSION • PERFORMANCE • TEAMWORK</p>
@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="swiper-slide">
-                        <img class="w-100" src="<?= base_url('assets/images/slider/slider-image-2.jpg') ?>" alt="EverGreen Cricket Team">
+                        <img class="w-100" src="<?= base_url('assets/images/slider/slider-image-5.jpg') ?>" alt="EverGreen Cricket Team">
                         <div class="slide-content">
                             <h2>MATCH DAY READY</h2>
                             <p>UNITED WE PLAY, UNITED WE WIN</p>
@@ -59,7 +59,7 @@
                     </div>
 
                     <div class="swiper-slide">
-                        <img class="w-100" src="<?= base_url('assets/images/slider/slider-image-3.jpg') ?>" alt="EverGreen Cricket Team">
+                        <img class="w-100" src="<?= base_url('assets/images/slider/slider-image-6.jpg') ?>" alt="EverGreen Cricket Team">
                         <div class="slide-content">
                             <h2>CHAMPIONS IN ACTION</h2>
                             <p>BUILDING A WINNING LEGACY</p>
@@ -199,7 +199,6 @@
                             <?php foreach ($players as $player): ?>
                                 <a class="swiper-slide text-decoration-none" href="<?= site_url('/players/' . (int) $player['id']) ?>" style="background-image: url('<?= base_url('assets/images/empty-male.png') ?>');">
                                     <div class="card-content">
-                                        <p>Player</p>
                                         <h3><?= esc($player['name']) ?></h3>
                                     </div>
                                 </a>
@@ -293,7 +292,7 @@
                             </div>
                         </div>
                         <div class="col-lg-6 align-content-center text-center">
-                            <img src="<?= base_url('assets/images/logo/challengers-logo.png') ?>" alt="Join Evergreen Team" style="width: 100%; max-width: 400px;">
+                            <img src="<?= base_url('assets/images/logo/logo.svg') ?>" alt="Join Evergreen Team" style="width: 100%; max-width: 400px;">
                         </div>
                     </div>
                 </div>
