@@ -159,7 +159,7 @@
                     ];
                     ?>
                     <?php foreach ($poolSections as $key => $section): ?>
-                        <div class="col-md-<?= !$key ? 6 : 3 ?>">
+                        <div class="col-md-<?= !$key ? 6 : 3 ?>" style="max-height: 800px; overflow-y: auto;">
                             <div class="border rounded p-2 bg-white h-100">
                                 <div class="fw-semibold small mb-2 px-1 <?= esc($section['color']) ?>">
                                     <?= esc($section['label']) ?>
